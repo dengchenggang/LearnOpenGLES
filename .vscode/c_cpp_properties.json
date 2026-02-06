@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Android NDK",
+            "includePath": [
+                 "${workspaceFolder}/**",
+                // "C:/Users/11750/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/x86_64-linux-android/**",
+                // "C:/Users/11750/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/**",
+                "C:/Users/11750/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/**"
+            ],
+            "defines": [
+                "__ANDROID__",
+                "ANDROID"
+            ],
+            "compilerPath": "C:/Users/11750/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-arm64",
+            "browse": {
+                "path": ["${workspaceFolder}"],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceFolder}\\.vscode\\browse\\browse.vc.db"
+            },
+            "compilerArgs": [
+                "--target=aarch64-none-linux-android30"
+            ]
+        }
+    ],
+    "version": 4
+}
