@@ -4,35 +4,33 @@
 
 #ifndef LEARNOPENGLES_CEGLSURFACE_H
 #define LEARNOPENGLES_CEGLSURFACE_H
+#include <EGL/egl.h>
 #include <android/native_window_jni.h>
 #include <cstdint>
 #include <memory>
-
-class IRender;
+#include "IRenderer.h"
 
 
 class CEGLSurface {
 private:
-    void* mDisplay;
-    void* mSurface;
-    void* mContext;
-    int mWidth;
-    int mHeight;
-    std::unique_ptr<IRender> mRender;
+    std::unique_ptr<IRenderer> mRender;
+    EGLDisplay mDisplay;
+    EGLConfig mConfig;
+    EGLContext mContext;
+    EGLSurface mSurface;
 public:
-    CEGLSurface(ANativeWindow *window, std::unique_ptr<IRender>&& render);
+    explicit CEGLSurface(std::unique_ptr<IRenderer>&& render) : mRender(std::move(render)), mDisplay(EGL_NO_DISPLAY), mConfig(nullptr), mContext(EGL_NO_CONTEXT), mSurface(EGL_NO_SURFACE) { }
+    ~CEGLSurface() { this->release(); }
     CEGLSurface(const CEGLSurface&) = delete;
     CEGLSurface& operator =(const CEGLSurface&) = delete;
-    ~CEGLSurface();
 public:
-    explicit operator bool() const { return !invalid(); }
+    bool initialize(std::int32_t gles);
+    bool bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
     void update(std::int64_t deltaTime);
     void render(std::int64_t deltaTime);
-private:
-    [[nodiscard]] bool invalid() const;
-    bool initialize(ANativeWindow *window, std::int32_t gles);
     void release();
+    void unbind();
 };
 
 

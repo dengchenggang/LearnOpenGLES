@@ -4,7 +4,7 @@
 
 #include "CShader.h"
 #include <GLES3/gl3.h>
-#include "CLogUtils.h"
+#include "LogUtils.h"
 #include <cstdio>
 #include "bind_guard.hpp"
 

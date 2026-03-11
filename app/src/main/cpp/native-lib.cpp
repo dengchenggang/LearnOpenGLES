@@ -1,15 +1,15 @@
 #include "CEGLSurface.h"
-#include "CLogUtils.h"
+#include "LogUtils.h"
+#include "OpenGLESRenderer.h"
 #include <jni.h>
 #include <string>
 #include <memory>
-#include <IRender.h>
 
 class EGLSurfaceManager {
 private:
     static constexpr const char* TAG {"EGLSurfaceManager"};
 
-    std::shared_ptr<CEGLSurface> mEGLSurface {nullptr};
+    CEGLSurface mEGLSurface {std::make_unique<OpenGLESRenderer>()};
 private:
     EGLSurfaceManager() = default;
     ~EGLSurfaceManager() = default;
@@ -19,10 +19,12 @@ public:
 
     static EGLSurfaceManager& getInstance();
 public:
-    void init(ANativeWindow *window, std::int32_t gles);
+    void init(std::int32_t gles);
+    void bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
     void update(std::int64_t deltaTime);
     void render(std::int64_t deltaTime);
+    void unbind();
     void destroy();
 };
 
@@ -31,43 +33,44 @@ EGLSurfaceManager& EGLSurfaceManager::getInstance() {
     return sEGLSurfaceManager;
 }
 
-void EGLSurfaceManager::init(ANativeWindow *window, std::int32_t gles) {
-    if (!mEGLSurface) {
-        mEGLSurface = std::make_unique<CEGLSurface>(window, nullptr);
-    } else {
-        LogUtils.i("%s init: mEGLSurface has initialized", TAG);
-    }
+void EGLSurfaceManager::init(std::int32_t gles) {
+    mEGLSurface.initialize(gles);
+}
+
+void EGLSurfaceManager::bind(ANativeWindow *window) {
+    mEGLSurface.bind(window);
 }
 
 void EGLSurfaceManager::resize(std::int32_t w, std::int32_t h) {
-    if (mEGLSurface) {
-        mEGLSurface->resize(w, h);
-    }
+    mEGLSurface.resize(w, h);
 }
 
 void EGLSurfaceManager::update(std::int64_t deltaTime) {
-    if (mEGLSurface) {
-        mEGLSurface->update(deltaTime);
-    }
+    mEGLSurface.update(deltaTime);
 }
 
 void EGLSurfaceManager::render(std::int64_t deltaTime) {
-    if (mEGLSurface) {
-        mEGLSurface->render(deltaTime);
-    }
+    mEGLSurface.render(deltaTime);
+}
+
+void EGLSurfaceManager::unbind() {
+    mEGLSurface.unbind();
 }
 
 void EGLSurfaceManager::destroy() {
-    if (mEGLSurface) {
-        mEGLSurface.reset();
-    }
+    mEGLSurface.release();
 }
 
 extern "C" {
 JNIEXPORT void JNICALL
-Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject surface, jint gles) {
+Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jint gles) {
+    EGLSurfaceManager::getInstance().init(gles);
+}
+
+JNIEXPORT void JNICALL
+Java_com_dcg_learnopengles_NativeBridge_nativeBind(JNIEnv* env, jclass, jobject surface) {
     ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
-    EGLSurfaceManager::getInstance().init(window, gles);
+    EGLSurfaceManager::getInstance().bind(window);
 }
 
 JNIEXPORT void JNICALL
@@ -83,6 +86,11 @@ Java_com_dcg_learnopengles_NativeBridge_nativeUpdate(JNIEnv* env, jclass, jlong 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeRender(JNIEnv* env, jclass, jlong deltaTime) {
     EGLSurfaceManager::getInstance().render(deltaTime);
+}
+
+JNIEXPORT void JNICALL
+Java_com_dcg_learnopengles_NativeBridge_nativeUnbind(JNIEnv* env, jclass) {
+    EGLSurfaceManager::getInstance().unbind();
 }
 
 JNIEXPORT void JNICALL

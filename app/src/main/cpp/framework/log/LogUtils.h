@@ -18,12 +18,12 @@ STRING_ID(LearnOpenGLES)
 #define LogE(...) __android_log_print(ANDROID_LOG_ERROR, LearnOpenGLES, __VA_ARGS__)
 
 
-class CLogUtils {
+class LogUtils {
 private:
-    CLogUtils() = default;
+    LogUtils() = default;
 public:
-    static CLogUtils& getInstance() {
-        static CLogUtils log {};
+    static LogUtils& getInstance() {
+        static LogUtils log {};
         return log;
     }
 public:
@@ -31,5 +31,5 @@ public:
     void e(const char* fmt, ...);
 };
 
-#define LogUtils CLogUtils::getInstance()
+#define Log LogUtils::getInstance()
 #endif //C_LOG_UTILS_H

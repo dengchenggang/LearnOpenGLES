@@ -1,19 +1,16 @@
 package com.dcg.learnopengles;
-
 import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.dcg.learnopengles.databinding.ActivityMainBinding;
-import com.unity3d.player.UnityPlayerActivity;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends UnityPlayerActivity {
-
-    private ActivityMainBinding binding;
-    private EGLSurfaceView mEGLSurfaceView;
+//    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mEGLSurfaceView = new EGLSurfaceView(this);
-//        setContentView(mEGLSurfaceView);
+        setContentView(R.layout.activity_main);
+        var closeBtn = findViewById(R.id.btn_close);
+        closeBtn.setOnClickListener(v -> this.moveTaskToBack(true));
     }
 }

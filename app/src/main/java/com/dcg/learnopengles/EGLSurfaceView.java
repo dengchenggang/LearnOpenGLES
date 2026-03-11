@@ -37,7 +37,7 @@ public class EGLSurfaceView extends SurfaceView {
         SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                NativeBridge.nativeInit(holder.getSurface(), 3);
+                NativeBridge.nativeBind(holder.getSurface());
                 mChoreographer.postFrameCallback(mChoreographerFrameCallback);
             }
 
@@ -49,7 +49,7 @@ public class EGLSurfaceView extends SurfaceView {
             @Override
             public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
                 mChoreographer.removeFrameCallback(mChoreographerFrameCallback);
-                NativeBridge.nativeDestroy();
+                NativeBridge.nativeUnbind();
             }
         };
         this.getHolder().addCallback(mSurfaceHolderCallback);
