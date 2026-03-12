@@ -22,8 +22,6 @@ public:
     void init(std::int32_t gles);
     void bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
-    void update(std::int64_t deltaTime);
-    void render(std::int64_t deltaTime);
     void unbind();
     void destroy();
 };
@@ -43,14 +41,6 @@ void EGLSurfaceManager::bind(ANativeWindow *window) {
 
 void EGLSurfaceManager::resize(std::int32_t w, std::int32_t h) {
     mEGLSurface.resize(w, h);
-}
-
-void EGLSurfaceManager::update(std::int64_t deltaTime) {
-    mEGLSurface.update(deltaTime);
-}
-
-void EGLSurfaceManager::render(std::int64_t deltaTime) {
-    mEGLSurface.render(deltaTime);
 }
 
 void EGLSurfaceManager::unbind() {
@@ -76,16 +66,6 @@ Java_com_dcg_learnopengles_NativeBridge_nativeBind(JNIEnv* env, jclass, jobject 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeResize(JNIEnv* env, jclass, jint w, jint h) {
     EGLSurfaceManager::getInstance().resize(w, h);
-}
-
-JNIEXPORT void JNICALL
-Java_com_dcg_learnopengles_NativeBridge_nativeUpdate(JNIEnv* env, jclass, jlong deltaTime) {
-    EGLSurfaceManager::getInstance().update(deltaTime);
-}
-
-JNIEXPORT void JNICALL
-Java_com_dcg_learnopengles_NativeBridge_nativeRender(JNIEnv* env, jclass, jlong deltaTime) {
-    EGLSurfaceManager::getInstance().render(deltaTime);
 }
 
 JNIEXPORT void JNICALL

@@ -38,7 +38,8 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_LOG_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
-    ${FRAMEWORK_SRC_LIST})
+    ${FRAMEWORK_SRC_LIST}
+    ${PROJECT_SOURCE_DIR}/framework/TaskPool.cpp)
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine)
@@ -67,3 +68,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log
         ${egl-lib}
         ${gles-lib})
+
+# 启用 C++17 支持
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)

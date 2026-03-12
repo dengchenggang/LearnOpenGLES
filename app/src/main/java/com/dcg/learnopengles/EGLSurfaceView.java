@@ -10,16 +10,6 @@ import androidx.annotation.NonNull;
 
 public class EGLSurfaceView extends SurfaceView {
 
-    private final Choreographer mChoreographer = Choreographer.getInstance();
-    private final Choreographer.FrameCallback mChoreographerFrameCallback = new Choreographer.FrameCallback() {
-        @Override
-        public void doFrame(long frameTimeNanos) {
-            NativeBridge.nativeUpdate(frameTimeNanos);
-            NativeBridge.nativeRender(frameTimeNanos);
-            mChoreographer.postFrameCallback(mChoreographerFrameCallback);
-        }
-    };
-
     public EGLSurfaceView(Context context) {
         this(context, null, 0, 0);
     }
@@ -38,7 +28,6 @@ public class EGLSurfaceView extends SurfaceView {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
                 NativeBridge.nativeBind(holder.getSurface());
-                mChoreographer.postFrameCallback(mChoreographerFrameCallback);
             }
 
             @Override
@@ -48,7 +37,6 @@ public class EGLSurfaceView extends SurfaceView {
 
             @Override
             public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                mChoreographer.removeFrameCallback(mChoreographerFrameCallback);
                 NativeBridge.nativeUnbind();
             }
         };
