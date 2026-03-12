@@ -12,6 +12,7 @@ void OpenGLESRenderer::resize(int32_t width, int32_t height) {
     mWidth = width;
     mHeight = height;
     glViewport(0, 0, width, height);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void OpenGLESRenderer::update(int64_t deltaTime) {

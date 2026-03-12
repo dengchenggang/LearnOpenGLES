@@ -187,6 +187,12 @@ void CEGLSurface::renderFrame() {
     auto deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(frameStartTime - mLastFrameTime).count();
     mLastFrameTime = frameStartTime;
 
+    // 记录 swapBuffers 耗时
+    auto swapStart = std::chrono::steady_clock::now();
+    eglSwapBuffers(mDisplay, mSurface);
+    auto swapCost = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - swapStart).count();
+
     // 记录 update 耗时
     auto updateStart = std::chrono::steady_clock::now();
     mRender->update(deltaTime);
@@ -198,12 +204,6 @@ void CEGLSurface::renderFrame() {
     mRender->render(deltaTime);
     auto renderCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - renderStart).count();
-
-    // 记录 swapBuffers 耗时
-    auto swapStart = std::chrono::steady_clock::now();
-    eglSwapBuffers(mDisplay, mSurface);
-    auto swapCost = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::steady_clock::now() - swapStart).count();
 
     // 计算总帧耗时
     auto frameCost = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -229,7 +229,7 @@ void CEGLSurface::scheduleNextFrame() {
     if (delayMs < 0) {
         delayMs = 0;  // 如果已经超时，立即执行下一帧
     }
-    // LogI("%s scheduleNextFrame: mTargetFrameIntervalMs=%ld ms, delayMs=%lld ms, elapsedMs=%lld ms", TAG, mTargetFrameIntervalMs, delayMs, elapsedMs);
+    LogI("%s scheduleNextFrame: mTargetFrameIntervalMs=%ld ms, delayMs=%lld ms, elapsedMs=%lld ms", TAG, mTargetFrameIntervalMs, delayMs, elapsedMs);
     // 使用延时任务调度下一帧
     mTaskPool->detachDelayed(delayMs, &CEGLSurface::renderFrame, this);
 }

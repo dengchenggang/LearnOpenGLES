@@ -35,7 +35,7 @@ private:
     std::int32_t mGLESVersion{3};
 
     // 渲染帧率控制
-    std::int64_t mTargetFrameIntervalMs{16};  // 默认约 60 FPS
+    std::int64_t mTargetFrameIntervalMs{33};  // 默认约 60 FPS
     std::chrono::steady_clock::time_point mLastFrameTime;
 
 public:
@@ -47,6 +47,7 @@ public:
 
 public:
     // 在主线程调用
+
     bool initialize(std::int32_t gles);
     bool bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
