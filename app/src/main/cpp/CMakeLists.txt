@@ -28,26 +28,26 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 
 ## framework
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
-include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/log    FRAMEWORK_LOG_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_LOG_SRC_LIST}
-    ${FRAMEWORK_RENDER_SRC_LIST}
-    ${FRAMEWORK_SRC_LIST}
-    ${PROJECT_SOURCE_DIR}/framework/TaskPool.cpp)
+    ${FRAMEWORK_SRC_LIST})
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine)
+include_directories(${PROJECT_SOURCE_DIR}/engine/render)
+include_directories(${PROJECT_SOURCE_DIR}/engine/thirdparty)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/engine ENGINE_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/render    ENGINE_RENDER_SRC_LIST)
 
 set(ENGINE_ALL_SRC_LIST
-    ${ENGINE_SRC_LIST})
+    ${ENGINE_SRC_LIST}
+    ${ENGINE_RENDER_SRC_LIST})
 
 ## 编译动态库
 add_library(${CMAKE_PROJECT_NAME} SHARED
