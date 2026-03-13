@@ -1,6 +1,6 @@
 #include "CEGLSurface.h"
 #include "LogUtils.h"
-#include "OpenGLESRenderer.h"
+#include "OpenGLESRenderInterface.h"
 #include <jni.h>
 #include <string>
 #include <memory>
@@ -9,7 +9,7 @@ class EGLSurfaceManager {
 private:
     static constexpr const char* TAG {"EGLSurfaceManager"};
 
-    CEGLSurface mEGLSurface {std::make_unique<OpenGLESRenderer>()};
+    CEGLSurface mEGLSurface {std::make_unique<OpenGLESRenderInterface>()};
 private:
     EGLSurfaceManager() = default;
     ~EGLSurfaceManager() = default;

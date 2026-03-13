@@ -12,8 +12,8 @@
 
 KEY_VALUE(TAG, CEGLSurface)
 
-CEGLSurface::CEGLSurface(std::unique_ptr<IRenderer>&& render)
-    : mRender(std::move(render))
+CEGLSurface::CEGLSurface(std::unique_ptr<IRenderInterface>&& renderInterface)
+    : mRenderInterface(std::move(renderInterface))
     , mTaskPool(std::make_unique<TaskPool>())
     , mDisplay(EGL_NO_DISPLAY)
     , mConfig(nullptr)
@@ -129,7 +129,7 @@ bool CEGLSurface::doBind(ANativeWindow *window) {
     eglQuerySurface(mDisplay, mSurface, EGL_WIDTH, &mWidth);
     eglQuerySurface(mDisplay, mSurface, EGL_HEIGHT, &mHeight);
 
-    mRender->initialize(mWidth, mHeight);
+    mRenderInterface->setViewport(0, 0, mWidth, mHeight);
     mBound = true;
 
     LogI("%s bind success: width=%d, height=%d.", TAG, mWidth, mHeight);
@@ -150,7 +150,7 @@ void CEGLSurface::doResize(std::int32_t w, std::int32_t h) {
     mWidth = w;
     mHeight = h;
 
-    mRender->resize(w, h);
+    mRenderInterface->setViewport(0, 0, w, h);
     LogI("%s resize exit.", TAG);
 }
 
@@ -195,13 +195,13 @@ void CEGLSurface::renderFrame() {
 
     // 记录 update 耗时
     auto updateStart = std::chrono::steady_clock::now();
-    mRender->update(deltaTime);
+    mRenderInterface->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     auto updateCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - updateStart).count();
 
     // 记录 render 耗时
     auto renderStart = std::chrono::steady_clock::now();
-    mRender->render(deltaTime);
+    mRenderInterface->clear(true, true, false);
     auto renderCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - renderStart).count();
 
@@ -286,7 +286,6 @@ void CEGLSurface::release() {
 }
 
 void CEGLSurface::doRelease() {
-    mRender->destroy();
     if (mDisplay != EGL_NO_DISPLAY) {
         eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (mSurface != EGL_NO_SURFACE) {

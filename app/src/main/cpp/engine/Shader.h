@@ -5,7 +5,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "render/IRenderInterface.h"
+#include "IRenderInterface.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <string>

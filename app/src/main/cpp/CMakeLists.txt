@@ -26,34 +26,42 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 # for GameActivity/NativeActivity derived applications, the same library name must be
 # used in the AndroidManifest.xml file.
 
+## thirdparty (GLM)
+include_directories(${PROJECT_SOURCE_DIR}/framework/thirdparty)
+
 ## framework
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
+include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/log    FRAMEWORK_LOG_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_LOG_SRC_LIST}
+    ${FRAMEWORK_EGL_SRC_LIST}
+    ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine)
-include_directories(${PROJECT_SOURCE_DIR}/engine/render)
-include_directories(${PROJECT_SOURCE_DIR}/engine/thirdparty)
+include_directories(${PROJECT_SOURCE_DIR}/engine/egl)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/engine/render    ENGINE_RENDER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/egl       ENGINE_EGL_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
 
 set(ENGINE_ALL_SRC_LIST
     ${ENGINE_SRC_LIST}
-    ${ENGINE_RENDER_SRC_LIST})
+    ${ENGINE_EGL_SRC_LIST}
+    ${ENGINE_RENDERER_SRC_LIST})
 
 ## 编译动态库
 add_library(${CMAKE_PROJECT_NAME} SHARED
         ${FRAMEWORK_ALL_SRC_LIST}
         ${ENGINE_ALL_SRC_LIST}
-        CEGLSurface.cpp
         native-lib.cpp)
 
 find_library(egl-lib EGL)
