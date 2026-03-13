@@ -49,7 +49,7 @@ bool CEGLSurface::initialize(std::int32_t gles) {
 bool CEGLSurface::doInitialize(std::int32_t gles) {
     mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (mDisplay == EGL_NO_DISPLAY) {
-        Log.e("eglGetDisplay failed");
+        LogE("eglGetDisplay failed");
         return false;
     }
     eglInitialize(mDisplay, nullptr, nullptr);
@@ -66,7 +66,7 @@ bool CEGLSurface::doInitialize(std::int32_t gles) {
     const EGLint ctxAttr[] = {EGL_CONTEXT_CLIENT_VERSION, gles, EGL_NONE};
     mContext = eglCreateContext(mDisplay, mConfig, nullptr, ctxAttr);
     if (mContext == EGL_NO_CONTEXT) {
-        Log.e("eglCreateContext failed!");
+        LogE("eglCreateContext failed!");
         return false;
     }
 

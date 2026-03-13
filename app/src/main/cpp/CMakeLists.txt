@@ -34,12 +34,10 @@ include_directories(${PROJECT_SOURCE_DIR}/framework/log)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/log    FRAMEWORK_LOG_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
-    ${FRAMEWORK_LOG_SRC_LIST}
     ${FRAMEWORK_EGL_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})

@@ -2,8 +2,9 @@
 // Created by banma-3361 on 2025/11/4.
 //
 
-#ifndef C_LOG_UTILS_H
-#define C_LOG_UTILS_H
+#ifndef LOG_UTILS_H
+#define LOG_UTILS_H
+
 #include <android/log.h>
 
 #define KEY(name) #name
@@ -17,19 +18,4 @@ STRING_ID(LearnOpenGLES)
 #define LogW(...) __android_log_print(ANDROID_LOG_WARN,  LearnOpenGLES, __VA_ARGS__)
 #define LogE(...) __android_log_print(ANDROID_LOG_ERROR, LearnOpenGLES, __VA_ARGS__)
 
-
-class LogUtils {
-private:
-    LogUtils() = default;
-public:
-    static LogUtils& getInstance() {
-        static LogUtils log {};
-        return log;
-    }
-public:
-    void i(const char* fmt, ...);
-    void e(const char* fmt, ...);
-};
-
-#define Log LogUtils::getInstance()
-#endif //C_LOG_UTILS_H
+#endif // LOG_UTILS_H
