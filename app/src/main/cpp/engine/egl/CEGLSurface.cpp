@@ -195,7 +195,7 @@ void CEGLSurface::renderFrame() {
 
     // 记录 update 耗时
     auto updateStart = std::chrono::steady_clock::now();
-    mRenderInterface->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    mRenderInterface->setClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     auto updateCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - updateStart).count();
 

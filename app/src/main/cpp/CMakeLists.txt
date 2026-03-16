@@ -27,7 +27,7 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 # used in the AndroidManifest.xml file.
 
 ## thirdparty (GLM)
-include_directories(${PROJECT_SOURCE_DIR}/framework/thirdparty)
+include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 
 ## framework
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
