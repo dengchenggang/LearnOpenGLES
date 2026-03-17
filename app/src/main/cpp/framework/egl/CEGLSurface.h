@@ -10,12 +10,10 @@
 #include <memory>
 #include <atomic>
 #include <chrono>
-#include "IRenderInterface.h"
 #include "TaskPool.h"
 
 class CEGLSurface {
 private:
-    std::unique_ptr<IRenderInterface> mRenderInterface;
     std::unique_ptr<TaskPool> mTaskPool;
 
     EGLDisplay mDisplay;
@@ -39,7 +37,7 @@ private:
     std::chrono::steady_clock::time_point mLastFrameTime;
 
 public:
-    explicit CEGLSurface(std::unique_ptr<IRenderInterface>&& renderInterface);
+    CEGLSurface();
     ~CEGLSurface();
 
     CEGLSurface(const CEGLSurface&) = delete;

@@ -2,15 +2,14 @@
 #define OPENGLES_RENDER_INTERFACE_H
 
 #include "IRenderInterface.h"
+#include "Singleton.hpp"
 #include <GLES3/gl3.h>
 #include <string>
 #include <queue>
 
 class OpenGLESRenderInterface : public IRenderInterface {
+    friend class Singleton<OpenGLESRenderInterface>;
 public:
-    OpenGLESRenderInterface() = default;
-    ~OpenGLESRenderInterface() override = default;
-
     // 禁止拷贝
     OpenGLESRenderInterface(const OpenGLESRenderInterface&) = delete;
     OpenGLESRenderInterface& operator=(const OpenGLESRenderInterface&) = delete;
@@ -90,6 +89,10 @@ public:
     void setUniformMat4(int32_t location, const float* matrix, bool transpose) override;
 
 private:
+    OpenGLESRenderInterface() = default;
+    ~OpenGLESRenderInterface() override = default;
+private:
+
     // 内部类型转换辅助函数
     static GLenum toGLShaderType(ShaderType type);
     static GLenum toGLBufferUsage(BufferUsage usage);

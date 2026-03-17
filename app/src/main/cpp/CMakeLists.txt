@@ -30,30 +30,35 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 
 ## framework
+include_directories(${PROJECT_SOURCE_DIR}/framework/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
+include_directories(${PROJECT_SOURCE_DIR}/framework/egl)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/egl    FRAMEWORK_EGL_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
+    ${FRAMEWORK_COMMON_SRC_LIST}
     ${FRAMEWORK_EGL_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
-include_directories(${PROJECT_SOURCE_DIR}/engine)
-include_directories(${PROJECT_SOURCE_DIR}/engine/egl)
+include_directories(${PROJECT_SOURCE_DIR}/engine/common)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
+include_directories(${PROJECT_SOURCE_DIR}/engine)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/engine/egl       ENGINE_EGL_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/common    ENGINE_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
 
 set(ENGINE_ALL_SRC_LIST
+    ${ENGINE_COMMON_SRC_LIST}
     ${ENGINE_SRC_LIST}
-    ${ENGINE_EGL_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST})
 
 ## 编译动态库

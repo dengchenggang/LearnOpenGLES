@@ -9,7 +9,7 @@ class EGLSurfaceManager {
 private:
     static constexpr const char* TAG {"EGLSurfaceManager"};
 
-    CEGLSurface mEGLSurface {std::make_unique<OpenGLESRenderInterface>()};
+    CEGLSurface mEGLSurface {};
 private:
     EGLSurfaceManager() = default;
     ~EGLSurfaceManager() = default;
