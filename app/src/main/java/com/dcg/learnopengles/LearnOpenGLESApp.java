@@ -7,6 +7,7 @@ public class LearnOpenGLESApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        NativeBridge.nativeInit(3);
+        // 初始化（传入 AssetManager 和 GLES 版本）
+        NativeBridge.nativeInit(getAssets(), 3);
     }
 }

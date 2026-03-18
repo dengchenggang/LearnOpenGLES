@@ -1,6 +1,10 @@
 #include "CEGLSurface.h"
+#include "AssetManagerReader.h"
+#include "FileSystem.h"
 #include "LogUtils.h"
 #include "OpenGLESRenderInterface.h"
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
 #include <jni.h>
 #include <string>
 #include <memory>
@@ -52,8 +56,15 @@ void EGLSurfaceManager::destroy() {
 }
 
 extern "C" {
+
 JNIEXPORT void JNICALL
-Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jint gles) {
+Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject assetManager, jint gles) {
+    // 初始化文件系统
+    auto reader = std::make_unique<AssetManagerReader>();
+    reader->initialize(AAssetManager_fromJava(env, assetManager));
+    FileSystem.setReader(std::move(reader));
+
+    // 初始化 EGL
     EGLSurfaceManager::getInstance().init(gles);
 }
 

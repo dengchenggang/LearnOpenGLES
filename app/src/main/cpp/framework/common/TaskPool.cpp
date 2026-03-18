@@ -74,7 +74,7 @@ void TaskPool::workerLoop() {
                 auto delay = mTasks.top().executeTime - now;
 
                 // 等待直到任务到期或有新任务（新任务可能更早到期或更高优先级）
-                LogI("TaskPool workerLoop: delay=%lld", delay.count());
+                // LogI("TaskPool workerLoop: delay=%lld", delay.count());
                 mCondition.wait_for(lock, delay, [this] {
                     return mStopRequested ||
                            (mTasks.top().isReady()) ||  // 任务到期

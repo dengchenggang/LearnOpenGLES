@@ -207,6 +207,12 @@ void OpenGLESRenderInterface::activeTextureUnit(uint32_t unit) {
     glActiveTexture(GL_TEXTURE0 + unit);
 }
 
+uint32_t OpenGLESRenderInterface::getActiveTextureUnit() {
+    GLint activeUnit;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeUnit);
+    return static_cast<uint32_t>(activeUnit - GL_TEXTURE0);
+}
+
 void OpenGLESRenderInterface::setTextureFilter(TextureFilter minFilter, TextureFilter magFilter) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, toGLTextureFilter(minFilter));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, toGLTextureFilter(magFilter));
@@ -219,6 +225,23 @@ void OpenGLESRenderInterface::setTextureWrap(TextureWrap wrapS, TextureWrap wrap
 
 void OpenGLESRenderInterface::generateMipmap() {
     glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void OpenGLESRenderInterface::updateTexture2D(RenderResourceHandle texture, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) {
+    if (texture == INVALID_HANDLE || !data || width <= 0 || height <= 0) {
+        return;
+    }
+
+    // 保存当前绑定的纹理
+    GLint prevTexture;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
+
+    // 绑定目标纹理并更新数据
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(texture));
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    // 恢复之前的绑定
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(prevTexture));
 }
 
 // 帧缓冲

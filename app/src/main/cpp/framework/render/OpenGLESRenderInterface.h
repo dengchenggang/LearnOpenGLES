@@ -50,9 +50,11 @@ public:
     void deleteTexture(RenderResourceHandle texture) override;
     void bindTexture2D(RenderResourceHandle texture, uint32_t unit) override;
     void activeTextureUnit(uint32_t unit) override;
+    uint32_t getActiveTextureUnit() override;
     void setTextureFilter(TextureFilter minFilter, TextureFilter magFilter) override;
     void setTextureWrap(TextureWrap wrapS, TextureWrap wrapT) override;
     void generateMipmap() override;
+    void updateTexture2D(RenderResourceHandle texture, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) override;
 
     // 帧缓冲
     RenderResourceHandle createFramebuffer() override;

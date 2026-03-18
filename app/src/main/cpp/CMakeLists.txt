@@ -33,15 +33,18 @@ include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 include_directories(${PROJECT_SOURCE_DIR}/framework/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
+include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem FRAMEWORK_FILESYSTEM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_COMMON_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
+    ${FRAMEWORK_FILESYSTEM_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
@@ -59,6 +62,7 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_RENDERER_SRC_LIST})
 
 ## platform
+include_directories(${PROJECT_SOURCE_DIR}/platform)
 include_directories(${PROJECT_SOURCE_DIR}/platform/egl)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/platform/egl    PLATFORM_EGL_SRC_LIST)

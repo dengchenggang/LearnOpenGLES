@@ -175,9 +175,11 @@ public:
     virtual void deleteTexture(RenderResourceHandle texture) = 0;
     virtual void bindTexture2D(RenderResourceHandle texture, uint32_t unit) = 0;
     virtual void activeTextureUnit(uint32_t unit) = 0;
+    virtual uint32_t getActiveTextureUnit() = 0;
     virtual void setTextureFilter(TextureFilter minFilter, TextureFilter magFilter) = 0;
     virtual void setTextureWrap(TextureWrap wrapS, TextureWrap wrapT) = 0;
     virtual void generateMipmap() = 0;
+    virtual void updateTexture2D(RenderResourceHandle texture, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) = 0;
 
     // 帧缓冲
     virtual RenderResourceHandle createFramebuffer() = 0;

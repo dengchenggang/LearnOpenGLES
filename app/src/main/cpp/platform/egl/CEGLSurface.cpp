@@ -129,6 +129,7 @@ bool CEGLSurface::doBind(ANativeWindow *window) {
     eglQuerySurface(mDisplay, mSurface, EGL_WIDTH, &mWidth);
     eglQuerySurface(mDisplay, mSurface, EGL_HEIGHT, &mHeight);
 
+    EngineSingleton.setBackground(1, 0, 0, 1);
     mBound = true;
 
     LogI("%s bind success: width=%d, height=%d.", TAG, mWidth, mHeight);
@@ -228,7 +229,7 @@ void CEGLSurface::scheduleNextFrame() {
     if (delayMs < 0) {
         delayMs = 0;  // 如果已经超时，立即执行下一帧
     }
-    LogI("%s scheduleNextFrame: mTargetFrameIntervalMs=%ld ms, delayMs=%lld ms, elapsedMs=%lld ms", TAG, mTargetFrameIntervalMs, delayMs, elapsedMs);
+    // LogI("%s scheduleNextFrame: mTargetFrameIntervalMs=%ld ms, delayMs=%lld ms, elapsedMs=%lld ms", TAG, mTargetFrameIntervalMs, delayMs, elapsedMs);
     // 使用延时任务调度下一帧
     mTaskPool->detachDelayed(delayMs, &CEGLSurface::renderFrame, this);
 }
