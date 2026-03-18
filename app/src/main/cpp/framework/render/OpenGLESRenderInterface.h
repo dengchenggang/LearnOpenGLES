@@ -8,8 +8,9 @@
 #include <queue>
 
 class OpenGLESRenderInterface : public IRenderInterface {
-    friend class Singleton<OpenGLESRenderInterface>;
 public:
+    OpenGLESRenderInterface() = default;
+    ~OpenGLESRenderInterface() override = default;
     // 禁止拷贝
     OpenGLESRenderInterface(const OpenGLESRenderInterface&) = delete;
     OpenGLESRenderInterface& operator=(const OpenGLESRenderInterface&) = delete;
@@ -87,10 +88,6 @@ public:
     void setUniformVec3(int32_t location, float x, float y, float z) override;
     void setUniformVec4(int32_t location, float x, float y, float z, float w) override;
     void setUniformMat4(int32_t location, const float* matrix, bool transpose) override;
-
-private:
-    OpenGLESRenderInterface() = default;
-    ~OpenGLESRenderInterface() override = default;
 private:
 
     // 内部类型转换辅助函数

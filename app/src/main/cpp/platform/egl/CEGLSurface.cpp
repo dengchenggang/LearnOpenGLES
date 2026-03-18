@@ -8,7 +8,7 @@
 #include <limits>
 #include <android/log.h>
 #include <chrono>
-#include "IRenderer.h"
+#include "Engine.h"
 
 KEY_VALUE(TAG, CEGLSurface)
 
@@ -69,6 +69,7 @@ bool CEGLSurface::doInitialize(std::int32_t gles) {
         return false;
     }
 
+    EngineSingleton.init();
     mInitialized = true;
     LogI("%s EGL initialized successfully.", TAG);
     return true;
@@ -148,6 +149,7 @@ void CEGLSurface::doResize(std::int32_t w, std::int32_t h) {
     mWidth = w;
     mHeight = h;
 
+    EngineSingleton.setViewPort(w, h);
     LogI("%s resize exit.", TAG);
 }
 
@@ -192,11 +194,13 @@ void CEGLSurface::renderFrame() {
 
     // 记录 update 耗时
     auto updateStart = std::chrono::steady_clock::now();
+    EngineSingleton.update(deltaTime);
     auto updateCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - updateStart).count();
 
     // 记录 render 耗时
     auto renderStart = std::chrono::steady_clock::now();
+    EngineSingleton.render(deltaTime);
     auto renderCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - renderStart).count();
 
@@ -281,6 +285,7 @@ void CEGLSurface::release() {
 }
 
 void CEGLSurface::doRelease() {
+    EngineSingleton.release();
     if (mDisplay != EGL_NO_DISPLAY) {
         eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (mSurface != EGL_NO_SURFACE) {

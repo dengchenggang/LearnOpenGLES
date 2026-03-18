@@ -32,18 +32,15 @@ include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 ## framework
 include_directories(${PROJECT_SOURCE_DIR}/framework/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
-include_directories(${PROJECT_SOURCE_DIR}/framework/egl)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/egl    FRAMEWORK_EGL_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_COMMON_SRC_LIST}
-    ${FRAMEWORK_EGL_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
@@ -61,11 +58,21 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST})
 
+## platform
+include_directories(${PROJECT_SOURCE_DIR}/platform/egl)
+
+aux_source_directory(${PROJECT_SOURCE_DIR}/platform/egl    PLATFORM_EGL_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/platform        PLATFORM_SRC_LIST)
+
+set(PLATFORM_ALL_SRC_LIST
+    ${PLATFORM_EGL_SRC_LIST}
+    ${PLATFORM_SRC_LIST})
+
 ## 编译动态库
 add_library(${CMAKE_PROJECT_NAME} SHARED
         ${FRAMEWORK_ALL_SRC_LIST}
         ${ENGINE_ALL_SRC_LIST}
-        native-lib.cpp)
+        ${PLATFORM_ALL_SRC_LIST})
 
 find_library(egl-lib EGL)
 find_library(gles-lib GLESv3)
