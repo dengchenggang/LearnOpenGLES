@@ -190,6 +190,7 @@ public:
 
     // 渲染状态
     virtual void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) = 0;
+    virtual void getViewport(int32_t* x, int32_t* y, int32_t* width, int32_t* height) = 0;
     virtual void setClearColor(float r, float g, float b, float a) = 0;
     virtual void clear(bool color, bool depth, bool stencil) = 0;
     virtual void enableDepthTest(bool enable) = 0;

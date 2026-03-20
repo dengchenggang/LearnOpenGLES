@@ -1,6 +1,9 @@
 #include "AssetManagerReader.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
+#include "LogUtils.h"
+
+constexpr const char* TAG {"AssetManagerReader"};
 
 void AssetManagerReader::initialize(void* context) {
     std::lock_guard<std::mutex> lock(mMutex);
@@ -50,6 +53,7 @@ std::string AssetManagerReader::readString(const char* filePath) {
 bool AssetManagerReader::exists(const char* filePath) {
     std::lock_guard<std::mutex> lock(mMutex);
     if (!mAssetManager || !filePath) {
+        LogE("%s exists: filePath=%s or mAssetManager is nullptr", TAG, filePath);
         return false;
     }
 
@@ -60,6 +64,7 @@ bool AssetManagerReader::exists(const char* filePath) {
         AAsset_close(asset);
         return true;
     }
+    LogE("%s exists: filePath=%s AAssetManager_open is error.", TAG, filePath);
     return false;
 }
 

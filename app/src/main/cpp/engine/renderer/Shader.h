@@ -23,7 +23,6 @@ public:
 
 private:
     std::string mName;
-    IRenderInterface& mRender;           // 渲染接口引用
     RenderResourceHandle mProgram;       // 着色器程序句柄
     bool mLinked = false;
 
@@ -36,7 +35,7 @@ private:
 
 public:
     // 构造函数
-    Shader(const std::string& name, IRenderInterface& render);
+    explicit Shader(const std::string& name);
     ~Shader();
 
     // 禁止拷贝和移动

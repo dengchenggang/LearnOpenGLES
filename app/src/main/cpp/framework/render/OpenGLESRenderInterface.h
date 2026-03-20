@@ -65,6 +65,7 @@ public:
 
     // 渲染状态
     void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) override;
+    void getViewport(int32_t* x, int32_t* y, int32_t* width, int32_t* height) override;
     void setClearColor(float r, float g, float b, float a) override;
     void clear(bool color, bool depth, bool stencil) override;
     void enableDepthTest(bool enable) override;

@@ -276,6 +276,15 @@ void OpenGLESRenderInterface::setViewport(int32_t x, int32_t y, int32_t width, i
     glViewport(x, y, width, height);
 }
 
+void OpenGLESRenderInterface::getViewport(int32_t* x, int32_t* y, int32_t* width, int32_t* height) {
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    if (x) *x = viewport[0];
+    if (y) *y = viewport[1];
+    if (width) *width = viewport[2];
+    if (height) *height = viewport[3];
+}
+
 void OpenGLESRenderInterface::setClearColor(float r, float g, float b, float a) {
     glClearColor(r, g, b, a);
 }
