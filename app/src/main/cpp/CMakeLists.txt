@@ -49,17 +49,23 @@ set(FRAMEWORK_ALL_SRC_LIST
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine/common)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/mesh)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/material)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
 include_directories(${PROJECT_SOURCE_DIR}/engine)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/common    ENGINE_COMMON_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/mesh ENGINE_RENDERER_MESH_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/material ENGINE_RENDERER_MATERIAL_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
 
 set(ENGINE_ALL_SRC_LIST
     ${ENGINE_COMMON_SRC_LIST}
-    ${ENGINE_SRC_LIST}
-    ${ENGINE_RENDERER_SRC_LIST})
+    ${ENGINE_RENDERER_MESH_SRC_LIST}
+    ${ENGINE_RENDERER_MATERIAL_SRC_LIST}
+    ${ENGINE_RENDERER_SRC_LIST}
+    ${ENGINE_SRC_LIST})
 
 ## platform
 include_directories(${PROJECT_SOURCE_DIR}/platform)

@@ -18,6 +18,8 @@ public:
 private:
     Engine() = default;
     ~Engine() = default;
+private:
+
 };
 
 #define EngineSingleton Singleton<Engine>::getInstance()
