@@ -7,10 +7,6 @@
 
 KEY_VALUE(TAG, Image)
 
-// stb_image 用于加载 jpg/png
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 // 顶点数据结构
 struct Vertex {
     float position[3];
@@ -99,40 +95,37 @@ void Image::release() {
     LogI("%s released", TAG);
 }
 
-bool Image::loadFromFile(const char* filePath) {
+bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t channels) {
     if (!mInitialized) {
-        LogE("%s not initialized, cannot load image: %s", TAG, filePath);
+        LogE("%s not initialized, cannot load image", TAG);
         return false;
     }
 
-    if (!filePath) {
-        LogE("%s filePath is null", TAG);
+    if (!buffer) {
+        LogE("%s buffer is null", TAG);
         return false;
     }
 
-    LogI("%s loading image: %s", TAG, filePath);
-
-    // 读取图像文件数据
-    FileData data = FileSystem.readFile(filePath);
-    if (data.empty()) {
-        LogE("%s failed to read file: %s", TAG, filePath);
+    if (width <= 0 || height <= 0) {
+        LogE("%s invalid image size: %dx%d", TAG, width, height);
         return false;
     }
 
-    LogD("%s file read successfully, size: %zu bytes", TAG, data.size());
+    LogI("%s loading image: %dx%d, channels: %d", TAG, width, height, channels);
 
-    // 使用 stb_image 解码图像数据
-    int width, height, channels;
-    stbi_uc* pixels = stbi_load_from_memory(
-        data.ptr(), static_cast<int>(data.size()),
-        &width, &height, &channels, 4);  // 强制转换为 4 通道 RGBA
-
-    if (!pixels) {
-        LogE("%s failed to decode image: %s (stb_image error)", TAG, filePath);
-        return false;
+    // 根据通道数选择纹理格式
+    TextureFormat format;
+    switch (channels) {
+        case 3:
+            format = TextureFormat::RGB8;
+            break;
+        case 4:
+            format = TextureFormat::RGBA8;
+            break;
+        default:
+            LogE("%s unsupported channels: %d (only 3 or 4 supported)", TAG, channels);
+            return false;
     }
-
-    LogI("%s image decoded: %dx%d, channels: %d", TAG, width, height, channels);
 
     // 创建纹理
     mTexture = std::make_unique<Texture>();
@@ -140,25 +133,21 @@ bool Image::loadFromFile(const char* filePath) {
     TextureDesc desc;
     desc.width = width;
     desc.height = height;
-    desc.format = TextureFormat::RGBA8;
-    desc.initialData = pixels;
+    desc.format = format;
+    desc.initialData = buffer;
 
     if (!mTexture->create(desc)) {
-        LogE("%s failed to create texture for: %s", TAG, filePath);
-        stbi_image_free(pixels);
+        LogE("%s failed to create texture: %dx%d", TAG, width, height);
         mTexture.reset();
         return false;
     }
 
     LogI("%s texture created successfully: %dx%d", TAG, width, height);
 
-    // 释放 stb_image 分配的内存
-    stbi_image_free(pixels);
-
     // 保存图像原始大小
     mImageSize = glm::vec2(static_cast<float>(width), static_cast<float>(height));
 
-    LogI("%s image loaded successfully: %s (size: %.0fx%.0f)", TAG, filePath, mImageSize.x, mImageSize.y);
+    LogI("%s image loaded successfully (size: %.0fx%.0f)", TAG, mImageSize.x, mImageSize.y);
     return true;
 }
 

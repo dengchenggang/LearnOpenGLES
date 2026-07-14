@@ -26,8 +26,8 @@ public:
     void render(int64_t deltaTime) override;
     void release() override;
 
-    // 加载图像（从文件路径）
-    bool loadFromFile(const char* filePath);
+    // 加载图像（从内存数据）
+    bool load(const uint8_t* buffer, int32_t width, int32_t height, int32_t channels);
 
     // 设置位置（屏幕坐标，左下角为原点）
     void setPosition(float x, float y);

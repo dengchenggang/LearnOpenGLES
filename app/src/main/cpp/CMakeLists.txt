@@ -34,29 +34,42 @@ include_directories(${PROJECT_SOURCE_DIR}/framework/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem)
+include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/reader)
+include_directories(${PROJECT_SOURCE_DIR}/framework/video/common)
+include_directories(${PROJECT_SOURCE_DIR}/framework/video/camera)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem FRAMEWORK_FILESYSTEM_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/reader FRAMEWORK_FILESYSTEM_READER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/common FRAMEWORK_VIDEO_COMMON_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/camera FRAMEWORK_VIDEO_CAMERA_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_COMMON_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_SRC_LIST}
+    ${FRAMEWORK_FILESYSTEM_READER_SRC_LIST}
+    ${FRAMEWORK_VIDEO_COMMON_SRC_LIST}
+    ${FRAMEWORK_VIDEO_CAMERA_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine/common)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/mesh)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/material)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/camera)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/transform)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
 include_directories(${PROJECT_SOURCE_DIR}/engine)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/common    ENGINE_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/mesh ENGINE_RENDERER_MESH_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/material ENGINE_RENDERER_MATERIAL_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/camera ENGINE_RENDERER_CAMERA_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/transform ENGINE_RENDERER_TRANSFORM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
 
@@ -64,6 +77,8 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_COMMON_SRC_LIST}
     ${ENGINE_RENDERER_MESH_SRC_LIST}
     ${ENGINE_RENDERER_MATERIAL_SRC_LIST}
+    ${ENGINE_RENDERER_CAMERA_SRC_LIST}
+    ${ENGINE_RENDERER_TRANSFORM_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST}
     ${ENGINE_SRC_LIST})
 
@@ -86,6 +101,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
 find_library(egl-lib EGL)
 find_library(gles-lib GLESv3)
+find_library(mediandk-lib mediandk)
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
@@ -94,6 +110,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library
         android
         log
+        mediandk
         ${egl-lib}
         ${gles-lib})
 
