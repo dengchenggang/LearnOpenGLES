@@ -10,10 +10,14 @@ using VideoFrameCallback = std::function<void(const VideoFramePtr&)>;
 
 class VideoPipelineBase {
 public:
+    VideoPipelineBase() = default;
     virtual ~VideoPipelineBase() = default;
     VideoPipelineBase(const VideoPipelineBase&) = delete;
     VideoPipelineBase& operator = (const VideoPipelineBase&) = delete;
 public:
+    virtual void start() = 0;
+    virtual void stop() = 0;
+
     std::pair<size_t, size_t> connect(const std::string& moduleName, VideoFrameCallback callback);
     std::pair<size_t, size_t> disconnect(const std::string& moduleName);
 protected:

@@ -37,6 +37,7 @@ include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/reader)
 include_directories(${PROJECT_SOURCE_DIR}/framework/video/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/video/camera)
+include_directories(${PROJECT_SOURCE_DIR}/framework/video/videofile)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
@@ -45,6 +46,7 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem FRAMEWORK_FILESY
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/reader FRAMEWORK_FILESYSTEM_READER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/common FRAMEWORK_VIDEO_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/camera FRAMEWORK_VIDEO_CAMERA_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/videofile FRAMEWORK_VIDEO_VIDEOFILE_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
@@ -54,6 +56,7 @@ set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_FILESYSTEM_READER_SRC_LIST}
     ${FRAMEWORK_VIDEO_COMMON_SRC_LIST}
     ${FRAMEWORK_VIDEO_CAMERA_SRC_LIST}
+    ${FRAMEWORK_VIDEO_VIDEOFILE_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
