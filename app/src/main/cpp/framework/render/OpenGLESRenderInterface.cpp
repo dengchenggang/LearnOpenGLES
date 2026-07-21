@@ -1,5 +1,5 @@
 #include "OpenGLESRenderInterface.h"
-#include "log/LogUtils.h"
+#include "log/Log.h"
 
 KEY_VALUE(TAG, OpenGLESRenderInterface)
 

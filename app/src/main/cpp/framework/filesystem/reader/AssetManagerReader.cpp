@@ -1,7 +1,7 @@
 #include "AssetManagerReader.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-#include "LogUtils.h"
+#include "Log.h"
 
 constexpr const char* TAG {"AssetManagerReader"};
 

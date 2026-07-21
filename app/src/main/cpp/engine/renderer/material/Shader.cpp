@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 #include "RenderInterface.h"
-#include "log/LogUtils.h"
+#include "log/Log.h"
 
 KEY_VALUE(TAG, Shader)
 

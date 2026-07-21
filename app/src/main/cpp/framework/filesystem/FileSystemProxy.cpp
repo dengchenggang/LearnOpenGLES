@@ -1,37 +1,50 @@
 #include "FileSystem.h"
 
 void FileSystemProxy::setReader(std::unique_ptr<IFileReader> reader) {
-    mReader = std::move(reader);
-}
-
-IFileReader* FileSystemProxy::getReader() const {
-    return mReader.get();
+    mReaders.push_back(std::move(reader));
 }
 
 FileData FileSystemProxy::readFile(const char* filePath) {
-    if (mReader) {
-        return mReader->readFile(filePath);
+    for (const auto& reader : mReaders) {
+        if (reader) {
+            FileData data = reader->readFile(filePath);
+            if (!data.empty()) {
+                return data;
+            }
+        }
     }
     return FileData();
 }
 
 std::string FileSystemProxy::readString(const char* filePath) {
-    if (mReader) {
-        return mReader->readString(filePath);
+    for (const auto& reader : mReaders) {
+        if (reader) {
+            std::string str = reader->readString(filePath);
+            if (!str.empty()) {
+                return str;
+            }
+        }
     }
     return "";
 }
 
 bool FileSystemProxy::exists(const char* filePath) {
-    if (mReader) {
-        return mReader->exists(filePath);
+    for (const auto& reader : mReaders) {
+        if (reader && reader->exists(filePath)) {
+            return true;
+        }
     }
     return false;
 }
 
 size_t FileSystemProxy::getFileSize(const char* filePath) {
-    if (mReader) {
-        return mReader->getFileSize(filePath);
+    for (const auto& reader : mReaders) {
+        if (reader) {
+            size_t size = reader->getFileSize(filePath);
+            if (size > 0) {
+                return size;
+            }
+        }
     }
     return 0;
 }

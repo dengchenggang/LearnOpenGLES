@@ -5,15 +5,15 @@
 
 class VideoFrameCamera : public VideoFrameBase {
 public:
-    explicit VideoFrameCamera(const AImage* image);
-    ~VideoFrameCamera() override {}
+    explicit VideoFrameCamera(AImage* image);
+    ~VideoFrameCamera() override;
     VideoFrameCamera(const VideoFrameCamera&) = delete;
     VideoFrameCamera& operator = (const VideoFrameCamera&) = delete;
 public:
     const uint8_t* getData()  const override;
     void* getHardwareBuffer() const override;
 private:
-    const AImage* mAImage;
+    AImage* mAImage;
 };
 
 #endif

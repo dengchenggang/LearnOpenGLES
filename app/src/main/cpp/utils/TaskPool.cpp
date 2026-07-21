@@ -1,5 +1,5 @@
 #include "TaskPool.h"
-#include "LogUtils.h"
+#include "Log.h"
 
 KEY_VALUE(TAG, TaskPool)
 

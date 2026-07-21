@@ -4,6 +4,7 @@
 #include "Singleton.hpp"
 #include "IFileReader.h"
 #include <memory>
+#include <vector>
 
 // 文件系统代理类
 class FileSystemProxy {
@@ -14,9 +15,6 @@ public:
 
     // 设置文件读取器（通常在初始化时调用一次）
     void setReader(std::unique_ptr<IFileReader> reader);
-
-    // 获取文件读取器
-    IFileReader* getReader() const;
 
     // 便捷方法：直接访问文件
     FileData readFile(const char* filePath);
@@ -29,7 +27,7 @@ private:
     ~FileSystemProxy() = default;
 
 private:
-    std::unique_ptr<IFileReader> mReader;
+    std::vector<std::unique_ptr<IFileReader>> mReaders;
 };
 
 // 全局访问宏

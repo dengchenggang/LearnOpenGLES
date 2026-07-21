@@ -1,7 +1,7 @@
 #include "CEGLSurface.h"
 #include "AssetManagerReader.h"
 #include "FileSystem.h"
-#include "LogUtils.h"
+#include "Log.h"
 #include "OpenGLESRenderInterface.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>

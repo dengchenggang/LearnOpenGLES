@@ -10,7 +10,7 @@ public:
     Engine& operator=(const Engine&) = delete;
 public:
     void init();
-    void setViewPort(int32_t width, int height);
+    void setViewPort(int32_t width, int32_t height);
     void setBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     void update(int64_t deltaTime);
     void render(int64_t deltaTime);

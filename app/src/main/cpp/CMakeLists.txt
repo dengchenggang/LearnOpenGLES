@@ -30,33 +30,42 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 
 ## framework
-include_directories(${PROJECT_SOURCE_DIR}/framework/common)
+include_directories(${PROJECT_SOURCE_DIR}/utils)
+include_directories(${PROJECT_SOURCE_DIR}/utils/config)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
 include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/reader)
+include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/writer)
+include_directories(${PROJECT_SOURCE_DIR}/framework/video)
 include_directories(${PROJECT_SOURCE_DIR}/framework/video/common)
 include_directories(${PROJECT_SOURCE_DIR}/framework/video/camera)
-include_directories(${PROJECT_SOURCE_DIR}/framework/video/videofile)
+include_directories(${PROJECT_SOURCE_DIR}/framework/video/image)
 include_directories(${PROJECT_SOURCE_DIR}/framework)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/common FRAMEWORK_COMMON_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/utils       FRAMEWORK_UTILS_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/utils/config UTILS_CONFIG_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem FRAMEWORK_FILESYSTEM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/reader FRAMEWORK_FILESYSTEM_READER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/writer FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video       FRAMEWORK_VIDEO_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/common FRAMEWORK_VIDEO_COMMON_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/camera FRAMEWORK_VIDEO_CAMERA_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/videofile FRAMEWORK_VIDEO_VIDEOFILE_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/video/image FRAMEWORK_VIDEO_IMAGE_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 
 set(FRAMEWORK_ALL_SRC_LIST
-    ${FRAMEWORK_COMMON_SRC_LIST}
+    ${FRAMEWORK_UTILS_SRC_LIST}
+    ${UTILS_CONFIG_SRC_LIST}
     ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_READER_SRC_LIST}
+    ${FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST}
+    ${FRAMEWORK_VIDEO_SRC_LIST}
     ${FRAMEWORK_VIDEO_COMMON_SRC_LIST}
     ${FRAMEWORK_VIDEO_CAMERA_SRC_LIST}
-    ${FRAMEWORK_VIDEO_VIDEOFILE_SRC_LIST}
+    ${FRAMEWORK_VIDEO_IMAGE_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
@@ -105,6 +114,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 find_library(egl-lib EGL)
 find_library(gles-lib GLESv3)
 find_library(mediandk-lib mediandk)
+find_library(camera2ndk-lib camera2ndk)
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
@@ -114,6 +124,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         android
         log
         mediandk
+        camera2ndk
         ${egl-lib}
         ${gles-lib})
 

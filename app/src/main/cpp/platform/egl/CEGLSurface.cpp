@@ -3,7 +3,7 @@
 //
 
 #include "CEGLSurface.h"
-#include "LogUtils.h"
+#include "Log.h"
 #include <GLES3/gl3.h>
 #include <limits>
 #include <android/log.h>

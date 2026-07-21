@@ -16,7 +16,7 @@ namespace {
     }
 }
 
-VideoFrameCamera::VideoFrameCamera(const AImage* image)
+VideoFrameCamera::VideoFrameCamera(AImage* image)
     : VideoFrameBase(
         [&]() { int32_t w = 0; if (image) AImage_getWidth(image, &w); return w; }(),
         [&]() { int32_t h = 0; if (image) AImage_getHeight(image, &h); return h; }(),
@@ -25,6 +25,12 @@ VideoFrameCamera::VideoFrameCamera(const AImage* image)
         true
       )
     , mAImage(image) {
+}
+
+VideoFrameCamera::~VideoFrameCamera() {
+    if (mAImage) {
+        AImage_delete(mAImage);
+    }
 }
 
 const uint8_t* VideoFrameCamera::getData() const {
