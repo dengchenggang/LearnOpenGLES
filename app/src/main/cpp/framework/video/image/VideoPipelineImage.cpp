@@ -26,7 +26,7 @@ void VideoPipelineImage::start() {
         return;
     }
 
-    mImageData.assign(data.ptr(), data.ptr() + data.size());
+    mImageData.assign(data.data(), data.data() + data.size());
 
     mTaskPool->start();
     mRunning.store(true);

@@ -58,11 +58,15 @@ void EGLSurfaceManager::destroy() {
 extern "C" {
 
 JNIEXPORT void JNICALL
-Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject assetManager, jint gles) {
-    // 初始化文件系统
-    auto reader = std::make_unique<AssetManagerReader>();
-    reader->initialize(AAssetManager_fromJava(env, assetManager));
-    FileSystem.setReader(std::move(reader));
+Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject assetManager, jstring filesDir, jint gles) {
+    // 初始化文件系统（Assets + FilesDir）
+    FileSystem.SetReader(AAssetManager_fromJava(env, assetManager));
+
+    const char* filesDirPath = env->GetStringUTFChars(filesDir, nullptr);
+    if (filesDirPath) {
+        FileSystem.SetReader(filesDirPath);
+        env->ReleaseStringUTFChars(filesDir, filesDirPath);
+    }
 
     // 初始化 EGL
     EGLSurfaceManager::getInstance().init(gles);

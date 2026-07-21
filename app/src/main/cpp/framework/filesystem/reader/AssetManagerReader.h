@@ -7,21 +7,11 @@
 // Android Assets 文件读取实现
 class AssetManagerReader : public IFileReader {
 public:
-    AssetManagerReader() = default;
+    explicit AssetManagerReader(void* assetManager) : mAssetManager(assetManager) {}
     ~AssetManagerReader() override = default;
-
-    // 禁止拷贝和移动
     AssetManagerReader(const AssetManagerReader&) = delete;
     AssetManagerReader& operator=(const AssetManagerReader&) = delete;
-    AssetManagerReader(AssetManagerReader&&) = delete;
-    AssetManagerReader& operator=(AssetManagerReader&&) = delete;
-
-    // 初始化（传入 AAssetManager）
-    void initialize(void* context) override;
-
-    // 检查是否已初始化
-    bool isInitialized() const override;
-
+public:
     // 读取整个文件
     FileData readFile(const char* filePath) override;
 

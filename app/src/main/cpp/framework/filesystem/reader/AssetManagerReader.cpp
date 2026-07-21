@@ -5,18 +5,6 @@
 
 constexpr const char* TAG {"AssetManagerReader"};
 
-void AssetManagerReader::initialize(void* context) {
-    std::lock_guard<std::mutex> lock(mMutex);
-    if (!mAssetManager) {
-        mAssetManager = context;
-    }
-}
-
-bool AssetManagerReader::isInitialized() const {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mAssetManager != nullptr;
-}
-
 FileData AssetManagerReader::readFile(const char* filePath) {
     FileData result;
 
@@ -26,28 +14,56 @@ FileData AssetManagerReader::readFile(const char* filePath) {
     }
 
     AAssetManager* mgr = static_cast<AAssetManager*>(mAssetManager);
-    AAsset* asset = AAssetManager_open(mgr, filePath, AASSET_MODE_STREAMING);
-
+    AAsset* asset = AAssetManager_open(mgr, filePath, AASSET_MODE_BUFFER);
     if (!asset) {
         return result;
     }
 
     off_t fileSize = AAsset_getLength(asset);
+    if (fileSize <= 0) {
+        AAsset_close(asset);
+        return result;
+    }
+
+    const void* assetBuffer = AAsset_getBuffer(asset);
+    if (!assetBuffer) {
+        AAsset_close(asset);
+        return result;
+    }
+
+    result.bufferSize = static_cast<size_t>(fileSize);
+    result.buffer = std::unique_ptr<std::uint8_t[], std::function<void(std::uint8_t*)>>(
+        const_cast<std::uint8_t*>(static_cast<const std::uint8_t*>(assetBuffer)),
+        [asset](std::uint8_t*) { AAsset_close(asset); }
+    );
+
+    return result;
+}
+
+std::string AssetManagerReader::readString(const char* filePath) {
+    std::lock_guard<std::mutex> lock(mMutex);
+    if (!mAssetManager || !filePath) {
+        return "";
+    }
+
+    AAssetManager* mgr = static_cast<AAssetManager*>(mAssetManager);
+    AAsset* asset = AAssetManager_open(mgr, filePath, AASSET_MODE_STREAMING);
+    if (!asset) {
+        return "";
+    }
+
+    off_t fileSize = AAsset_getLength(asset);
+    std::string result;
     if (fileSize > 0) {
-        result.data.resize(static_cast<size_t>(fileSize));
-        off_t bytesRead = AAsset_read(asset, result.data.data(), static_cast<size_t>(fileSize));
+        result.resize(static_cast<size_t>(fileSize));
+        off_t bytesRead = AAsset_read(asset, result.data(), static_cast<size_t>(fileSize));
         if (bytesRead != fileSize) {
-            result.data.clear();
+            result.clear();
         }
     }
 
     AAsset_close(asset);
     return result;
-}
-
-std::string AssetManagerReader::readString(const char* filePath) {
-    FileData data = readFile(filePath);
-    return data.asString();
 }
 
 bool AssetManagerReader::exists(const char* filePath) {

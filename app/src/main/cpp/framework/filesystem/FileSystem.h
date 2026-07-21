@@ -14,7 +14,8 @@ public:
     FileSystemProxy& operator=(const FileSystemProxy&) = delete;
 
     // 设置文件读取器（通常在初始化时调用一次）
-    void setReader(std::unique_ptr<IFileReader> reader);
+    void SetReader(void* context);
+    void SetReader(const std::string& rootPath);
 
     // 便捷方法：直接访问文件
     FileData readFile(const char* filePath);

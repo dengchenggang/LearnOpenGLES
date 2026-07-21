@@ -1,7 +1,13 @@
 #include "FileSystem.h"
+#include "AssetManagerReader.h"
+#include "FileReader.h"
 
-void FileSystemProxy::setReader(std::unique_ptr<IFileReader> reader) {
-    mReaders.push_back(std::move(reader));
+void FileSystemProxy::SetReader(void* context) {
+    mReaders.push_back(std::make_unique<AssetManagerReader>(context));
+}
+
+void FileSystemProxy::SetReader(const std::string& rootPath) {
+    mReaders.push_back(std::make_unique<FileReader>(rootPath.c_str()));
 }
 
 FileData FileSystemProxy::readFile(const char* filePath) {

@@ -2,23 +2,9 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <functional>
 
 namespace fs = std::filesystem;
-
-void FileReader::initialize(void* context) {
-    std::lock_guard<std::mutex> lock(mMutex);
-    if (!mInitialized) {
-        if (context) {
-            mRootPath = static_cast<const char*>(context);
-        }
-        mInitialized = true;
-    }
-}
-
-bool FileReader::isInitialized() const {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mInitialized;
-}
 
 std::string FileReader::buildFullPath(const char* filePath) const {
     if (mRootPath.empty()) {
@@ -31,7 +17,7 @@ FileData FileReader::readFile(const char* filePath) {
     FileData result;
 
     std::lock_guard<std::mutex> lock(mMutex);
-    if (!mInitialized || !filePath) {
+    if (!filePath) {
         return result;
     }
 
@@ -54,24 +40,44 @@ FileData FileReader::readFile(const char* filePath) {
         return result;
     }
 
-    result.data.resize(static_cast<size_t>(fileSize));
-    file.read(reinterpret_cast<char*>(result.data.data()), static_cast<std::streamsize>(fileSize));
+    result.bufferSize = static_cast<size_t>(fileSize);
+    result.buffer = std::unique_ptr<std::uint8_t[], std::function<void(std::uint8_t*)>>(
+        new std::uint8_t[result.bufferSize],
+        [](std::uint8_t* p) { delete[] p; }
+    );
+    file.read(reinterpret_cast<char*>(result.buffer.get()), static_cast<std::streamsize>(fileSize));
 
     if (!file) {
-        result.data.clear();
+        result.buffer.reset();
+        result.bufferSize = 0;
     }
 
     return result;
 }
 
 std::string FileReader::readString(const char* filePath) {
-    FileData data = readFile(filePath);
-    return data.asString();
+    std::lock_guard<std::mutex> lock(mMutex);
+    if (!filePath) {
+        return "";
+    }
+
+    std::string fullPath = buildFullPath(filePath);
+    if (!fs::exists(fullPath) || !fs::is_regular_file(fullPath)) {
+        return "";
+    }
+
+    std::ifstream file(fullPath);
+    if (!file.is_open()) {
+        return "";
+    }
+
+    return std::string((std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
 }
 
 bool FileReader::exists(const char* filePath) {
     std::lock_guard<std::mutex> lock(mMutex);
-    if (!mInitialized || !filePath) {
+    if (!filePath) {
         return false;
     }
 
@@ -81,7 +87,7 @@ bool FileReader::exists(const char* filePath) {
 
 size_t FileReader::getFileSize(const char* filePath) {
     std::lock_guard<std::mutex> lock(mMutex);
-    if (!mInitialized || !filePath) {
+    if (!filePath) {
         return 0;
     }
 

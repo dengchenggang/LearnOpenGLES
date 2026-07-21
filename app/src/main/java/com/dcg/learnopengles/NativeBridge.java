@@ -7,8 +7,8 @@ import android.view.SurfaceView;
 public class NativeBridge {
     static { System.loadLibrary("learnopengles");}
 
-    // 初始化（传入 AssetManager 和 GLES 版本）
-    public static native void nativeInit(AssetManager assetManager, int gles);
+    // 初始化（传入 AssetManager、FilesDir 绝对路径和 GLES 版本）
+    public static native void nativeInit(AssetManager assetManager, String filesDir, int gles);
 
     // EGL 相关
     public static native void nativeBind(Surface surface);

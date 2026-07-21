@@ -8,21 +8,11 @@
 // C++17 filesystem 文件读取实现（用于桌面平台）
 class FileReader : public IFileReader {
 public:
-    FileReader() = default;
+    explicit FileReader(const std::string& rootPath) : mRootPath(rootPath) {}
     ~FileReader() override = default;
-
-    // 禁止拷贝和移动
     FileReader(const FileReader&) = delete;
     FileReader& operator=(const FileReader&) = delete;
-    FileReader(FileReader&&) = delete;
-    FileReader& operator=(FileReader&&) = delete;
-
-    // 初始化（传入根目录路径，可为 nullptr 使用当前目录）
-    void initialize(void* context) override;
-
-    // 检查是否已初始化
-    bool isInitialized() const override;
-
+public:
     // 读取整个文件
     FileData readFile(const char* filePath) override;
 
@@ -41,7 +31,6 @@ public:
 private:
     std::string mRootPath;
     mutable std::mutex mMutex;
-    bool mInitialized = false;
 
     // 构建完整路径
     std::string buildFullPath(const char* filePath) const;
