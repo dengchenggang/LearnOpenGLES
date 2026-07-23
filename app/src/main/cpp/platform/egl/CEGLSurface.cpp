@@ -69,7 +69,7 @@ bool CEGLSurface::doInitialize(std::int32_t gles) {
         return false;
     }
 
-    EngineSingleton.init();
+    Engine.init();
     mInitialized = true;
     LogI("%s EGL initialized successfully.", TAG);
     return true;
@@ -129,7 +129,7 @@ bool CEGLSurface::doBind(ANativeWindow *window) {
     eglQuerySurface(mDisplay, mSurface, EGL_WIDTH, &mWidth);
     eglQuerySurface(mDisplay, mSurface, EGL_HEIGHT, &mHeight);
 
-    EngineSingleton.setBackground(1, 0, 0, 1);
+    Engine.setBackground(1, 0, 0, 1);
     mBound = true;
 
     LogI("%s bind success: width=%d, height=%d.", TAG, mWidth, mHeight);
@@ -150,7 +150,7 @@ void CEGLSurface::doResize(std::int32_t w, std::int32_t h) {
     mWidth = w;
     mHeight = h;
 
-    EngineSingleton.setViewPort(w, h);
+    Engine.setViewPort(w, h);
     LogI("%s resize exit.", TAG);
 }
 
@@ -195,13 +195,13 @@ void CEGLSurface::renderFrame() {
 
     // 记录 update 耗时
     auto updateStart = std::chrono::steady_clock::now();
-    EngineSingleton.update(deltaTime);
+    Engine.update(deltaTime);
     auto updateCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - updateStart).count();
 
     // 记录 render 耗时
     auto renderStart = std::chrono::steady_clock::now();
-    EngineSingleton.render(deltaTime);
+    Engine.render(deltaTime);
     auto renderCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - renderStart).count();
 
@@ -286,7 +286,7 @@ void CEGLSurface::release() {
 }
 
 void CEGLSurface::doRelease() {
-    EngineSingleton.release();
+    Engine.release();
     if (mDisplay != EGL_NO_DISPLAY) {
         eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (mSurface != EGL_NO_SURFACE) {

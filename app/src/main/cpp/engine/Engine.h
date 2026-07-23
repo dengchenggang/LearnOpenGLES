@@ -1,13 +1,13 @@
-#ifndef C_ENGINE_H
-#define C_ENGINE_H
+#ifndef C_ENGINE_PROXY_H
+#define C_ENGINE_PROXY_H
 #include <cstdint>
 #include <Singleton.hpp>
 
-class Engine {
-    friend class Singleton<Engine>;
+class EngineProxy {
+    friend class Singleton<EngineProxy>;
 public:
-    Engine(const Engine&) = delete;
-    Engine& operator=(const Engine&) = delete;
+    EngineProxy(const EngineProxy&) = delete;
+    EngineProxy& operator=(const EngineProxy&) = delete;
 public:
     void init();
     void setViewPort(int32_t width, int32_t height);
@@ -16,11 +16,11 @@ public:
     void render(int64_t deltaTime);
     void release();
 private:
-    Engine() = default;
-    ~Engine() = default;
+    EngineProxy() = default;
+    ~EngineProxy() = default;
 private:
 
 };
 
-#define EngineSingleton Singleton<Engine>::getInstance()
+#define Engine Singleton<EngineProxy>::getInstance()
 #endif
