@@ -65,6 +65,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
     const char* filesDirPath = env->GetStringUTFChars(filesDir, nullptr);
     if (filesDirPath) {
         FileSystem.SetReader(filesDirPath);
+        FileSystem.SetWriter(filesDirPath);
         env->ReleaseStringUTFChars(filesDir, filesDirPath);
     }
 

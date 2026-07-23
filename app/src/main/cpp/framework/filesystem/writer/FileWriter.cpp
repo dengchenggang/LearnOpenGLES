@@ -1,5 +1,5 @@
 #include "FileWriter.h"
-#include "ImageWriter.h"
+#include "ImageEncoder.h"
 #include <cstring>
 #include <fstream>
 
@@ -49,16 +49,12 @@ namespace {
 FileWriter::FileWriter(const std::string& rootPath) : mRootPath(rootPath) {}
 
 bool FileWriter::write(const std::string& filePath, const std::string& content) {
-    return write(filePath, content.c_str(), content.length());
-}
-
-bool FileWriter::write(const std::string& filePath, const char* data, size_t length) {
     std::string fullPath = joinPath(mRootPath, filePath);
     std::ofstream ofs(fullPath, std::ios::out | std::ios::trunc);
     if (!ofs.is_open()) {
         return false;
     }
-    ofs.write(data, static_cast<std::streamsize>(length));
+    ofs.write(content.c_str(), static_cast<std::streamsize>(content.length()));
     return ofs.good();
 }
 
@@ -76,13 +72,13 @@ bool FileWriter::write(const std::string& filePath, int width, int height, int c
     std::string fullPath = joinPath(mRootPath, filePath);
     switch (getImageFormat(filePath.c_str())) {
         case ImageFormat::PNG:
-            return ImageWriter::writePNG(fullPath.c_str(), width, height, channels, data);
+            return ImageEncoder::writePNG(fullPath.c_str(), width, height, channels, data);
         case ImageFormat::JPG:
-            return ImageWriter::writeJPG(fullPath.c_str(), width, height, channels, data, quality);
+            return ImageEncoder::writeJPG(fullPath.c_str(), width, height, channels, data, quality);
         case ImageFormat::BMP:
-            return ImageWriter::writeBMP(fullPath.c_str(), width, height, channels, data);
+            return ImageEncoder::writeBMP(fullPath.c_str(), width, height, channels, data);
         case ImageFormat::TGA:
-            return ImageWriter::writeTGA(fullPath.c_str(), width, height, channels, data);
+            return ImageEncoder::writeTGA(fullPath.c_str(), width, height, channels, data);
         default:
             return false;
     }

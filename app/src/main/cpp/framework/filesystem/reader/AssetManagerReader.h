@@ -13,7 +13,7 @@ public:
     AssetManagerReader& operator=(const AssetManagerReader&) = delete;
 public:
     // 读取整个文件
-    FileData readFile(const char* filePath) override;
+    std::unique_ptr<FileData> readFile(const char* filePath) override;
 
     // 读取为字符串
     std::string readString(const char* filePath) override;

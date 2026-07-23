@@ -10,16 +10,21 @@ void FileSystemProxy::SetReader(const std::string& rootPath) {
     mReaders.push_back(std::make_unique<FileReader>(rootPath.c_str()));
 }
 
-FileData FileSystemProxy::readFile(const char* filePath) {
+bool FileSystemProxy::SetWriter(const std::string& rootPath) {
+    mWriter = std::make_unique<FileWriter>(rootPath);
+    return mWriter != nullptr;
+}
+
+std::unique_ptr<FileData> FileSystemProxy::readFile(const char* filePath) {
     for (const auto& reader : mReaders) {
         if (reader) {
-            FileData data = reader->readFile(filePath);
-            if (!data.empty()) {
+            auto data = reader->readFile(filePath);
+            if (data && !data->empty()) {
                 return data;
             }
         }
     }
-    return FileData();
+    return nullptr;
 }
 
 std::string FileSystemProxy::readString(const char* filePath) {

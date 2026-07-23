@@ -12,7 +12,6 @@ public:
     FileWriter& operator=(const FileWriter&) = delete;
 
     bool write(const std::string& filePath, const std::string& content);
-    bool write(const std::string& filePath, const char* data, size_t length);
     bool write(const std::string& filePath, const uint8_t* data, size_t size);
     bool write(const std::string& filePath, int width, int height, int channels, const uint8_t* data, int quality = 90);
 

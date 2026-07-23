@@ -1,13 +1,13 @@
-#ifndef C_IMAGE_WRITER_H
-#define C_IMAGE_WRITER_H
+#ifndef C_IMAGE_ENCODER_H
+#define C_IMAGE_ENCODER_H
 
 #include <cstdint>
 
-class ImageWriter {
+class ImageEncoder {
 public:
-    ImageWriter() = delete;
-    ImageWriter(const ImageWriter&) = delete;
-    ImageWriter& operator=(const ImageWriter&) = delete;
+    ImageEncoder() = delete;
+    ImageEncoder(const ImageEncoder&) = delete;
+    ImageEncoder& operator=(const ImageEncoder&) = delete;
 
     static bool writePNG(const char* filename, int width, int height, int channels, const uint8_t* data);
     static bool writeJPG(const char* filename, int width, int height, int channels, const uint8_t* data, int quality = 90);

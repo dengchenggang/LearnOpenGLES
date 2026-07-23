@@ -1,43 +1,46 @@
 #include "AssetManagerReader.h"
+#include "ImageDecoder.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include "Log.h"
 
 constexpr const char* TAG {"AssetManagerReader"};
 
-FileData AssetManagerReader::readFile(const char* filePath) {
-    FileData result;
-
+std::unique_ptr<FileData> AssetManagerReader::readFile(const char* filePath) {
     std::lock_guard<std::mutex> lock(mMutex);
     if (!mAssetManager || !filePath) {
-        return result;
+        return nullptr;
     }
 
     AAssetManager* mgr = static_cast<AAssetManager*>(mAssetManager);
     AAsset* asset = AAssetManager_open(mgr, filePath, AASSET_MODE_BUFFER);
     if (!asset) {
-        return result;
+        return nullptr;
     }
 
     off_t fileSize = AAsset_getLength(asset);
     if (fileSize <= 0) {
         AAsset_close(asset);
-        return result;
+        return nullptr;
     }
 
     const void* assetBuffer = AAsset_getBuffer(asset);
     if (!assetBuffer) {
         AAsset_close(asset);
-        return result;
+        return nullptr;
     }
 
-    result.bufferSize = static_cast<size_t>(fileSize);
-    result.buffer = std::unique_ptr<std::uint8_t[], std::function<void(std::uint8_t*)>>(
+    if (ImageDecoder::isImageFile(filePath)) {
+        auto imageData = ImageDecoder::decode(static_cast<const uint8_t*>(assetBuffer), static_cast<size_t>(fileSize));
+        AAsset_close(asset);
+        return imageData;
+    }
+
+    auto buffer = FileDataBufferType(
         const_cast<std::uint8_t*>(static_cast<const std::uint8_t*>(assetBuffer)),
         [asset](std::uint8_t*) { AAsset_close(asset); }
     );
-
-    return result;
+    return std::make_unique<FileData>(std::move(buffer), static_cast<size_t>(fileSize));
 }
 
 std::string AssetManagerReader::readString(const char* filePath) {

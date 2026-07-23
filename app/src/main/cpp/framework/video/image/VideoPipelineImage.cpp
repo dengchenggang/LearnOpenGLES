@@ -21,12 +21,12 @@ void VideoPipelineImage::start() {
         return;
     }
 
-    FileData data = FileSystem.readFile(mAssetName.c_str());
-    if (data.empty()) {
+    auto data = FileSystem.readFile(mAssetName.c_str());
+    if (!data || data->empty()) {
         return;
     }
 
-    mImageData.assign(data.data(), data.data() + data.size());
+    mImageData.assign(data->data(), data->data() + data->size());
 
     mTaskPool->start();
     mRunning.store(true);

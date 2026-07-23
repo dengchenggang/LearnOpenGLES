@@ -3,6 +3,7 @@
 
 #include "Singleton.hpp"
 #include "IFileReader.h"
+#include "FileWriter.h"
 #include <memory>
 #include <vector>
 
@@ -16,9 +17,10 @@ public:
     // 设置文件读取器（通常在初始化时调用一次）
     void SetReader(void* context);
     void SetReader(const std::string& rootPath);
+    bool SetWriter(const std::string& rootPath);
 
     // 便捷方法：直接访问文件
-    FileData readFile(const char* filePath);
+    std::unique_ptr<FileData> readFile(const char* filePath);
     std::string readString(const char* filePath);
     bool exists(const char* filePath);
     size_t getFileSize(const char* filePath);
@@ -29,6 +31,7 @@ private:
 
 private:
     std::vector<std::unique_ptr<IFileReader>> mReaders;
+    std::unique_ptr<FileWriter> mWriter;
 };
 
 // 全局访问宏
