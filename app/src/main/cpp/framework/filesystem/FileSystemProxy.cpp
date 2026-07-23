@@ -1,18 +1,25 @@
 #include "FileSystem.h"
 #include "AssetManagerReader.h"
 #include "FileReader.h"
+#include "Log.h"
 
 void FileSystemProxy::SetReader(void* context) {
     mReaders.push_back(std::make_unique<AssetManagerReader>(context));
 }
 
 void FileSystemProxy::SetReader(const std::string& rootPath) {
+    LogI("rootPath=%s", rootPath.c_str());
     mReaders.push_back(std::make_unique<FileReader>(rootPath.c_str()));
 }
 
 bool FileSystemProxy::SetWriter(const std::string& rootPath) {
     mWriter = std::make_unique<FileWriter>(rootPath);
     return mWriter != nullptr;
+}
+
+void FileSystemProxy::reset() {
+    mReaders.clear();
+    mWriter.reset();
 }
 
 std::unique_ptr<FileData> FileSystemProxy::readFile(const char* filePath) {

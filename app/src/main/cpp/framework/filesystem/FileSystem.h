@@ -13,11 +13,14 @@ class FileSystemProxy {
 public:
     FileSystemProxy(const FileSystemProxy&) = delete;
     FileSystemProxy& operator=(const FileSystemProxy&) = delete;
-
+public:
     // 设置文件读取器（通常在初始化时调用一次）
     void SetReader(void* context);
     void SetReader(const std::string& rootPath);
     bool SetWriter(const std::string& rootPath);
+
+    // 重置文件系统（清空所有读取器和写入器）
+    void reset();
 
     // 便捷方法：直接访问文件
     std::unique_ptr<FileData> readFile(const char* filePath);

@@ -1,0 +1,46 @@
+#ifndef VIEW_MANAGER_H
+#define VIEW_MANAGER_H
+
+#include "Singleton.hpp"
+#include "ViewCtrlEGLSurface.h"
+#include "TaskPool.h"
+#include <cstdint>
+#include <string>
+#include <memory>
+#include <atomic>
+#include <chrono>
+
+class ViewManagerProxy {
+    friend class Singleton<ViewManagerProxy>;
+public:
+    ViewManagerProxy(const ViewManagerProxy&) = delete;
+    ViewManagerProxy& operator= (const ViewManagerProxy&) = delete;
+
+    void init(std::int32_t gles);
+    void bind(ANativeWindow *window);
+    void resize(std::int32_t w, std::int32_t h);
+    void unbind();
+    void destroy();
+
+private:
+    ViewManagerProxy() = default;
+    ~ViewManagerProxy() = default;
+
+    void renderFrame();
+    void scheduleNextFrame();
+
+private:
+    static constexpr const char* TAG {"ViewManager"};
+    ViewCtrlEGLSurface mEGLSurface {};
+    std::unique_ptr<TaskPool> mTaskPool {std::make_unique<TaskPool>()};
+
+    std::atomic<bool> mRunning{false};
+    std::atomic<bool> mStopRequested{false};
+
+    std::int64_t mTargetFrameIntervalMs{33};
+    std::chrono::steady_clock::time_point mLastFrameTime;
+};
+
+#define ViewManager Singleton<ViewManagerProxy>::getInstance()
+
+#endif

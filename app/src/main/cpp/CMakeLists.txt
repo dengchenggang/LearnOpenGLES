@@ -94,19 +94,17 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_RENDERER_SRC_LIST}
     ${ENGINE_SRC_LIST})
 
-## platform
-include_directories(${PROJECT_SOURCE_DIR}/platform)
-include_directories(${PROJECT_SOURCE_DIR}/platform/egl)
+## view
+include_directories(${PROJECT_SOURCE_DIR}/view)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/platform/egl    PLATFORM_EGL_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/platform        PLATFORM_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/view            VIEW_SRC_LIST)
 
 set(PLATFORM_ALL_SRC_LIST
-    ${PLATFORM_EGL_SRC_LIST}
-    ${PLATFORM_SRC_LIST})
+    ${VIEW_SRC_LIST})
 
 ## 编译动态库
 add_library(${CMAKE_PROJECT_NAME} SHARED
+        ${PROJECT_SOURCE_DIR}/NativeBridge.cpp
         ${FRAMEWORK_ALL_SRC_LIST}
         ${ENGINE_ALL_SRC_LIST}
         ${PLATFORM_ALL_SRC_LIST})
