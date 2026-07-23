@@ -29,6 +29,10 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 ## thirdparty (GLM)
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 
+include_directories(${PROJECT_SOURCE_DIR}/framework/network/mongoose)
+
+aux_source_directory(${PROJECT_SOURCE_DIR}/framework/network/mongoose   FRAMEWORK_NETWORK_MONGOOSE_SRC_LIST)
+
 ## framework
 include_directories(${PROJECT_SOURCE_DIR}/utils)
 include_directories(${PROJECT_SOURCE_DIR}/utils/config)
@@ -66,6 +70,7 @@ set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_VIDEO_COMMON_SRC_LIST}
     ${FRAMEWORK_VIDEO_CAMERA_SRC_LIST}
     ${FRAMEWORK_VIDEO_IMAGE_SRC_LIST}
+    ${FRAMEWORK_NETWORK_MONGOOSE_SRC_LIST}
     ${FRAMEWORK_SRC_LIST})
 
 ## engine
