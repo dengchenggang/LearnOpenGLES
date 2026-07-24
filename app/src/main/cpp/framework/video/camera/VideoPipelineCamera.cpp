@@ -1,6 +1,5 @@
 #include "VideoPipelineCamera.h"
 #include "VideoFrameCamera.h"
-#include "VideoFrame.h"
 #include "Log.h"
 #include <camera/NdkCameraManager.h>
 #include <camera/NdkCameraDevice.h>
@@ -357,8 +356,7 @@ void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
         return;
     }
 
-    auto frame = std::make_shared<VideoFrameCamera>(image);
-    auto videoFrame = std::make_shared<VideoFrame>(std::move(frame));
+    auto videoFrame = std::make_shared<VideoFrameCamera>(image);
     dispath(videoFrame);
     LogD("exit");
 }

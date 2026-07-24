@@ -28,7 +28,7 @@ std::pair<size_t, size_t> VideoPipelineBase::disconnect(const std::string& modul
 }
 
 void VideoPipelineBase::dispath(const VideoFramePtr& videoFrame) {
-    if (!videoFrame || !videoFrame->frame) {
+    if (!videoFrame) {
         return;
     }
 

@@ -1,9 +1,9 @@
 #ifndef C_VIDEO_FRAME_CAMERA_H
 #define C_VIDEO_FRAME_CAMERA_H
-#include "VideoFrameBase.h"
+#include "VideoFrame.h"
 #include <media/NdkImage.h>
 
-class VideoFrameCamera : public VideoFrameBase {
+class VideoFrameCamera : public VideoFrame {
 public:
     explicit VideoFrameCamera(AImage* image);
     ~VideoFrameCamera() override;

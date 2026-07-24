@@ -1,13 +1,13 @@
 #ifndef C_VIDEO_FRAME_BUFFER_H
 #define C_VIDEO_FRAME_BUFFER_H
-#include "VideoFrameBase.h"
+#include "VideoFrame.h"
 #include <cstring>
 #include <memory>
 
-class VideoFrameBuffer : public VideoFrameBase {
+class VideoFrameBuffer : public VideoFrame {
 public:
     VideoFrameBuffer(const uint8_t* buffer, int32_t width, int32_t height, VideoFormat format, int64_t timestamp)
-        : VideoFrameBase(width, height, format, timestamp, false)
+        : VideoFrame(width, height, format, timestamp, false)
         , mBuffer(std::make_unique<uint8_t[]>(getSize())) {
             std::memcpy(mBuffer.get(), buffer, getSize());
         }
