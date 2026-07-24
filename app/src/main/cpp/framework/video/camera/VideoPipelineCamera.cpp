@@ -357,7 +357,7 @@ void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
         return;
     }
 
-    auto frame = std::make_unique<VideoFrameCamera>(image);
+    auto frame = std::make_shared<VideoFrameCamera>(image);
     auto videoFrame = std::make_shared<VideoFrame>(std::move(frame));
     dispath(videoFrame);
     LogD("exit");

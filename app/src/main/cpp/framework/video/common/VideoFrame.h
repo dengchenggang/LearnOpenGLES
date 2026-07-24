@@ -4,9 +4,9 @@
 #include <memory>
 
 struct VideoFrame {
-    const std::unique_ptr<VideoFrameBase> frame;
+    const std::shared_ptr<VideoFrameBase> frame;
 
-    explicit VideoFrame(std::unique_ptr<VideoFrameBase> f) : frame(std::move(f)) {}
+    explicit VideoFrame(std::shared_ptr<VideoFrameBase> f) : frame(std::move(f)) {}
 };
 
 using VideoFramePtr = std::shared_ptr<VideoFrame>;

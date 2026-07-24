@@ -15,9 +15,9 @@ public:
         : mWidth(width)
         , mHeight(height)
         , mFormat(format)
-        , mTimestamp(timestamp)
         , mSize(calculateSize(width, height, format))
-        , mHasHardwareBuffer(hasHardwareBuffer) {}
+        , mHasHardwareBuffer(hasHardwareBuffer)
+        , mTimestamp(timestamp){}
     virtual ~VideoFrameBase() = default;
     VideoFrameBase(const VideoFrameBase&) = delete;
     VideoFrameBase& operator = (const VideoFrameBase&) = delete;
@@ -31,7 +31,9 @@ public:
     int64_t getTimestamp()      const { return mTimestamp; }
     size_t  getSize()           const { return mSize; }
     bool    hasHardwareBuffer() const { return mHasHardwareBuffer; }
-private:
+
+    void resetTimestamp(int64_t timestamp) { mTimestamp = timestamp; }
+public:
     static size_t calculateSize(int32_t width, int32_t height, VideoFormat format) {
         switch (format) {
             case VideoFormat::RGBA_8888:
@@ -45,12 +47,12 @@ private:
         }
     }
 private:
-    int32_t mWidth;
-    int32_t mHeight;
-    VideoFormat mFormat;
+    const int32_t mWidth;
+    const int32_t mHeight;
+    const VideoFormat mFormat;
+    const size_t  mSize;
+    const bool mHasHardwareBuffer;
     int64_t mTimestamp;
-    size_t  mSize;
-    bool mHasHardwareBuffer;
 };
 
 #endif

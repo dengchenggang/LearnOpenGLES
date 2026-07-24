@@ -7,6 +7,7 @@
 #include "FileSystem.h"
 #include <atomic>
 #include <vector>
+#include "BufferPool.hpp"
 
 class VideoPipelineImage : public VideoPipelineBase {
 public:
@@ -33,6 +34,7 @@ private:
     std::unique_ptr<TaskPool> mTaskPool;
     std::atomic<bool> mRunning{false};
     std::chrono::steady_clock::time_point mLastDispatchLoopTimePoint {};
+    BufferPool<VideoFrameBuffer> mBufferPool {300 * 1024 * 1024};
 };
 
 #endif

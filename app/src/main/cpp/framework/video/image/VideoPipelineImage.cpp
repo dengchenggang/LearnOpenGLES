@@ -52,7 +52,14 @@ void VideoPipelineImage::dispatchLoop() {
 
     int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    auto frameBuffer = std::make_unique<VideoFrameBuffer>(mImageData.data(), mWidth, mHeight, mFormat, timestamp);
+    size_t size = VideoFrameBase::calculateSize(mWidth, mHeight, mFormat);
+    auto pair = mBufferPool.acquire(size, mImageData.data(), mWidth, mHeight, mFormat, timestamp);
+    if (!pair.second) {
+        pair.first->resetTimestamp(timestamp);
+        pair.first->resetBuffer(mImageData.data(), size);
+    }
+
+    auto frameBuffer = pair.first;
 
     auto videoFrame = std::make_shared<VideoFrame>(std::move(frameBuffer));
 

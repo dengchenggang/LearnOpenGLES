@@ -20,6 +20,13 @@ public:
     void* getHardwareBuffer() const override {
         return nullptr;
     }
+
+    void resetBuffer(const uint8_t* buffer, size_t size) {
+        if (size > getSize()) {
+            return;
+        }
+        std::memcpy(mBuffer.get(), buffer, size);
+    }
 private:
     std::unique_ptr<uint8_t[]> mBuffer;
 };
