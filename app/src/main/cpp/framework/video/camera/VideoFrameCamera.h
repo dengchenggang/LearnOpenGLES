@@ -10,8 +10,7 @@ public:
     VideoFrameCamera(const VideoFrameCamera&) = delete;
     VideoFrameCamera& operator = (const VideoFrameCamera&) = delete;
 public:
-    const uint8_t* getData()  const override;
-    void* getHardwareBuffer() const override;
+    const uint8_t* getData() const override;
 private:
     AImage* mAImage;
 };

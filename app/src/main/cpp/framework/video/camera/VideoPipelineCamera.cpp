@@ -358,5 +358,13 @@ void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
 
     auto videoFrame = std::make_shared<VideoFrameCamera>(image);
     dispath(videoFrame);
+
+    AHardwareBuffer* buffer = nullptr;
+    AImage_getHardwareBuffer(image, &buffer);
+    if (buffer) {
+        auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer);
+        dispath(hardwareBuffer);
+    }
+
     LogD("exit");
 }

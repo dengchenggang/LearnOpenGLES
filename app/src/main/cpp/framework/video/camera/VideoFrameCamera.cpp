@@ -21,8 +21,7 @@ VideoFrameCamera::VideoFrameCamera(AImage* image)
         [&]() { int32_t w = 0; if (image) AImage_getWidth(image, &w); return w; }(),
         [&]() { int32_t h = 0; if (image) AImage_getHeight(image, &h); return h; }(),
         [&]() { int32_t f = 0; if (image) AImage_getFormat(image, &f); return toVideoFormat(f); }(),
-        [&]() { int64_t t = 0; if (image) AImage_getTimestamp(image, &t); return t; }(),
-        true
+        [&]() { int64_t t = 0; if (image) AImage_getTimestamp(image, &t); return t; }()
       )
     , mAImage(image) {
 }
@@ -54,12 +53,4 @@ const uint8_t* VideoFrameCamera::getData() const {
     }
 }
 
-void* VideoFrameCamera::getHardwareBuffer() const {
-    if (!mAImage) {
-        return nullptr;
-    }
 
-    AHardwareBuffer* buffer = nullptr;
-    AImage_getHardwareBuffer(mAImage, &buffer);
-    return buffer;
-}

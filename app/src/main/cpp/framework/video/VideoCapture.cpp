@@ -83,6 +83,26 @@ bool VideoCapture::connect(const std::string& url, const std::string& moduleName
     return result.first != result.second;
 }
 
+bool VideoCapture::connect(const std::string& url, const std::string& moduleName, const VideoHardwareBufferCallback& callback) {
+    LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
+    std::lock_guard<std::mutex> lock(mMutex);
+
+    auto it = mVideoPipelines.find(url);
+    if (it == mVideoPipelines.end()) {
+        auto pipeline = createPipeline(url);
+        if (!pipeline) {
+            LogE("exit: failed to create pipeline for url: %s", url.c_str());
+            return false;
+        }
+        it = mVideoPipelines.emplace(url, std::move(pipeline)).first;
+        it->second->start();
+    }
+
+    auto result = it->second->connect(moduleName, callback);
+    LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
+    return result.first != result.second;
+}
+
 bool VideoCapture::disconnect(const std::string& url, const std::string& moduleName) {
     LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
     std::lock_guard<std::mutex> lock(mMutex);

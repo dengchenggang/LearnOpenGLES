@@ -5,26 +5,46 @@ std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleNa
 
     size_t oldSize = mConnections.size();
 
-    if (mConnections.find(moduleName) != mConnections.end()) {
+    auto it = mConnections.find(moduleName);
+    if (it != mConnections.end()) {
+        it->second = callback;
         return {oldSize, oldSize};
     }
 
-    Connection conn;
-    conn.callback = callback;
-
-    mConnections.emplace(moduleName, std::move(conn));
+    mConnections.emplace(moduleName, std::move(callback));
 
     return {oldSize, mConnections.size()};
+}
+
+std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleName, VideoHardwareBufferCallback callback) {
+    std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
+
+    size_t oldSize = mHardwareBufferConnections.size();
+
+    auto it = mHardwareBufferConnections.find(moduleName);
+    if (it != mHardwareBufferConnections.end()) {
+        it->second = callback;
+        return {oldSize, oldSize};
+    }
+
+    mHardwareBufferConnections.emplace(moduleName, std::move(callback));
+
+    return {oldSize, mHardwareBufferConnections.size()};
 }
 
 std::pair<size_t, size_t> VideoPipelineBase::disconnect(const std::string& moduleName) {
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
-    size_t oldSize = mConnections.size();
+    size_t oldFrameSize = mConnections.size();
+    size_t oldHwSize = mHardwareBufferConnections.size();
 
     mConnections.erase(moduleName);
+    mHardwareBufferConnections.erase(moduleName);
 
-    return {oldSize, mConnections.size()};
+    size_t newSize = mConnections.size() + mHardwareBufferConnections.size();
+    size_t oldSize = oldFrameSize + oldHwSize;
+
+    return {oldSize, newSize};
 }
 
 void VideoPipelineBase::dispath(const VideoFramePtr& videoFrame) {
@@ -34,9 +54,23 @@ void VideoPipelineBase::dispath(const VideoFramePtr& videoFrame) {
 
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
-    for (auto& [name, conn] : mConnections) {
-        if (conn.callback) {
-            conn.callback(videoFrame);
+    for (auto& [name, callback] : mConnections) {
+        if (callback) {
+            callback(videoFrame);
+        }
+    }
+}
+
+void VideoPipelineBase::dispath(const VideoHardwareBufferPtr& hardwareBuffer) {
+    if (!hardwareBuffer) {
+        return;
+    }
+
+    std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
+
+    for (auto& [name, callback] : mHardwareBufferConnections) {
+        if (callback) {
+            callback(hardwareBuffer);
         }
     }
 }
