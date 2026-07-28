@@ -80,6 +80,8 @@ include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/material)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/camera)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/transform)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
+include_directories(${PROJECT_SOURCE_DIR}/engine/actor)
+include_directories(${PROJECT_SOURCE_DIR}/engine/component)
 include_directories(${PROJECT_SOURCE_DIR}/engine)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/common    ENGINE_COMMON_SRC_LIST)
@@ -88,6 +90,8 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/material ENGINE_RENDE
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/camera ENGINE_RENDERER_CAMERA_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/transform ENGINE_RENDERER_TRANSFORM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/actor       ENGINE_ACTOR_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/component   ENGINE_COMPONENT_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
 
 set(ENGINE_ALL_SRC_LIST
@@ -97,6 +101,8 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_RENDERER_CAMERA_SRC_LIST}
     ${ENGINE_RENDERER_TRANSFORM_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST}
+    ${ENGINE_ACTOR_SRC_LIST}
+    ${ENGINE_COMPONENT_SRC_LIST}
     ${ENGINE_SRC_LIST})
 
 ## view
