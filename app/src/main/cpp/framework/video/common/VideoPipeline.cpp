@@ -1,6 +1,6 @@
-#include "VideoPipelineBase.h"
+#include "VideoPipeline.h"
 
-std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleName, VideoFrameCallback callback) {
+std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoFrameCallback callback) {
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
     size_t oldSize = mConnections.size();
@@ -16,7 +16,7 @@ std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleNa
     return {oldSize, mConnections.size()};
 }
 
-std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleName, VideoHardwareBufferCallback callback) {
+std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoHardwareBufferCallback callback) {
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
     size_t oldSize = mHardwareBufferConnections.size();
@@ -32,7 +32,7 @@ std::pair<size_t, size_t> VideoPipelineBase::connect(const std::string& moduleNa
     return {oldSize, mHardwareBufferConnections.size()};
 }
 
-std::pair<size_t, size_t> VideoPipelineBase::disconnect(const std::string& moduleName) {
+std::pair<size_t, size_t> VideoPipeline::disconnect(const std::string& moduleName) {
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
     size_t oldFrameSize = mConnections.size();
@@ -47,7 +47,7 @@ std::pair<size_t, size_t> VideoPipelineBase::disconnect(const std::string& modul
     return {oldSize, newSize};
 }
 
-void VideoPipelineBase::dispath(const VideoFramePtr& videoFrame) {
+void VideoPipeline::dispath(const VideoFramePtr& videoFrame) {
     if (!videoFrame) {
         return;
     }
@@ -61,7 +61,7 @@ void VideoPipelineBase::dispath(const VideoFramePtr& videoFrame) {
     }
 }
 
-void VideoPipelineBase::dispath(const VideoHardwareBufferPtr& hardwareBuffer) {
+void VideoPipeline::dispath(const VideoHardwareBufferPtr& hardwareBuffer) {
     if (!hardwareBuffer) {
         return;
     }

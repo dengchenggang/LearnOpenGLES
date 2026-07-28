@@ -1,5 +1,5 @@
-#ifndef C_VIDEO_PIPELINE_BASE_H
-#define C_VIDEO_PIPELINE_BASE_H
+#ifndef C_VIDEO_PIPELINE_H
+#define C_VIDEO_PIPELINE_H
 #include "VideoFrame.h"
 #include "VideoHardwareBuffer.h"
 #include <functional>
@@ -10,12 +10,12 @@
 using VideoFrameCallback = std::function<void(const VideoFramePtr&)>;
 using VideoHardwareBufferCallback = std::function<void(const VideoHardwareBufferPtr&)>;
 
-class VideoPipelineBase {
+class VideoPipeline {
 public:
-    VideoPipelineBase() = default;
-    virtual ~VideoPipelineBase() = default;
-    VideoPipelineBase(const VideoPipelineBase&) = delete;
-    VideoPipelineBase& operator = (const VideoPipelineBase&) = delete;
+    VideoPipeline() = default;
+    virtual ~VideoPipeline() = default;
+    VideoPipeline(const VideoPipeline&) = delete;
+    VideoPipeline& operator = (const VideoPipeline&) = delete;
 public:
     virtual void start() = 0;
     virtual void stop() = 0;

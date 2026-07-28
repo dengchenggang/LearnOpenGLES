@@ -25,7 +25,7 @@ namespace {
         return VideoFormat::RGBA_8888;
     }
 
-    std::unique_ptr<VideoPipelineBase> createPipeline(const std::string& url) {
+    std::unique_ptr<VideoPipeline> createPipeline(const std::string& url) {
         try {
             if (url.find("camera://") == 0) {
                 auto parts = split(url.substr(9), '/');

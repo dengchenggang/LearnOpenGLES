@@ -1,12 +1,12 @@
 #ifndef C_VIDEO_PIPELINE_CAMERA_H
 #define C_VIDEO_PIPELINE_CAMERA_H
-#include "VideoPipelineBase.h"
+#include "VideoPipeline.h"
 
 struct AImageReader;
 struct ACameraDevice;
 struct ACameraCaptureSession;
 
-class VideoPipelineCamera : public VideoPipelineBase {
+class VideoPipelineCamera : public VideoPipeline {
 public:
     VideoPipelineCamera(int32_t cameraId, int32_t width, int32_t height, VideoFormat format = VideoFormat::RGBA_8888);
     ~VideoPipelineCamera() override;

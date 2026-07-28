@@ -1,7 +1,7 @@
 #ifndef C_VIDEO_PIPELINE_IMAGE_H
 #define C_VIDEO_PIPELINE_IMAGE_H
 
-#include "VideoPipelineBase.h"
+#include "VideoPipeline.h"
 #include "VideoFrameBuffer.h"
 #include "TaskPool.h"
 #include "FileSystem.h"
@@ -9,7 +9,7 @@
 #include <vector>
 #include "BufferPool.hpp"
 
-class VideoPipelineImage : public VideoPipelineBase {
+class VideoPipelineImage : public VideoPipeline {
 public:
     VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps);
     ~VideoPipelineImage() override;
