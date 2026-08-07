@@ -4,6 +4,9 @@
 #include "IRenderInterface.h"
 #include <cstddef>
 
+namespace engine {
+
+
 // 顶点属性定义
 struct Attribute {
     uint32_t location;      // 着色器 location
@@ -30,5 +33,8 @@ namespace Attr {
         return Attribute(loc, 3, DataType::Float, false);
     }
 }
+
+
+} // namespace engine
 
 #endif

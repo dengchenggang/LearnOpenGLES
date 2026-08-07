@@ -6,6 +6,9 @@ struct AImageReader;
 struct ACameraDevice;
 struct ACameraCaptureSession;
 
+namespace framework {
+namespace video {
+
 class VideoPipelineCamera : public VideoPipeline {
 public:
     VideoPipelineCamera(int32_t cameraId, int32_t width, int32_t height, VideoFormat format = VideoFormat::RGBA_8888);
@@ -49,4 +52,8 @@ private:
     void* mNativeWindow = nullptr;
     bool mRunning = false;
 };
+
+} // namespace video
+} // namespace framework
+
 #endif

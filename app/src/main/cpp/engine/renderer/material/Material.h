@@ -6,6 +6,9 @@
 #include <memory>
 #include <vector>
 
+namespace engine {
+
+
 // 材质类：管理着色器和纹理
 class Material {
 public:
@@ -48,5 +51,8 @@ private:
     std::shared_ptr<Shader> mShader;
     std::vector<TextureSlot> mTextures;
 };
+
+
+} // namespace engine
 
 #endif

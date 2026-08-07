@@ -8,28 +8,28 @@
 #include <media/NdkImageReader.h>
 #include <android/native_window.h>
 
-namespace {
+namespace framework {
+namespace video {
 
-    int32_t toAImageFormat(VideoFormat format) {
-        switch (format) {
-            case VideoFormat::RGBA_8888:
-                return AIMAGE_FORMAT_RGBA_8888;
-            case VideoFormat::RGB_888:
-                return AIMAGE_FORMAT_RGB_888;
-            case VideoFormat::YUV_420_888:
-                return AIMAGE_FORMAT_YUV_420_888;
-            default:
-                return AIMAGE_FORMAT_YUV_420_888;
-        }
+int32_t toAImageFormat(VideoFormat format) {
+    switch (format) {
+        case VideoFormat::RGBA_8888:
+            return AIMAGE_FORMAT_RGBA_8888;
+        case VideoFormat::RGB_888:
+            return AIMAGE_FORMAT_RGB_888;
+        case VideoFormat::YUV_420_888:
+            return AIMAGE_FORMAT_YUV_420_888;
+        default:
+            return AIMAGE_FORMAT_YUV_420_888;
     }
+}
 
-    const char* formatToString(int32_t fmt) {
-        switch (fmt) {
-            case AIMAGE_FORMAT_RGBA_8888: return "RGBA_8888";
-            case AIMAGE_FORMAT_RGB_888:   return "RGB_888";
-            case AIMAGE_FORMAT_YUV_420_888: return "YUV_420_888";
-            default: return "Unknown";
-        }
+const char* formatToString(int32_t fmt) {
+    switch (fmt) {
+        case AIMAGE_FORMAT_RGBA_8888: return "RGBA_8888";
+        case AIMAGE_FORMAT_RGB_888:   return "RGB_888";
+        case AIMAGE_FORMAT_YUV_420_888: return "YUV_420_888";
+        default: return "Unknown";
     }
 }
 
@@ -368,3 +368,6 @@ void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
 
     LogD("exit");
 }
+
+} // namespace video
+} // namespace framework

@@ -7,12 +7,15 @@
 #include <memory>
 #include <vector>
 
+namespace framework {
+namespace filesystem {
+
 // 文件系统代理类
-class FileSystemProxy {
-    friend class Singleton<FileSystemProxy>;
+class FileSystem {
+    friend class Singleton<FileSystem>;
 public:
-    FileSystemProxy(const FileSystemProxy&) = delete;
-    FileSystemProxy& operator=(const FileSystemProxy&) = delete;
+    FileSystem(const FileSystem&) = delete;
+    FileSystem& operator=(const FileSystem&) = delete;
 public:
     // 设置文件读取器（通常在初始化时调用一次）
     void SetReader(void* context);
@@ -29,15 +32,18 @@ public:
     size_t getFileSize(const char* filePath);
 
 private:
-    FileSystemProxy() = default;
-    ~FileSystemProxy() = default;
+    FileSystem() = default;
+    ~FileSystem() = default;
 
 private:
     std::vector<std::unique_ptr<IFileReader>> mReaders;
     std::unique_ptr<FileWriter> mWriter;
 };
 
+} // namespace filesystem
+} // namespace framework
+
 // 全局访问宏
-#define FileSystem Singleton<FileSystemProxy>::getInstance()
+#define FileSystem Singleton<framework::filesystem::FileSystem>::getInstance()
 
 #endif // FILE_SYSTEM_H

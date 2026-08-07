@@ -2,6 +2,9 @@
 #define I_RENDERER_H
 #include <cstdint>
 
+namespace engine {
+
+
 class IRenderer {
 
 public:
@@ -15,5 +18,8 @@ public:
     virtual void render(int64_t deltaTime) = 0;
     virtual void release() = 0;
 };
+
+
+} // namespace engine
 
 #endif

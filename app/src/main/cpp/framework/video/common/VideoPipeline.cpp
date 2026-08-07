@@ -1,5 +1,8 @@
 #include "VideoPipeline.h"
 
+namespace framework {
+namespace video {
+
 std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoFrameCallback callback) {
     std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
 
@@ -74,3 +77,6 @@ void VideoPipeline::dispath(const VideoHardwareBufferPtr& hardwareBuffer) {
         }
     }
 }
+
+} // namespace video
+} // namespace framework

@@ -5,6 +5,9 @@
 #include <mutex>
 #include <string>
 
+namespace framework {
+namespace filesystem {
+
 // C++17 filesystem 文件读取实现（用于桌面平台）
 class FileReader : public IFileReader {
 public:
@@ -35,5 +38,8 @@ private:
     // 构建完整路径
     std::string buildFullPath(const char* filePath) const;
 };
+
+} // namespace filesystem
+} // namespace framework
 
 #endif // FILE_READER_H

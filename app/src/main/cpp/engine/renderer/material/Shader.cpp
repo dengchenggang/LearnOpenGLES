@@ -6,6 +6,9 @@
 #include "RenderInterface.h"
 #include "log/Log.h"
 
+namespace engine {
+
+
 KEY_VALUE(TAG, Shader)
 
 Shader::Shader(const std::string& name)
@@ -219,3 +222,5 @@ void Shader::reflectUniforms() {
         }
     }
 }
+
+} // namespace engine

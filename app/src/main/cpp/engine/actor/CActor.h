@@ -2,6 +2,9 @@
 #include <vector>
 #include "CActorComponent.h"
 
+namespace engine {
+
+
 class CActor {
 public:
     CActor() = default;
@@ -12,3 +15,5 @@ public:
 private:
     std::vector<CActorComponentPtr> mComponents;
 };
+
+} // namespace engine

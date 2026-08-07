@@ -1,6 +1,9 @@
 #include "Texture.h"
 #include "RenderInterface.h"
 
+namespace engine {
+
+
 Texture::Texture() = default;
 
 Texture::~Texture() {
@@ -158,3 +161,5 @@ void Texture::setWrap(TextureWrap wrapS, TextureWrap wrapT) {
 uint32_t Texture::getActiveTextureUnit() {
     return RenderInterface.getActiveTextureUnit();
 }
+
+} // namespace engine

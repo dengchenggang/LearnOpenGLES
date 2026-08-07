@@ -4,6 +4,9 @@
 #include <android/hardware_buffer.h>
 #include <memory>
 
+namespace framework {
+namespace video {
+
 class VideoHardwareBuffer {
 public:
     explicit VideoHardwareBuffer(AHardwareBuffer* buffer);
@@ -19,4 +22,8 @@ private:
 };
 
 using VideoHardwareBufferPtr = std::shared_ptr<VideoHardwareBuffer>;
+
+} // namespace video
+} // namespace framework
+
 #endif

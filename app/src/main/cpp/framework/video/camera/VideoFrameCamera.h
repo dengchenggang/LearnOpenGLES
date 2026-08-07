@@ -3,6 +3,9 @@
 #include "VideoFrame.h"
 #include <media/NdkImage.h>
 
+namespace framework {
+namespace video {
+
 class VideoFrameCamera : public VideoFrame {
 public:
     explicit VideoFrameCamera(AImage* image);
@@ -14,5 +17,8 @@ public:
 private:
     AImage* mAImage;
 };
+
+} // namespace video
+} // namespace framework
 
 #endif

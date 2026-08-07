@@ -1,6 +1,9 @@
 #include "Material.h"
 #include <stdexcept>
 
+namespace engine {
+
+
 void Material::setTexture(std::shared_ptr<Texture> texture, uint32_t unit) {
     for (auto& slot : mTextures) {
         if (slot.unit == unit) {
@@ -72,3 +75,5 @@ void Material::setUniformVec4(const std::string& name, float x, float y, float z
 void Material::setUniformMat4(const std::string& name, const float* matrix, bool transpose) const {
     if (mShader) mShader->setUniformMat4(name, matrix, transpose);
 }
+
+} // namespace engine

@@ -3,26 +3,31 @@
 #include "FileReader.h"
 #include "Log.h"
 
-void FileSystemProxy::SetReader(void* context) {
+#undef FileSystem
+
+namespace framework {
+namespace filesystem {
+
+void FileSystem::SetReader(void* context) {
     mReaders.push_back(std::make_unique<AssetManagerReader>(context));
 }
 
-void FileSystemProxy::SetReader(const std::string& rootPath) {
+void FileSystem::SetReader(const std::string& rootPath) {
     LogI("rootPath=%s", rootPath.c_str());
     mReaders.push_back(std::make_unique<FileReader>(rootPath.c_str()));
 }
 
-bool FileSystemProxy::SetWriter(const std::string& rootPath) {
+bool FileSystem::SetWriter(const std::string& rootPath) {
     mWriter = std::make_unique<FileWriter>(rootPath);
     return mWriter != nullptr;
 }
 
-void FileSystemProxy::reset() {
+void FileSystem::reset() {
     mReaders.clear();
     mWriter.reset();
 }
 
-std::unique_ptr<FileData> FileSystemProxy::readFile(const char* filePath) {
+std::unique_ptr<FileData> FileSystem::readFile(const char* filePath) {
     for (const auto& reader : mReaders) {
         if (reader) {
             auto data = reader->readFile(filePath);
@@ -34,7 +39,7 @@ std::unique_ptr<FileData> FileSystemProxy::readFile(const char* filePath) {
     return nullptr;
 }
 
-std::string FileSystemProxy::readString(const char* filePath) {
+std::string FileSystem::readString(const char* filePath) {
     for (const auto& reader : mReaders) {
         if (reader) {
             std::string str = reader->readString(filePath);
@@ -46,7 +51,7 @@ std::string FileSystemProxy::readString(const char* filePath) {
     return "";
 }
 
-bool FileSystemProxy::exists(const char* filePath) {
+bool FileSystem::exists(const char* filePath) {
     for (const auto& reader : mReaders) {
         if (reader && reader->exists(filePath)) {
             return true;
@@ -55,7 +60,7 @@ bool FileSystemProxy::exists(const char* filePath) {
     return false;
 }
 
-size_t FileSystemProxy::getFileSize(const char* filePath) {
+size_t FileSystem::getFileSize(const char* filePath) {
     for (const auto& reader : mReaders) {
         if (reader) {
             size_t size = reader->getFileSize(filePath);
@@ -66,3 +71,6 @@ size_t FileSystemProxy::getFileSize(const char* filePath) {
     }
     return 0;
 }
+
+} // namespace filesystem
+} // namespace framework

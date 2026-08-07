@@ -8,6 +8,9 @@
 #include <memory>
 #include <string>
 
+namespace engine {
+
+
 // 图像渲染器：使用 OpenGL ES 渲染 2D 图像/纹理
 class Image : public IRenderer {
 public:
@@ -78,5 +81,8 @@ private:
     // 加载默认着色器
     bool loadDefaultShader();
 };
+
+
+} // namespace engine
 
 #endif // IMAGE_H

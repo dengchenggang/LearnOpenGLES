@@ -6,6 +6,9 @@
 
 constexpr const char* TAG {"AssetManagerReader"};
 
+namespace framework {
+namespace filesystem {
+
 std::unique_ptr<FileData> AssetManagerReader::readFile(const char* filePath) {
     std::lock_guard<std::mutex> lock(mMutex);
     if (!mAssetManager || !filePath) {
@@ -103,3 +106,6 @@ size_t AssetManagerReader::getFileSize(const char* filePath) {
     }
     return size;
 }
+
+} // namespace filesystem
+} // namespace framework

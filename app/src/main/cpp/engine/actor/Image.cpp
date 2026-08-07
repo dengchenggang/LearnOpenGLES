@@ -5,6 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
+namespace engine {
+
+
 KEY_VALUE(TAG, Image)
 
 // 顶点数据结构
@@ -276,3 +279,5 @@ bool Image::loadDefaultShader() {
     LogI("%s shader program linked successfully", TAG);
     return true;
 }
+
+} // namespace engine

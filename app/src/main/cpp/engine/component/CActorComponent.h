@@ -1,6 +1,9 @@
 #pragma once
 #include <memory>
 
+namespace engine {
+
+
 class CActor;
 
 class CActorComponent {
@@ -16,3 +19,5 @@ private:
 };
 
 using CActorComponentPtr = std::unique_ptr<CActorComponent>;
+
+} // namespace engine

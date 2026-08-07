@@ -7,6 +7,9 @@
 #include <shared_mutex>
 #include <string>
 
+namespace framework {
+namespace video {
+
 using VideoFrameCallback = std::function<void(const VideoFramePtr&)>;
 using VideoHardwareBufferCallback = std::function<void(const VideoHardwareBufferPtr&)>;
 
@@ -31,4 +34,8 @@ private:
     std::map<std::string, VideoHardwareBufferCallback> mHardwareBufferConnections;
     mutable std::shared_mutex mConnectionsMutex;
 };
+
+} // namespace video
+} // namespace framework
+
 #endif

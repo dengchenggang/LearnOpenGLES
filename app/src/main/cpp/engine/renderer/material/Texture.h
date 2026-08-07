@@ -4,6 +4,9 @@
 #include "IRenderInterface.h"
 #include <memory>
 
+namespace engine {
+
+
 // 纹理描述信息
 struct TextureDesc {
     int32_t width = 0;
@@ -85,5 +88,8 @@ private:
 // 纹理智能指针类型
 using TexturePtr = std::unique_ptr<Texture>;
 using TextureSharedPtr = std::shared_ptr<Texture>;
+
+
+} // namespace engine
 
 #endif // TEXTURE_H

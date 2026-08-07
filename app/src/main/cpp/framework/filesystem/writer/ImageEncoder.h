@@ -3,6 +3,9 @@
 
 #include <cstdint>
 
+namespace framework {
+namespace filesystem {
+
 class ImageEncoder {
 public:
     ImageEncoder() = delete;
@@ -14,5 +17,8 @@ public:
     static bool writeBMP(const char* filename, int width, int height, int channels, const uint8_t* data);
     static bool writeTGA(const char* filename, int width, int height, int channels, const uint8_t* data);
 };
+
+} // namespace filesystem
+} // namespace framework
 
 #endif

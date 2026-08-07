@@ -1,6 +1,9 @@
 #include "VertexArray.h"
 #include "RenderInterface.h"
 
+namespace engine {
+
+
 void VertexArray::setup(const std::vector<BatchDesc>& batches) {
     // 计算总容量和各属性偏移
     size_t totalOffset = 0;
@@ -118,3 +121,5 @@ uint32_t VertexArray::getDataTypeSize(DataType type) const {
     }
     return 4;
 }
+
+} // namespace engine

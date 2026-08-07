@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <string>
 
+namespace framework {
+namespace filesystem {
+
 class FileWriter {
 public:
     explicit FileWriter(const std::string& rootPath);
@@ -18,5 +21,8 @@ public:
 private:
     std::string mRootPath;
 };
+
+} // namespace filesystem
+} // namespace framework
 
 #endif

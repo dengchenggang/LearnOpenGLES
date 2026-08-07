@@ -7,6 +7,9 @@
 #include <memory>
 #include <functional>
 
+namespace framework {
+namespace filesystem {
+
 // 文件数据封装
 using FileDataBufferType = std::unique_ptr<std::uint8_t[], std::function<void(std::uint8_t*)>>;
 
@@ -57,5 +60,8 @@ public:
     // 获取文件大小
     virtual size_t getFileSize(const char* filePath) = 0;
 };
+
+} // namespace filesystem
+} // namespace framework
 
 #endif // I_FILE_READER_H

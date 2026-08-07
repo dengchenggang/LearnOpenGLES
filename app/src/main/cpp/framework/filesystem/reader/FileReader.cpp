@@ -7,6 +7,9 @@
 
 namespace fs = std::filesystem;
 
+namespace framework {
+namespace filesystem {
+
 std::string FileReader::buildFullPath(const char* filePath) const {
     if (mRootPath.empty()) {
         return std::string(filePath);
@@ -111,3 +114,6 @@ void FileReader::setRootPath(const char* rootPath) {
         mRootPath.clear();
     }
 }
+
+} // namespace filesystem
+} // namespace framework

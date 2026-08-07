@@ -5,6 +5,9 @@
 #include "Attribute.hpp"
 #include <vector>
 
+namespace engine {
+
+
 // 分批属性描述
 struct BatchDesc {
     Attribute attribute;    // 属性描述
@@ -62,5 +65,8 @@ private:
 
     uint32_t getDataTypeSize(DataType type) const;
 };
+
+
+} // namespace engine
 
 #endif

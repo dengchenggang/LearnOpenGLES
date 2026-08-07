@@ -1,5 +1,8 @@
 #include "VideoHardwareBuffer.h"
 
+namespace framework {
+namespace video {
+
 VideoHardwareBuffer::VideoHardwareBuffer(AHardwareBuffer* buffer)
     : mBuffer(buffer) {
     if (mBuffer) {
@@ -13,4 +16,6 @@ VideoHardwareBuffer::~VideoHardwareBuffer() {
     }
 }
 
+} // namespace video
+} // namespace framework
 

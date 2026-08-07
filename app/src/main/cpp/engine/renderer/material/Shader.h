@@ -13,6 +13,9 @@
 #include <unordered_map>
 #include <queue>
 
+namespace engine {
+
+
 class Shader {
 public:
     // 着色器类型
@@ -81,5 +84,8 @@ private:
     void reflectAttributes();
     void reflectUniforms();
 };
+
+
+} // namespace engine
 
 #endif // SHADER_H

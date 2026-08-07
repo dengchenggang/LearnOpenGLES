@@ -3,11 +3,13 @@
 #include <cstdint>
 #include <Singleton.hpp>
 
-class EngineProxy {
-    friend class Singleton<EngineProxy>;
+namespace engine {
+
+class Engine {
+    friend class Singleton<Engine>;
 public:
-    EngineProxy(const EngineProxy&) = delete;
-    EngineProxy& operator=(const EngineProxy&) = delete;
+    Engine(const Engine&) = delete;
+    Engine& operator=(const Engine&) = delete;
 public:
     void init();
     void setViewPort(int32_t width, int32_t height);
@@ -16,11 +18,13 @@ public:
     void render(int64_t deltaTime);
     void release();
 private:
-    EngineProxy() = default;
-    ~EngineProxy() = default;
+    Engine() = default;
+    ~Engine() = default;
 private:
 
 };
 
-#define Engine Singleton<EngineProxy>::getInstance()
+} // namespace engine
+
+#define Engine Singleton<engine::Engine>::getInstance()
 #endif

@@ -1,6 +1,9 @@
 #include "VideoPipelineImage.h"
 #include <chrono>
 
+namespace framework {
+namespace video {
+
 VideoPipelineImage::VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps)
     : mAssetName(assetName)
     , mWidth(width)
@@ -72,3 +75,6 @@ void VideoPipelineImage::dispatchLoop() {
     }
     mTaskPool->detachDelayed(delayMs, &VideoPipelineImage::dispatchLoop, this);
 }
+
+} // namespace video
+} // namespace framework

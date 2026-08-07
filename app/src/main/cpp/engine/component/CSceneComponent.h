@@ -1,6 +1,9 @@
 #pragma once
 #include "CActorComponent.h"
 
+namespace engine {
+
+
 class CSceneComponent : public CActorComponent {
 public:
     CSceneComponent() = default;
@@ -10,3 +13,5 @@ public:
 public:
 
 };
+
+} // namespace engine

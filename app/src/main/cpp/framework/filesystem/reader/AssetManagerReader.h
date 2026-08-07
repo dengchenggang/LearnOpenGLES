@@ -4,6 +4,9 @@
 #include "IFileReader.h"
 #include <mutex>
 
+namespace framework {
+namespace filesystem {
+
 // Android Assets 文件读取实现
 class AssetManagerReader : public IFileReader {
 public:
@@ -28,5 +31,8 @@ private:
     void* mAssetManager = nullptr;
     mutable std::mutex mMutex;
 };
+
+} // namespace filesystem
+} // namespace framework
 
 #endif // ASSET_MANAGER_READER_H

@@ -2,6 +2,9 @@
 #include "stb/stb_image_write.h"
 #include "ImageEncoder.h"
 
+namespace framework {
+namespace filesystem {
+
 bool ImageEncoder::writePNG(const char* filename, int width, int height, int channels, const uint8_t* data) {
     return stbi_write_png(filename, width, height, channels, data, width * channels) != 0;
 }
@@ -17,3 +20,6 @@ bool ImageEncoder::writeBMP(const char* filename, int width, int height, int cha
 bool ImageEncoder::writeTGA(const char* filename, int width, int height, int channels, const uint8_t* data) {
     return stbi_write_tga(filename, width, height, channels, data) != 0;
 }
+
+} // namespace filesystem
+} // namespace framework

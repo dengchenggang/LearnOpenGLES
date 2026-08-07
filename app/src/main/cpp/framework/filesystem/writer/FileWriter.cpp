@@ -3,6 +3,9 @@
 #include <cstring>
 #include <fstream>
 
+namespace framework {
+namespace filesystem {
+
 namespace {
     enum class ImageFormat {
         PNG,
@@ -83,3 +86,6 @@ bool FileWriter::write(const std::string& filePath, int width, int height, int c
             return false;
     }
 }
+
+} // namespace filesystem
+} // namespace framework

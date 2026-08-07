@@ -1,18 +1,18 @@
 #include "VideoFrameCamera.h"
 #include <android/hardware_buffer.h>
 
-namespace {
-    VideoFormat toVideoFormat(int32_t aimageFormat) {
-        switch (aimageFormat) {
-            case AIMAGE_FORMAT_RGBA_8888:
-                return VideoFormat::RGBA_8888;
-            case AIMAGE_FORMAT_RGB_888:
-                return VideoFormat::RGB_888;
-            case AIMAGE_FORMAT_YUV_420_888:
-                return VideoFormat::YUV_420_888;
-            default:
-                return VideoFormat::Unknown;
-        }
+namespace framework {
+namespace video {
+VideoFormat toVideoFormat(int32_t aimageFormat) {
+    switch (aimageFormat) {
+        case AIMAGE_FORMAT_RGBA_8888:
+            return VideoFormat::RGBA_8888;
+        case AIMAGE_FORMAT_RGB_888:
+            return VideoFormat::RGB_888;
+        case AIMAGE_FORMAT_YUV_420_888:
+            return VideoFormat::YUV_420_888;
+        default:
+            return VideoFormat::Unknown;
     }
 }
 
@@ -52,5 +52,8 @@ const uint8_t* VideoFrameCamera::getData() const {
             return nullptr;
     }
 }
+
+} // namespace video
+} // namespace framework
 
 

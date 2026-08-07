@@ -9,6 +9,9 @@
 #include <vector>
 #include "BufferPool.hpp"
 
+namespace framework {
+namespace video {
+
 class VideoPipelineImage : public VideoPipeline {
 public:
     VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps);
@@ -36,5 +39,8 @@ private:
     std::chrono::steady_clock::time_point mLastDispatchLoopTimePoint {};
     BufferPool<VideoFrameBuffer> mBufferPool {300 * 1024 * 1024};
 };
+
+} // namespace video
+} // namespace framework
 
 #endif

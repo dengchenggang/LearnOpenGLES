@@ -2,6 +2,10 @@
 #define C_VIDEO_FRAME_H
 #include <cstdint>
 #include <memory>
+#include <filesystem>
+
+namespace framework {
+namespace video {
 
 enum class VideoFormat : int32_t {
     RGBA_8888 = 1,    // AIMAGE_FORMAT_RGBA_8888
@@ -52,5 +56,8 @@ private:
 };
 
 using VideoFramePtr = std::shared_ptr<VideoFrame>;
+
+} // namespace video
+} // namespace framework
 
 #endif
