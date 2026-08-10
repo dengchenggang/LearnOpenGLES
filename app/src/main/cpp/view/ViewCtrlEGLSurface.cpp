@@ -5,6 +5,8 @@
 
 KEY_VALUE(TAG, ViewCtrlEGLSurface)
 
+namespace view {
+
 ViewCtrlEGLSurface::ViewCtrlEGLSurface()
     : mDisplay(EGL_NO_DISPLAY)
     , mConfig(nullptr)
@@ -137,3 +139,5 @@ void ViewCtrlEGLSurface::release() {
 
     LogI("%s release exit.", TAG);
 }
+
+}  // namespace view

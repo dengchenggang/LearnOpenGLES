@@ -5,6 +5,8 @@
 #include <android/native_window_jni.h>
 #include <cstdint>
 
+namespace view {
+
 class ViewCtrlEGLSurface {
 public:
     ViewCtrlEGLSurface();
@@ -47,5 +49,7 @@ private:
     bool mBound{false};
     std::int32_t mGLESVersion{3};
 };
+
+}  // namespace view
 
 #endif

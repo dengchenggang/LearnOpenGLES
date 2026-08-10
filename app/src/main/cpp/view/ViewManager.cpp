@@ -2,7 +2,13 @@
 #include "Log.h"
 #include "Engine.h"
 
-void ViewManagerProxy::init(std::int32_t gles) {
+#undef ViewManager
+
+constexpr const char* TAG {"ViewManager"};
+
+namespace view {
+
+void ViewManager::init(std::int32_t gles) {
     mTaskPool->start();
     auto future = mTaskPool->submit([this, gles]() {
         bool result = mEGLSurface.initialize(gles);
@@ -14,7 +20,7 @@ void ViewManagerProxy::init(std::int32_t gles) {
     future.get();
 }
 
-void ViewManagerProxy::bind(ANativeWindow *window) {
+void ViewManager::bind(ANativeWindow *window) {
     LogI("%s bind enter.", TAG);
 
     if (!mEGLSurface.isInitialized()) {
@@ -47,7 +53,7 @@ void ViewManagerProxy::bind(ANativeWindow *window) {
     LogI("%s bind exit.", TAG);
 }
 
-void ViewManagerProxy::renderFrame() {
+void ViewManager::renderFrame() {
     if (mStopRequested || !mRunning) {
         LogI("%s renderFrame stopped.", TAG);
         return;
@@ -81,7 +87,7 @@ void ViewManagerProxy::renderFrame() {
     scheduleNextFrame();
 }
 
-void ViewManagerProxy::scheduleNextFrame() {
+void ViewManager::scheduleNextFrame() {
     if (mStopRequested || !mRunning) {
         return;
     }
@@ -97,7 +103,7 @@ void ViewManagerProxy::scheduleNextFrame() {
     mTaskPool->detachDelayed(delayMs, [this]() { renderFrame(); });
 }
 
-void ViewManagerProxy::resize(std::int32_t w, std::int32_t h) {
+void ViewManager::resize(std::int32_t w, std::int32_t h) {
     mTaskPool->detach([this, w, h]() {
         LogI("%s resize enter, width=%d, height=%d", TAG, w, h);
         if (!mEGLSurface.isBound()) {
@@ -109,7 +115,7 @@ void ViewManagerProxy::resize(std::int32_t w, std::int32_t h) {
     });
 }
 
-void ViewManagerProxy::unbind() {
+void ViewManager::unbind() {
     LogI("%s unbind enter", TAG);
 
     if (mRunning) {
@@ -126,7 +132,7 @@ void ViewManagerProxy::unbind() {
     LogI("%s unbind exit", TAG);
 }
 
-void ViewManagerProxy::destroy() {
+void ViewManager::destroy() {
     LogI("%s destroy enter.", TAG);
 
     if (mRunning) {
@@ -145,3 +151,5 @@ void ViewManagerProxy::destroy() {
 
     LogI("%s destroy exit.", TAG);
 }
+
+} // namespace view

@@ -4,6 +4,8 @@
 #include "Log.h"
 #include <sstream>
 
+#undef VideoCapture
+
 namespace framework {
 namespace video {
 

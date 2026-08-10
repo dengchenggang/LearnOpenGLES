@@ -10,12 +10,15 @@
 #include <atomic>
 #include <chrono>
 
-class ViewManagerProxy {
-    friend class Singleton<ViewManagerProxy>;
-public:
-    ViewManagerProxy(const ViewManagerProxy&) = delete;
-    ViewManagerProxy& operator= (const ViewManagerProxy&) = delete;
 
+namespace view {
+
+class ViewManager {
+    friend class Singleton<ViewManager>;
+public:
+    ViewManager(const ViewManager&) = delete;
+    ViewManager& operator= (const ViewManager&) = delete;
+public:
     void init(std::int32_t gles);
     void bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
@@ -23,14 +26,13 @@ public:
     void destroy();
 
 private:
-    ViewManagerProxy() = default;
-    ~ViewManagerProxy() = default;
+    ViewManager() = default;
+    ~ViewManager() = default;
 
     void renderFrame();
     void scheduleNextFrame();
 
 private:
-    static constexpr const char* TAG {"ViewManager"};
     ViewCtrlEGLSurface mEGLSurface {};
     std::unique_ptr<TaskPool> mTaskPool {std::make_unique<TaskPool>()};
 
@@ -41,6 +43,8 @@ private:
     std::chrono::steady_clock::time_point mLastFrameTime;
 };
 
-#define ViewManager Singleton<ViewManagerProxy>::getInstance()
+} // namespace view
+
+#define ViewManager Singleton<view::ViewManager>::getInstance()
 
 #endif

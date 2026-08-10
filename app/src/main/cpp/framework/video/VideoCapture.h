@@ -1,5 +1,6 @@
 #pragma once
 #include "VideoPipeline.h"
+#include "Singleton.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -9,9 +10,8 @@ namespace framework {
 namespace video {
 
 class VideoCapture {
+    friend class Singleton<VideoCapture>;
 public:
-    VideoCapture() = default;
-    ~VideoCapture() = default;
     VideoCapture(const VideoCapture&) = delete;
     VideoCapture& operator=(const VideoCapture&) = delete;
 public:
@@ -19,7 +19,8 @@ public:
     bool connect(const std::string& url, const std::string& moduleName, const VideoHardwareBufferCallback& callback);
     bool disconnect(const std::string& url, const std::string& moduleName);
 private:
-    std::pair<size_t, size_t> getStreamId(const std::string& url, const std::string& moduleName);
+    VideoCapture() = default;
+    ~VideoCapture() = default;
 private:
     std::map<std::string, std::unique_ptr<VideoPipeline>> mVideoPipelines;
     std::mutex mMutex;
@@ -27,3 +28,5 @@ private:
 
 } // namespace video
 } // namespace framework
+
+#define VideoCapture Singleton<framework::video::VideoCapture>::getInstance()
