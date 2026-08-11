@@ -55,11 +55,10 @@ void VideoPipelineImage::dispatchLoop() {
 
     int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    size_t size = VideoFrame::calculateSize(mWidth, mHeight, mFormat);
+    size_t size = calculateSize(mWidth, mHeight, mFormat);
     auto pair = mBufferPool.acquire(size, mImageData.data(), mWidth, mHeight, mFormat, timestamp);
     if (!pair.second) {
         pair.first->resetTimestamp(timestamp);
-        pair.first->resetBuffer(mImageData.data(), size);
     }
 
     auto videoFrame = pair.first;
