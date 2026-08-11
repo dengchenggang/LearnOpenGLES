@@ -7,6 +7,9 @@
 #include <string>
 #include <queue>
 
+namespace engine {
+namespace renderer {
+
 class OpenGLESRenderInterface : public IRenderInterface {
 public:
     OpenGLESRenderInterface() = default;
@@ -108,5 +111,8 @@ private:
     static GLenum toGLDrawMode(DrawMode mode);
     static GLenum toGLFramebufferAttachment(FramebufferAttachment attachment);
 };
+
+} // namespace renderer
+} // namespace engine
 
 #endif // OPENGLES_RENDER_INTERFACE_H

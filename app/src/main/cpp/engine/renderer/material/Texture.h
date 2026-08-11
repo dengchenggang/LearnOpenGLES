@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace engine {
+namespace renderer {
 
 
 // 纹理描述信息
@@ -90,6 +91,7 @@ using TexturePtr = std::unique_ptr<Texture>;
 using TextureSharedPtr = std::shared_ptr<Texture>;
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif // TEXTURE_H

@@ -37,7 +37,6 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/framework/network/mongoose   FRAMEWOR
 include_directories(${PROJECT_SOURCE_DIR}/utils)
 include_directories(${PROJECT_SOURCE_DIR}/utils/config)
 include_directories(${PROJECT_SOURCE_DIR}/framework/log)
-include_directories(${PROJECT_SOURCE_DIR}/framework/render)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/reader)
 include_directories(${PROJECT_SOURCE_DIR}/framework/filesystem/writer)
@@ -49,7 +48,6 @@ include_directories(${PROJECT_SOURCE_DIR}/framework)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/utils       FRAMEWORK_UTILS_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/utils/config UTILS_CONFIG_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/render FRAMEWORK_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem FRAMEWORK_FILESYSTEM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/reader FRAMEWORK_FILESYSTEM_READER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/framework/filesystem/writer FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST)
@@ -62,7 +60,6 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
 set(FRAMEWORK_ALL_SRC_LIST
     ${FRAMEWORK_UTILS_SRC_LIST}
     ${UTILS_CONFIG_SRC_LIST}
-    ${FRAMEWORK_RENDER_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_READER_SRC_LIST}
     ${FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST}
@@ -80,6 +77,7 @@ include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/material)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/camera)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/transform)
 include_directories(${PROJECT_SOURCE_DIR}/engine/renderer)
+include_directories(${PROJECT_SOURCE_DIR}/engine/renderer/render)
 include_directories(${PROJECT_SOURCE_DIR}/engine/actor)
 include_directories(${PROJECT_SOURCE_DIR}/engine/component)
 include_directories(${PROJECT_SOURCE_DIR}/engine)
@@ -90,6 +88,7 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/material ENGINE_RENDE
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/camera ENGINE_RENDERER_CAMERA_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/transform ENGINE_RENDERER_TRANSFORM_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer  ENGINE_RENDERER_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/engine/renderer/render ENGINE_RENDERER_RENDER_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/actor       ENGINE_ACTOR_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine/component   ENGINE_COMPONENT_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine           ENGINE_SRC_LIST)
@@ -101,6 +100,7 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_RENDERER_CAMERA_SRC_LIST}
     ${ENGINE_RENDERER_TRANSFORM_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST}
+    ${ENGINE_RENDERER_RENDER_SRC_LIST}
     ${ENGINE_ACTOR_SRC_LIST}
     ${ENGINE_COMPONENT_SRC_LIST}
     ${ENGINE_SRC_LIST})

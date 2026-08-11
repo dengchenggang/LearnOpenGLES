@@ -6,6 +6,7 @@
 #include <vector>
 
 namespace engine {
+namespace renderer {
 
 
 // 分批属性描述
@@ -67,6 +68,7 @@ private:
 };
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif

@@ -1,6 +1,9 @@
 #include "OpenGLESRenderInterface.h"
 #include "log/Log.h"
 
+namespace engine {
+namespace renderer {
+
 KEY_VALUE(TAG, OpenGLESRenderInterface)
 
 // 着色器管理
@@ -540,3 +543,6 @@ GLenum OpenGLESRenderInterface::toGLFramebufferAttachment(FramebufferAttachment 
     }
     return GL_COLOR_ATTACHMENT0;
 }
+
+} // namespace renderer
+} // namespace engine

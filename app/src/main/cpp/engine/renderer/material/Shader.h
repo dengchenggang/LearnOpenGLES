@@ -14,6 +14,7 @@
 #include <queue>
 
 namespace engine {
+namespace renderer {
 
 
 class Shader {
@@ -86,6 +87,7 @@ private:
 };
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif // SHADER_H

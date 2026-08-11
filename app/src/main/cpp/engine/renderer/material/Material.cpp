@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 namespace engine {
+namespace renderer {
 
 
 void Material::setTexture(std::shared_ptr<Texture> texture, uint32_t unit) {
@@ -76,4 +77,5 @@ void Material::setUniformMat4(const std::string& name, const float* matrix, bool
     if (mShader) mShader->setUniformMat4(name, matrix, transpose);
 }
 
+} // namespace renderer
 } // namespace engine

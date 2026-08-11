@@ -7,6 +7,7 @@
 #include "log/Log.h"
 
 namespace engine {
+namespace renderer {
 
 
 KEY_VALUE(TAG, Shader)
@@ -223,4 +224,5 @@ void Shader::reflectUniforms() {
     }
 }
 
+} // namespace renderer
 } // namespace engine

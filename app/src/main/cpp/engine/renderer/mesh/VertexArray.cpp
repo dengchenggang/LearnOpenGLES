@@ -2,6 +2,7 @@
 #include "RenderInterface.h"
 
 namespace engine {
+namespace renderer {
 
 
 void VertexArray::setup(const std::vector<BatchDesc>& batches) {
@@ -122,4 +123,5 @@ uint32_t VertexArray::getDataTypeSize(DataType type) const {
     return 4;
 }
 
+} // namespace renderer
 } // namespace engine

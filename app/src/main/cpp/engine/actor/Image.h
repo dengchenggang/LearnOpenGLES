@@ -10,6 +10,7 @@
 
 namespace engine {
 
+using namespace renderer;
 
 // 图像渲染器：使用 OpenGL ES 渲染 2D 图像/纹理
 class Image : public IRenderer {

@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace engine {
+namespace renderer {
 
 
 // 材质类：管理着色器和纹理
@@ -53,6 +54,7 @@ private:
 };
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif

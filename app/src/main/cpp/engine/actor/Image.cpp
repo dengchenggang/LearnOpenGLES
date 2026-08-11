@@ -7,6 +7,7 @@
 
 namespace engine {
 
+using namespace renderer;
 
 KEY_VALUE(TAG, Image)
 

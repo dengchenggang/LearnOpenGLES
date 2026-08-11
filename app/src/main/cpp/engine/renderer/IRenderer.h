@@ -3,6 +3,7 @@
 #include <cstdint>
 
 namespace engine {
+namespace renderer {
 
 
 class IRenderer {
@@ -20,6 +21,7 @@ public:
 };
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif

@@ -5,6 +5,7 @@
 #include <cstddef>
 
 namespace engine {
+namespace renderer {
 
 
 // 顶点属性定义
@@ -35,6 +36,7 @@ namespace Attr {
 }
 
 
+} // namespace renderer
 } // namespace engine
 
 #endif

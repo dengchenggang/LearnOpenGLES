@@ -2,6 +2,7 @@
 #include "RenderInterface.h"
 
 namespace engine {
+namespace renderer {
 
 
 Texture::Texture() = default;
@@ -162,4 +163,5 @@ uint32_t Texture::getActiveTextureUnit() {
     return RenderInterface.getActiveTextureUnit();
 }
 
+} // namespace renderer
 } // namespace engine
