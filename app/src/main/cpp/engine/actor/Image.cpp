@@ -1,7 +1,7 @@
 #include "Image.h"
 #include "FileSystem.h"
 #include "RenderInterface.h"
-#include "log/Log.h"
+#include "Log.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
