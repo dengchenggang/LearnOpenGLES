@@ -29,49 +29,8 @@ message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 ## thirdparty (GLM)
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/network/mongoose)
-
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/network/mongoose   FRAMEWORK_NETWORK_MONGOOSE_SRC_LIST)
-
 ## framework
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/utils)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/utils/config)
-include_directories(${PROJECT_SOURCE_DIR}/framework/include/common)
-include_directories(${PROJECT_SOURCE_DIR}/framework/include/filesystem)
-include_directories(${PROJECT_SOURCE_DIR}/framework/include/utils)
-include_directories(${PROJECT_SOURCE_DIR}/framework/include/video)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/filesystem)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/filesystem/reader)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/filesystem/writer)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/video)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/video/common)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/video/camera)
-include_directories(${PROJECT_SOURCE_DIR}/framework/src/video/image)
-include_directories(${PROJECT_SOURCE_DIR}/framework)
-
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/utils       FRAMEWORK_UTILS_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/utils/config UTILS_CONFIG_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/filesystem FRAMEWORK_FILESYSTEM_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/filesystem/reader FRAMEWORK_FILESYSTEM_READER_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/filesystem/writer FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/video       FRAMEWORK_VIDEO_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/video/common FRAMEWORK_VIDEO_COMMON_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/video/camera FRAMEWORK_VIDEO_CAMERA_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework/src/video/image FRAMEWORK_VIDEO_IMAGE_SRC_LIST)
-aux_source_directory(${PROJECT_SOURCE_DIR}/framework        FRAMEWORK_SRC_LIST)
-
-set(FRAMEWORK_ALL_SRC_LIST
-    ${FRAMEWORK_UTILS_SRC_LIST}
-    ${UTILS_CONFIG_SRC_LIST}
-    ${FRAMEWORK_FILESYSTEM_SRC_LIST}
-    ${FRAMEWORK_FILESYSTEM_READER_SRC_LIST}
-    ${FRAMEWORK_FILESYSTEM_WRITER_SRC_LIST}
-    ${FRAMEWORK_VIDEO_SRC_LIST}
-    ${FRAMEWORK_VIDEO_COMMON_SRC_LIST}
-    ${FRAMEWORK_VIDEO_CAMERA_SRC_LIST}
-    ${FRAMEWORK_VIDEO_IMAGE_SRC_LIST}
-    ${FRAMEWORK_NETWORK_MONGOOSE_SRC_LIST}
-    ${FRAMEWORK_SRC_LIST})
+add_subdirectory(framework)
 
 ## engine
 include_directories(${PROJECT_SOURCE_DIR}/engine/common)
@@ -119,14 +78,11 @@ set(PLATFORM_ALL_SRC_LIST
 ## 编译动态库
 add_library(${CMAKE_PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/NativeBridge.cpp
-        ${FRAMEWORK_ALL_SRC_LIST}
         ${ENGINE_ALL_SRC_LIST}
         ${PLATFORM_ALL_SRC_LIST})
 
 find_library(egl-lib EGL)
 find_library(gles-lib GLESv3)
-find_library(mediandk-lib mediandk)
-find_library(camera2ndk-lib camera2ndk)
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
@@ -135,10 +91,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library
         android
         log
-        mediandk
-        camera2ndk
         ${egl-lib}
-        ${gles-lib})
+        ${gles-lib}
+        framework)
 
 # 启用 C++17 支持
 set(CMAKE_CXX_STANDARD 17)

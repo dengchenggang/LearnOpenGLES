@@ -1,7 +1,7 @@
 #ifndef IMAGE_DATA_H
 #define IMAGE_DATA_H
 
-#include "FileData.h"
+#include "filesystem/FileData.h"
 #include <cstdint>
 
 namespace framework {

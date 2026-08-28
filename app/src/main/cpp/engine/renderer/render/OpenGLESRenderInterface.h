@@ -2,7 +2,7 @@
 #define OPENGLES_RENDER_INTERFACE_H
 
 #include "IRenderInterface.h"
-#include "Singleton.hpp"
+#include "common/Singleton.hpp"
 #include <GLES3/gl3.h>
 #include <string>
 #include <queue>

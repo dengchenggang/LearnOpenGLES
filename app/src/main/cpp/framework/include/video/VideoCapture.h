@@ -1,7 +1,7 @@
 #pragma once
-#include "Singleton.hpp"
-#include "VideoFrame.h"
-#include "VideoHardwareBuffer.h"
+#include "common/Singleton.hpp"
+#include "video/VideoFrame.h"
+#include "video/VideoHardwareBuffer.h"
 #include <string>
 #include <map>
 #include <memory>
@@ -28,6 +28,8 @@ private:
     std::mutex mMutex;
 };
 
+VideoCapture& GetVideoCaptureInstance();
+
 } // namespace framework
 
-#define VideoCapture Singleton<framework::VideoCapture>::getInstance()
+#define VideoCapture framework::GetVideoCaptureInstance()

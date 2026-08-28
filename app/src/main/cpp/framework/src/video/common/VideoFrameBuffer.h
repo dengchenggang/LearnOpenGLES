@@ -1,6 +1,6 @@
 #ifndef C_VIDEO_FRAME_BUFFER_H
 #define C_VIDEO_FRAME_BUFFER_H
-#include "VideoFrame.h"
+#include "video/VideoFrame.h"
 #include <cstring>
 #include <memory>
 

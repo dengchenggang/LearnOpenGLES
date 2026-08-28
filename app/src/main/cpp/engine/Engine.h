@@ -1,7 +1,7 @@
 #ifndef C_ENGINE_PROXY_H
 #define C_ENGINE_PROXY_H
 #include <cstdint>
-#include <Singleton.hpp>
+#include <common/Singleton.hpp>
 
 namespace engine {
 

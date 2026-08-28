@@ -1,7 +1,7 @@
 #ifndef C_VIDEO_PIPELINE_H
 #define C_VIDEO_PIPELINE_H
-#include "VideoFrame.h"
-#include "VideoHardwareBuffer.h"
+#include "video/VideoFrame.h"
+#include "video/VideoHardwareBuffer.h"
 #include <functional>
 #include <map>
 #include <shared_mutex>

@@ -1,8 +1,8 @@
-#include "FileSystem.h"
+#include "filesystem/FileSystem.h"
 #include "FileWriter.h"
 #include "AssetManagerReader.h"
 #include "FileReader.h"
-#include "Log.h"
+#include "utils/Log.h"
 
 #undef FileSystem
 
@@ -73,6 +73,10 @@ size_t FileSystem::getFileSize(const char* filePath) {
         }
     }
     return 0;
+}
+
+FileSystem& GetFileSystemInstance() {
+    return Singleton<FileSystem>::getInstance();
 }
 
 } // namespace framework

@@ -1,6 +1,6 @@
 #ifndef C_VIDEO_FRAME_CAMERA_H
 #define C_VIDEO_FRAME_CAMERA_H
-#include "VideoFrame.h"
+#include "video/VideoFrame.h"
 #include <media/NdkImage.h>
 
 namespace framework {

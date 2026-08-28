@@ -1,8 +1,8 @@
 #ifndef FILE_SYSTEM_H
 #define FILE_SYSTEM_H
 
-#include "Singleton.hpp"
-#include "FileData.h"
+#include "common/Singleton.hpp"
+#include "filesystem/FileData.h"
 #include <memory>
 #include <vector>
 
@@ -41,9 +41,11 @@ private:
     std::unique_ptr<FileWriter> mWriter;
 };
 
+FileSystem& GetFileSystemInstance();
+
 } // namespace framework
 
 // 全局访问宏
-#define FileSystem Singleton<framework::FileSystem>::getInstance()
+#define FileSystem framework::GetFileSystemInstance()
 
 #endif // FILE_SYSTEM_H

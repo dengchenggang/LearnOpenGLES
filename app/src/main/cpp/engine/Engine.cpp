@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include "RenderInterface.h"
-#include "FileSystem.h"
-#include "Log.h"
+#include "filesystem/FileSystem.h"
+#include "utils/Log.h"
 
 #undef Engine
 

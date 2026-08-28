@@ -1,6 +1,6 @@
 #include "VideoPipelineCamera.h"
 #include "VideoFrameCamera.h"
-#include "Log.h"
+#include "utils/Log.h"
 #include <camera/NdkCameraManager.h>
 #include <camera/NdkCameraDevice.h>
 #include <camera/NdkCameraMetadata.h>

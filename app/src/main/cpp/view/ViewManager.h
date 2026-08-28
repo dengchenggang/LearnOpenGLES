@@ -1,9 +1,9 @@
 #ifndef VIEW_MANAGER_H
 #define VIEW_MANAGER_H
 
-#include "Singleton.hpp"
+#include "common/Singleton.hpp"
 #include "ViewCtrlEGLSurface.h"
-#include "TaskPool.h"
+#include "utils/TaskPool.h"
 #include <cstdint>
 #include <string>
 #include <memory>

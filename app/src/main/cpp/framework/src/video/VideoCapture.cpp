@@ -1,12 +1,16 @@
-#include "VideoCapture.h"
+#include "video/VideoCapture.h"
 #include "VideoPipelineCamera.h"
 #include "VideoPipelineImage.h"
-#include "Log.h"
+#include "utils/Log.h"
 #include <sstream>
 
 #undef VideoCapture
 
 namespace framework {
+
+VideoCapture::VideoCapture() = default;
+
+VideoCapture::~VideoCapture() = default;
 
 std::vector<std::string> split(const std::string& s, char delimiter) {
     std::vector<std::string> tokens;
@@ -122,6 +126,10 @@ bool VideoCapture::disconnect(const std::string& url, const std::string& moduleN
 
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
     return result.first != result.second;
+}
+
+VideoCapture& GetVideoCaptureInstance() {
+    return Singleton<VideoCapture>::getInstance();
 }
 
 } // namespace framework

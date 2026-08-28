@@ -1,5 +1,5 @@
-#include "JsonConfigLoader.h"
-#include "Log.h"
+#include "utils/JsonConfigLoader.h"
+#include "utils/Log.h"
 #include <sstream>
 
 std::vector<std::string> JsonConfigLoader::splitKey(const std::string& key) {

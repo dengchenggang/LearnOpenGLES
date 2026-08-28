@@ -2,7 +2,7 @@
 #include "ImageDecoder.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-#include "Log.h"
+#include "utils/Log.h"
 
 constexpr const char* TAG {"AssetManagerReader"};
 

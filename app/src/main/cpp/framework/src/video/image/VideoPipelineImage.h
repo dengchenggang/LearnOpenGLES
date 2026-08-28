@@ -3,11 +3,11 @@
 
 #include "VideoPipeline.h"
 #include "VideoFrameBuffer.h"
-#include "TaskPool.h"
-#include "FileSystem.h"
+#include "utils/TaskPool.h"
+#include "filesystem/FileSystem.h"
 #include <atomic>
 #include <vector>
-#include "BufferPool.hpp"
+#include "utils/BufferPool.hpp"
 
 namespace framework {
 

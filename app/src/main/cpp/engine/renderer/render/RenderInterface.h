@@ -1,6 +1,6 @@
 #ifndef C_RENDER_INTERFACE_H
 #define C_RENDER_INTERFACE_H
-#include "Singleton.hpp"
+#include "common/Singleton.hpp"
 #include "IRenderInterface.h"
 #include <memory>
 
