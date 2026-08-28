@@ -1,8 +1,10 @@
 #ifndef C_VIDEO_HARDWARE_BUFFER_H
 #define C_VIDEO_HARDWARE_BUFFER_H
 
-#include <android/hardware_buffer.h>
 #include <memory>
+#include <functional>
+
+typedef struct AHardwareBuffer AHardwareBuffer;
 
 namespace framework {
 

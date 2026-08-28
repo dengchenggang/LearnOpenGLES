@@ -1,4 +1,5 @@
 #include "VideoHardwareBuffer.h"
+#include <android/hardware_buffer.h>
 
 namespace framework {
 
