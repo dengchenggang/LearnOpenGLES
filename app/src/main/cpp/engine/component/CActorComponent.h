@@ -3,19 +3,29 @@
 
 namespace engine {
 
-
-class CActor;
+class Actor;
 
 class CActorComponent {
 public:
-    CActorComponent(CActor& owner);
+    explicit CActorComponent(Actor& owner);
     virtual ~CActorComponent() = default;
     CActorComponent(const CActorComponent&) = delete;
     CActorComponent& operator=(const CActorComponent&) = delete;
-public:
-    CActor& GetOwner() const { return mOwner; }
+
+    virtual void onAttach() {}
+    virtual void onBeginPlay() {}
+    virtual void onUpdate(float deltaTime) {}
+    virtual void onRender() {}
+    virtual void onEndPlay() {}
+
+    Actor& GetOwner() const { return mOwner; }
+
+    bool isEnabled() const { return mEnabled; }
+    void setEnabled(bool enabled) { mEnabled = enabled; }
+
 private:
-    CActor& mOwner;
+    Actor& mOwner;
+    bool mEnabled = true;
 };
 
 using CActorComponentPtr = std::unique_ptr<CActorComponent>;

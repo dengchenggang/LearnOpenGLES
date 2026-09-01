@@ -39,6 +39,7 @@ public:
     void setUniformVec3(const std::string& name, float x, float y, float z) const;
     void setUniformVec4(const std::string& name, float x, float y, float z, float w) const;
     void setUniformMat4(const std::string& name, const float* matrix, bool transpose = false) const;
+    void setUniformMat4(const std::string& name, const glm::mat4& matrix, bool transpose = false) const;
 
     // 检查是否有效
     bool isValid() const { return mShader != nullptr && mShader->isValid(); }

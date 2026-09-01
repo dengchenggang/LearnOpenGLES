@@ -77,5 +77,9 @@ void Material::setUniformMat4(const std::string& name, const float* matrix, bool
     if (mShader) mShader->setUniformMat4(name, matrix, transpose);
 }
 
+void Material::setUniformMat4(const std::string& name, const glm::mat4& matrix, bool transpose) const {
+    if (mShader) mShader->setUniformMat4(name, matrix, transpose);
+}
+
 } // namespace renderer
 } // namespace engine

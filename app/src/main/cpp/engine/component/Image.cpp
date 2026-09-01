@@ -3,7 +3,6 @@
 #include "RenderInterface.h"
 #include "utils/Log.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <vector>
 
 namespace engine {
 
@@ -11,19 +10,15 @@ using namespace renderer;
 
 KEY_VALUE(TAG, Image)
 
-// 顶点数据结构
-struct Vertex {
-    float position[3];
-    float texCoord[2];
-};
-
-Image::Image() = default;
+Image::Image(Actor& owner)
+    : CSceneComponent(owner, std::make_unique<RectTransform>())
+    , mRectTransform(static_cast<RectTransform&>(getTransform())) {}
 
 Image::~Image() {
-    release();
+    onEndPlay();
 }
 
-void Image::initialize() {
+void Image::onBeginPlay() {
     if (mInitialized) {
         LogW("%s already initialized", TAG);
         return;
@@ -31,7 +26,7 @@ void Image::initialize() {
 
     LogI("%s initializing...", TAG);
 
-    // 创建默认着色器
+    // 创建默认材质和着色器
     if (!loadDefaultShader()) {
         LogE("%s failed to load default shader", TAG);
         return;
@@ -44,56 +39,29 @@ void Image::initialize() {
     LogI("%s initialized successfully", TAG);
 }
 
-void Image::update(int64_t deltaTime) {
+void Image::onUpdate(float deltaTime) {
     // 更新逻辑（如动画）
 }
 
-void Image::render(int64_t deltaTime) {
-    if (!mInitialized || !mShader || !mTexture || !mTexture->isValid()) {
+void Image::onRender() {
+    if (!mInitialized || !mMesh || !mMesh->isValid() || !mMaterial || !mMaterial->isValid()) {
         return;
     }
 
-    // 使用着色器
-    mShader->bind();
-
-    // 绑定纹理到单元 0
-    mTexture->bind(0);
-    mShader->setUniformInt("uTexture", 0);
-
-    // 更新变换矩阵
+    // 更新变换矩阵和颜色
     updateTransform();
 
-    // 设置颜色
-    mShader->setUniformVec4("uColor", mColor);
-
-    // 绑定 VAO 并绘制
-    RenderInterface.bindVertexArray(mVAO);
-    RenderInterface.drawElements(DrawMode::Triangles, 6, DataType::UShort, nullptr);
-
-    // 解绑
-    RenderInterface.bindVertexArray(INVALID_HANDLE);
-    mTexture->unbind(0);
-    mShader->unbind();
+    // 绑定材质并绘制
+    mMaterial->bind();
+    mMesh->draw();
+    mMaterial->unbind();
 }
 
-void Image::release() {
+void Image::onEndPlay() {
     LogI("%s releasing...", TAG);
 
-    if (mVAO != INVALID_HANDLE) {
-        RenderInterface.deleteVertexArray(mVAO);
-        mVAO = INVALID_HANDLE;
-    }
-    if (mVBO != INVALID_HANDLE) {
-        RenderInterface.deleteBuffer(mVBO);
-        mVBO = INVALID_HANDLE;
-    }
-    if (mEBO != INVALID_HANDLE) {
-        RenderInterface.deleteBuffer(mEBO);
-        mEBO = INVALID_HANDLE;
-    }
-
-    mShader.reset();
-    mTexture.reset();
+    mMesh.reset();
+    mMaterial.reset();
 
     mInitialized = false;
     LogI("%s released", TAG);
@@ -132,7 +100,7 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
     }
 
     // 创建纹理
-    mTexture = std::make_unique<Texture>();
+    auto texture = std::make_shared<Texture>();
 
     TextureDesc desc;
     desc.width = width;
@@ -140,11 +108,12 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
     desc.format = format;
     desc.initialData = buffer;
 
-    if (!mTexture->create(desc)) {
+    if (!texture->create(desc)) {
         LogE("%s failed to create texture: %dx%d", TAG, width, height);
-        mTexture.reset();
         return false;
     }
+
+    mMaterial->setTexture(std::move(texture), 0);
 
     LogI("%s texture created successfully: %dx%d", TAG, width, height);
 
@@ -155,80 +124,52 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
     return true;
 }
 
-void Image::setPosition(float x, float y) {
-    mPosition = glm::vec2(x, y);
-}
-
-void Image::setScale(float scaleX, float scaleY) {
-    mScale = glm::vec2(scaleX, scaleY);
-}
-
 void Image::setColor(float r, float g, float b, float a) {
     mColor = glm::vec4(r, g, b, a);
 }
 
 bool Image::isValid() const {
-    return mInitialized && mShader && mShader->isValid() &&
-           mTexture && mTexture->isValid();
+    return mInitialized && mMesh && mMesh->isValid() &&
+           mMaterial && mMaterial->isValid();
 }
 
 void Image::createMesh() {
-    // 顶点数据（位置 + 纹理坐标）
-    Vertex vertices[] = {
-        // 左下角
-        {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-        // 右下角
-        {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        // 右上角
-        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
-        // 左上角
-        {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}}
+    mMesh = std::make_shared<Mesh>();
+
+    // 位置数据（SOA 布局）
+    float positions[] = {
+        0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f
+    };
+
+    // 纹理坐标数据（SOA 布局）
+    float texCoords[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f
     };
 
     // 索引数据
     uint16_t indices[] = {
-        0, 1, 2,  // 第一个三角形
-        0, 2, 3   // 第二个三角形
+        0, 1, 2,
+        0, 2, 3
     };
 
-    // 创建 VAO
-    mVAO = RenderInterface.createVertexArray();
-    RenderInterface.bindVertexArray(mVAO);
-
-    // 创建并填充 VBO
-    mVBO = RenderInterface.createVertexBuffer(vertices, sizeof(vertices), BufferUsage::Static);
-    RenderInterface.bindVertexBuffer(mVBO);
-
-    // 创建并填充 EBO
-    mEBO = RenderInterface.createIndexBuffer(indices, sizeof(indices), BufferUsage::Static);
-    RenderInterface.bindIndexBuffer(mEBO);
-
-    // 设置顶点属性
-    // 位置属性 (location = 0)
-    RenderInterface.enableVertexAttrib(0);
-    RenderInterface.setVertexAttribPointer(0, 3, DataType::Float, false, sizeof(Vertex), nullptr);
-
-    // 纹理坐标属性 (location = 1)
-    RenderInterface.enableVertexAttrib(1);
-    RenderInterface.setVertexAttribPointer(1, 2, DataType::Float, false, sizeof(Vertex),
-                                           reinterpret_cast<void*>(offsetof(Vertex, texCoord)));
-
-    // 解绑
-    RenderInterface.bindVertexArray(INVALID_HANDLE);
+    mMesh->initialize({
+        {Attr::Position(0), 4},
+        {Attr::TexCoord(1), 4}
+    });
+    mMesh->setAttributeData(0, positions, sizeof(positions));
+    mMesh->setAttributeData(1, texCoords, sizeof(texCoords));
+    mMesh->setIndexData(indices, sizeof(indices), DataType::UShort, 6);
 }
 
 void Image::updateTransform() {
-    // 计算实际渲染大小（图像原始大小 × 缩放比例）
-    glm::vec2 renderSize = mImageSize * mScale;
-
-    // 构建模型矩阵
-    glm::mat4 model = glm::mat4(1.0f);
-
-    // 平移到位置
-    model = glm::translate(model, glm::vec3(mPosition, 0.0f));
-
-    // 缩放到实际渲染大小
-    model = glm::scale(model, glm::vec3(renderSize, 1.0f));
+    // 从 RectTransform 获取模型矩阵
+    const glm::mat4& model = mRectTransform.getModelMatrix();
 
     // 从 RenderInterface 获取视口尺寸并构建正交投影矩阵
     int32_t x, viewportWidth, viewportHeight;
@@ -238,16 +179,18 @@ void Image::updateTransform() {
                                       -1.0f, 1.0f);
 
     // 设置 Uniform
-    mShader->setUniformMat4("uModelMatrix", model);
-    mShader->setUniformMat4("uViewMatrix", glm::mat4(1.0f));
-    mShader->setUniformMat4("uProjectionMatrix", projection);
+    mMaterial->setUniformMat4("uModelMatrix", model);
+    mMaterial->setUniformMat4("uViewMatrix", glm::mat4(1.0f));
+    mMaterial->setUniformMat4("uProjectionMatrix", projection);
+    mMaterial->setUniformVec4("uColor", mColor.r, mColor.g, mColor.b, mColor.a);
+    mMaterial->setUniformInt("uTexture", 0);
 }
 
 bool Image::loadDefaultShader() {
     LogI("%s loading default shader...", TAG);
 
     // 创建着色器
-    mShader = std::make_unique<Shader>("ImageShader");
+    auto shader = std::make_shared<Shader>("texture");
 
     // 从文件系统读取着色器源码
     std::string vertSource = FileSystem.readString("shader/texture.vert.glsl");
@@ -259,23 +202,26 @@ bool Image::loadDefaultShader() {
     }
 
     // 编译着色器
-    if (!mShader->compile(Shader::Type::Vertex, vertSource)) {
+    if (!shader->compile(Shader::Type::Vertex, vertSource)) {
         LogE("%s failed to compile vertex shader", TAG);
         return false;
     }
     LogD("%s vertex shader compiled successfully", TAG);
 
-    if (!mShader->compile(Shader::Type::Fragment, fragSource)) {
+    if (!shader->compile(Shader::Type::Fragment, fragSource)) {
         LogE("%s failed to compile fragment shader", TAG);
         return false;
     }
     LogD("%s fragment shader compiled successfully", TAG);
 
     // 链接着色器程序
-    if (!mShader->link()) {
+    if (!shader->link()) {
         LogE("%s failed to link shader program", TAG);
         return false;
     }
+
+    mMaterial = std::make_shared<Material>();
+    mMaterial->setShader(std::move(shader));
 
     LogI("%s shader program linked successfully", TAG);
     return true;

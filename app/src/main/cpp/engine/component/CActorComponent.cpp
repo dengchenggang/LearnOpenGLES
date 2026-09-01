@@ -1,9 +1,8 @@
 #include "CActorComponent.h"
-#include "CActor.h"
+#include "Actor.h"
 
 namespace engine {
 
-
-CActorComponent::CActorComponent(CActor& owner) : mOwner(owner) {}
+CActorComponent::CActorComponent(Actor& owner) : mOwner(owner) {}
 
 } // namespace engine

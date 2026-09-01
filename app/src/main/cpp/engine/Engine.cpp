@@ -1,9 +1,10 @@
 #include "Engine.h"
+
+#undef Engine
+
 #include "RenderInterface.h"
 #include "filesystem/FileSystem.h"
 #include "utils/Log.h"
-
-#undef Engine
 
 constexpr const char* TAG {"Engine"};
 constexpr const char* BACKGROUD_PATH = "textures/background.png";
@@ -24,15 +25,29 @@ void Engine::setViewPort(int32_t width, int32_t height) {
 }
 
 void Engine::update(int64_t deltaTime) {
-
+    for (auto& actor : mActors) {
+        if (actor->isActive()) {
+            actor->update(deltaTime);
+        }
+    }
 }
 
 void Engine::render(int64_t deltaTime) {
     RenderInterface.clear(true, true, false);
+    for (auto& actor : mActors) {
+        if (actor->isActive()) {
+            actor->render();
+        }
+    }
 }
 
 void Engine::release() {
+    mActors.clear();
+}
 
+Actor& Engine::createActor() {
+    mActors.emplace_back(new Actor());
+    return *mActors.back();
 }
 
 } // namespace engine
