@@ -7,7 +7,7 @@
 
 namespace engine {
 
-MeshRenderer::MeshRenderer(Actor& owner) : CSceneComponent(owner) {}
+MeshRenderer::MeshRenderer(Actor& owner) : SceneComponent(owner) {}
 
 renderer::Renderable MeshRenderer::getRenderable() const {
     return renderer::Renderable(*mMesh, *mMaterial, getTransform());

@@ -5,12 +5,12 @@ namespace engine {
 
 class Actor;
 
-class CActorComponent {
+class ActorComponent {
 public:
-    explicit CActorComponent(Actor& owner);
-    virtual ~CActorComponent() = default;
-    CActorComponent(const CActorComponent&) = delete;
-    CActorComponent& operator=(const CActorComponent&) = delete;
+    explicit ActorComponent(Actor& owner);
+    virtual ~ActorComponent() = default;
+    ActorComponent(const ActorComponent&) = delete;
+    ActorComponent& operator=(const ActorComponent&) = delete;
 
     virtual void onAttach() {}
     virtual void onBeginPlay() {}
@@ -28,6 +28,6 @@ private:
     bool mEnabled = true;
 };
 
-using CActorComponentPtr = std::unique_ptr<CActorComponent>;
+using ActorComponentPtr = std::unique_ptr<ActorComponent>;
 
 } // namespace engine

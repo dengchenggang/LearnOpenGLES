@@ -1,7 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "CSceneComponent.h"
+#include "SceneComponent.h"
 #include "RectTransform.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -14,7 +14,7 @@ namespace engine {
 using namespace renderer;
 
 // 图像渲染器：使用 OpenGL ES 渲染 2D 图像/纹理
-class Image : public CSceneComponent {
+class Image : public SceneComponent {
 public:
     explicit Image(Actor& owner);
     ~Image() override;

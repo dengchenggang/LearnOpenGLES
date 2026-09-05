@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CSceneComponent.h"
+#include "SceneComponent.h"
 #include "Renderable.h"
 #include <memory>
 
@@ -8,7 +8,7 @@ namespace engine {
 
 class Camera;
 
-class MeshRenderer : public CSceneComponent {
+class MeshRenderer : public SceneComponent {
 public:
     MeshRenderer(Actor& owner);
     ~MeshRenderer() override = default;

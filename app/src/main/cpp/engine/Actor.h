@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include "CActorComponent.h"
+#include "ActorComponent.h"
 
 namespace engine {
 
@@ -20,7 +20,7 @@ public:
 
     template<typename T, typename... Args>
     T& addComponent(Args&&... args) {
-        static_assert(std::is_base_of_v<CActorComponent, T>, "T must derive from CActorComponent");
+        static_assert(std::is_base_of_v<ActorComponent, T>, "T must derive from ActorComponent");
         auto comp = std::make_unique<T>(*this, std::forward<Args>(args)...);
         T* ptr = comp.get();
         mComponents.push_back(std::move(comp));
@@ -47,7 +47,7 @@ protected:
 private:
     Actor();
 
-    std::vector<CActorComponentPtr> mComponents;
+    std::vector<ActorComponentPtr> mComponents;
 };
 
 using ActorPtr = std::unique_ptr<Actor>;

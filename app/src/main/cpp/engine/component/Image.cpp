@@ -11,7 +11,7 @@ using namespace renderer;
 KEY_VALUE(TAG, Image)
 
 Image::Image(Actor& owner)
-    : CSceneComponent(owner, std::make_unique<RectTransform>())
+    : SceneComponent(owner, std::make_unique<RectTransform>())
     , mRectTransform(static_cast<RectTransform&>(getTransform())) {}
 
 Image::~Image() {
