@@ -1,6 +1,8 @@
 #include "ViewManager.h"
 #include "utils/Log.h"
 #include "Engine.h"
+#include "common/ModuleDef.h"
+#include "nvs/NVSModule.h"
 
 #undef ViewManager
 
@@ -13,7 +15,9 @@ void ViewManager::init(std::int32_t gles) {
     auto future = mTaskPool->submit([this, gles]() {
         bool result = mEGLSurface.initialize(gles);
         if (result) {
-            Engine.init();
+            std::vector<engine::LevelPtr> levels;
+            levels.emplace_back(std::make_unique<module::NVSModule>(Engine));
+            Engine.init(levels, module::MODULE_NAME_NVS);
         }
         return result;
     });
@@ -132,8 +136,8 @@ void ViewManager::unbind() {
     LogI("%s unbind exit", TAG);
 }
 
-void ViewManager::destroy() {
-    LogI("%s destroy enter.", TAG);
+void ViewManager::deInit() {
+    LogI("%s deInit enter.", TAG);
 
     if (mRunning) {
         mStopRequested = true;
@@ -142,14 +146,14 @@ void ViewManager::destroy() {
 
     if (mTaskPool && mTaskPool->isRunning()) {
         auto future = mTaskPool->submit([this]() {
-            Engine.release();
+            Engine.deInit();
             mEGLSurface.release();
         });
         future.wait();
         mTaskPool->stop();
     }
 
-    LogI("%s destroy exit.", TAG);
+    LogI("%s deInit exit.", TAG);
 }
 
 } // namespace view

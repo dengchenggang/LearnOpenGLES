@@ -4,26 +4,16 @@
 
 namespace module {
 
-NVSModule::NVSModule(IModuleManager& moduleManager) : ModuleBase(MODULE_NAME_NVS, moduleManager) {}
+NVSModule::NVSModule(engine::ILevelManager& levelManager) : engine::Level(MODULE_NAME_NVS, levelManager) {}
 
 NVSModule::~NVSModule() {}
 
-void NVSModule::initialize() {
-    LogI("initialize");
+void NVSModule::init() {
+    LogI("NVSModule init");
 }
 
-void NVSModule::start() {
-    LogI("start: enter");
-    LogI("start: exit");
-}
-
-void NVSModule::stop() {
-    LogI("stop");
-}
-
-void NVSModule::deinitialize() {
-    LogI("deinitialize");
+void NVSModule::deInit() {
+    LogI("NVSModule deInit");
 }
 
 }
-

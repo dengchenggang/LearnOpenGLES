@@ -34,4 +34,15 @@ void Actor::endPlay() {
     }
 }
 
+void Actor::setActive(bool active) {
+    if (mActive != active) {
+        mActive = active;
+        if (mActive) {
+            beginPlay();
+        } else {
+            endPlay();
+        }
+    }
+}
+
 } // namespace engine

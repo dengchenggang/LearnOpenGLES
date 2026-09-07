@@ -1,16 +1,15 @@
 #pragma once
-#include "common/ModuleBase.h"
+#include "level/Level.h"
 
 namespace module {
 
-class NVSModule : public ModuleBase {
+class NVSModule : public engine::Level {
 public:
-    explicit NVSModule(IModuleManager& moduleManager);
+    explicit NVSModule(engine::ILevelManager& levelManager);
     ~NVSModule();
 public:
-    void initialize() override;
-    void start() override;
-    void stop() override;
-    void deinitialize() override;
+    void init() override;
+    void deInit() override;
 };
+
 }

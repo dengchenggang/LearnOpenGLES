@@ -1,6 +1,5 @@
 #include "filesystem/FileSystem.h"
 #include "ViewManager.h"
-#include "ModuleManager.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <jni.h>
@@ -20,7 +19,6 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
     FileSystem.SetReader(AAssetManager_fromJava(env, assetManager));
     FileSystem.SetWriter(filesDirStr);
     ViewManager.init(gles);
-    ModuleManager.initialize();
 }
 
 JNIEXPORT void JNICALL
@@ -41,8 +39,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeUnbind(JNIEnv* env, jclass) {
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeDestroy(JNIEnv* env, jclass) {
-    ViewManager.destroy();
+    ViewManager.deInit();
     FileSystem.reset();
-    ModuleManager.deinitialize();
 }
 }

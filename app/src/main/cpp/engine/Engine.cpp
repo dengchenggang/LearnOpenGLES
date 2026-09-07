@@ -11,7 +11,20 @@ constexpr const char* BACKGROUD_PATH = "textures/background.png";
 
 namespace engine {
 
-void Engine::init() {
+void Engine::init(std::vector<LevelPtr>& levels, const std::string& startLevel) {
+    mActiveLevel = nullptr;
+    mNextActiveLevelName = startLevel;
+    mLevels.clear();
+
+    for (auto& level : levels) {
+        if (level) {
+            mLevels[level->getId()] = std::move(level);
+        }
+    }
+
+    for (auto& pair : mLevels) {
+        pair.second->init();
+    }
 }
 
 void Engine::setBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -25,29 +38,48 @@ void Engine::setViewPort(int32_t width, int32_t height) {
 }
 
 void Engine::update(int64_t deltaTime) {
-    for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->update(deltaTime);
-        }
+    if (!mNextActiveLevelName.empty()) {
+        doChangeLevel(mNextActiveLevelName);
+    }
+
+    if (mActiveLevel) {
+        mActiveLevel->update(deltaTime);
     }
 }
 
 void Engine::render(int64_t deltaTime) {
     RenderInterface.clear(true, true, false);
-    for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->render();
-        }
+    if (mActiveLevel) {
+        mActiveLevel->render();
     }
 }
 
-void Engine::release() {
-    mActors.clear();
+void Engine::deInit() {
+    mActiveLevel = nullptr;
+    mNextActiveLevelName = "";
 }
 
-Actor& Engine::createActor() {
-    mActors.emplace_back(new Actor());
-    return *mActors.back();
+void Engine::changeLevel(const std::string& levelName) {
+    LogI("changeLevel: %s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
+    mNextActiveLevelName = levelName;
+}
+
+void Engine::doChangeLevel(const std::string& levelName) {
+    LogI("doChangeLevel: %s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
+    auto it = mLevels.find(levelName);
+    if (it != mLevels.end()) {
+        auto oldLevel = mActiveLevel;
+        mActiveLevel = it->second.get();
+        if (oldLevel) {
+            oldLevel->endPlay();
+        }
+        if (mActiveLevel) {
+            mActiveLevel->beginPlay();
+        }
+    } else {
+        LogE("doChangeLevel: %s not found", levelName.c_str());
+    }
+    mNextActiveLevelName = "";
 }
 
 } // namespace engine

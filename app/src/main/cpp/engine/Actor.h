@@ -7,17 +7,12 @@
 namespace engine {
 
 class Actor {
-     friend class Engine;
+     friend class Level;
 public:
     virtual ~Actor() = default;
     Actor(const Actor&) = delete;
     Actor& operator=(const Actor&) = delete;
 public:
-    void beginPlay();
-    void update(float deltaTime);
-    void render();
-    void endPlay();
-
     template<typename T, typename... Args>
     T& addComponent(Args&&... args) {
         static_assert(std::is_base_of_v<ActorComponent, T>, "T must derive from ActorComponent");
@@ -39,14 +34,17 @@ public:
     }
 
     bool isActive() const { return mActive; }
-    void setActive(bool active) { mActive = active; }
-
-protected:
-    bool mActive = true;
+    void setActive(bool active);
 
 private:
     Actor();
-
+private:
+    void beginPlay();
+    void update(float deltaTime);
+    void render();
+    void endPlay();
+private:
+     bool mActive = true;
     std::vector<ActorComponentPtr> mComponents;
 };
 

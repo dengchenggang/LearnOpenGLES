@@ -23,7 +23,7 @@ public:
     void bind(ANativeWindow *window);
     void resize(std::int32_t w, std::int32_t h);
     void unbind();
-    void destroy();
+    void deInit();
 
 private:
     ViewManager() = default;

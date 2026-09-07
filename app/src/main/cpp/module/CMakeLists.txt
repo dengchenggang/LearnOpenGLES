@@ -10,13 +10,11 @@ include_directories(
 )
 
 # Collect source files from subdirectories
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/common COMMON_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/nvs NVS_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} MODULE_ROOT_SRC_LIST)
 
 # Combine all source lists
 set(MODULE_ALL_SRC_LIST
-    ${COMMON_SRC_LIST}
     ${NVS_SRC_LIST}
     ${MODULE_ROOT_SRC_LIST})
 

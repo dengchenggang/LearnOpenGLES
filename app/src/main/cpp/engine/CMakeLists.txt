@@ -1,6 +1,7 @@
 set(ENGINE_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/level
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer/mesh
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer/material
@@ -12,6 +13,7 @@ set(ENGINE_INCLUDE_DIRS
     PARENT_SCOPE)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/common             ENGINE_COMMON_SRC_LIST)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/level              ENGINE_LEVEL_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/mesh      ENGINE_RENDERER_MESH_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/material  ENGINE_RENDERER_MATERIAL_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component/camera    ENGINE_COMPONENT_CAMERA_SRC_LIST)
@@ -24,6 +26,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}                    ENGINE_SRC_L
 
 set(ENGINE_ALL_SRC_LIST
     ${ENGINE_COMMON_SRC_LIST}
+    ${ENGINE_LEVEL_SRC_LIST}
     ${ENGINE_RENDERER_MESH_SRC_LIST}
     ${ENGINE_RENDERER_MATERIAL_SRC_LIST}
     ${ENGINE_COMPONENT_CAMERA_SRC_LIST}
