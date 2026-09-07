@@ -8,7 +8,7 @@ namespace engine {
 namespace renderer {
 
 class RenderInterface {
-    friend class Singleton<RenderInterface>;
+    friend class framework::Singleton<RenderInterface>;
 public:
     RenderInterface(const RenderInterface&) = delete;
     RenderInterface& operator = (const RenderInterface&) = delete;
@@ -24,5 +24,5 @@ private:
 } // namespace renderer
 } // namespace engine
 
-#define RenderInterface Singleton<engine::renderer::RenderInterface>::getInstance().getProxy()
+#define RenderInterface framework::Singleton<engine::renderer::RenderInterface>::getInstance().getProxy()
 #endif

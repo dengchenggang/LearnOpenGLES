@@ -24,9 +24,9 @@ public:
     int32_t getWidth()          const { return mWidth; }
     int32_t getHeight()         const { return mHeight; }
     VideoFormat getFormat()     const { return mFormat; }
-    int64_t getTimestamp()      const { return mTimestamp; }
     size_t  getSize()           const { return mSize; }
-    void resetTimestamp(int64_t timestamp) { mTimestamp = timestamp; }
+    int64_t getTimestamp()      const { return mTimestamp; }
+    void setTimestamp(int64_t timestamp) { mTimestamp = timestamp; }
 private:
     const int32_t mWidth;
     const int32_t mHeight;

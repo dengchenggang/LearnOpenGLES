@@ -14,7 +14,7 @@
 namespace view {
 
 class ViewManager {
-    friend class Singleton<ViewManager>;
+    friend class framework::Singleton<ViewManager>;
 public:
     ViewManager(const ViewManager&) = delete;
     ViewManager& operator= (const ViewManager&) = delete;
@@ -45,6 +45,6 @@ private:
 
 } // namespace view
 
-#define ViewManager Singleton<view::ViewManager>::getInstance()
+#define ViewManager framework::Singleton<view::ViewManager>::getInstance()
 
 #endif

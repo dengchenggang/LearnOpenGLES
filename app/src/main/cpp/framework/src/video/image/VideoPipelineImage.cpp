@@ -57,7 +57,7 @@ void VideoPipelineImage::dispatchLoop() {
     size_t size = calculateSize(mWidth, mHeight, mFormat);
     auto pair = mBufferPool.acquire(size, mImageData.data(), mWidth, mHeight, mFormat, timestamp);
     if (!pair.second) {
-        pair.first->resetTimestamp(timestamp);
+        pair.first->setTimestamp(timestamp);
     }
 
     auto videoFrame = pair.first;

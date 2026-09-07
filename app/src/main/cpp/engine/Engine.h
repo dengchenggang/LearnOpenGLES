@@ -9,7 +9,7 @@
 namespace engine {
 
 class Engine {
-    friend class Singleton<Engine>;
+    friend class framework::Singleton<Engine>;
 public:
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
@@ -45,5 +45,5 @@ private:
 
 } // namespace engine
 
-#define Engine Singleton<engine::Engine>::getInstance()
+#define Engine framework::Singleton<engine::Engine>::getInstance()
 #endif

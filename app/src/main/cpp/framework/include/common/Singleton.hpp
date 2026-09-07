@@ -2,6 +2,7 @@
 #define SINGLETON_H
 #include <memory>
 
+namespace framework {
 template<typename T>
 class Singleton {
 public:
@@ -19,5 +20,6 @@ private:
     Singleton() = default;
     ~Singleton() = default;
 };
+}
 #endif
 
