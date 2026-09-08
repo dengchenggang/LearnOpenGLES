@@ -2,4 +2,6 @@
     <string name="app_name">LearnOpenGLES</string>
     <string name="game_view_content_description">Game view</string>
     <string name="btn_close">关闭</string>
+    <string name="btn_start">启动服务</string>
+    <string name="btn_stop">停止服务</string>
 </resources>

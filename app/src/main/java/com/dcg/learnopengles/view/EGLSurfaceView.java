@@ -1,12 +1,13 @@
-package com.dcg.learnopengles;
+package com.dcg.learnopengles.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
+
+import com.dcg.learnopengles.NativeBridge;
 
 public class EGLSurfaceView extends SurfaceView {
 

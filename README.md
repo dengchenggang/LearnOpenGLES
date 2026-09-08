@@ -91,6 +91,13 @@
 SystemPropertiesAdvanced
 
 adb connect 127.0.0.1:16384
-```
 
 git remote add origin git@github.com:dengchenggang/LearnOpenGLES.git
+```
+
+## 3 调用LearnOpenGLES
+
+```sh
+adb shell am start-foreground-service -n com.dcg.learnopengles/.service.RenderService
+killall -9 com.dcg.learnopengles
+```

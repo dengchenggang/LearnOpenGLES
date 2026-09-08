@@ -57,7 +57,7 @@ void Engine::beginPlay(ANativeWindow* window) {
     auto future = mTaskPool->submit([this, window]() {
         bool result = mRenderContext.beginPlay(window);
         if (result) {
-            RenderInterface.setClearColor(1, 0, 0, 1);
+            RenderInterface.setClearColor(1, 1, 0, 1);
         }
         return result;
     });
