@@ -49,7 +49,7 @@ private:
     std::shared_ptr<Material> mMaterial;
 
     glm::vec2 mImageSize = glm::vec2(1.0f, 1.0f);
-    glm::vec4 mColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec4 mColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.3f);
 
     // 是否已初始化
     bool mInitialized = false;
