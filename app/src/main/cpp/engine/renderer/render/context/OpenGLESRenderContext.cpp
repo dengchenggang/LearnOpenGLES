@@ -1,24 +1,25 @@
-#include "ViewCtrlEGLSurface.h"
+#include "OpenGLESRenderContext.h"
 #include "utils/Log.h"
 #include <GLES3/gl3.h>
 #include <limits>
 
-KEY_VALUE(TAG, ViewCtrlEGLSurface)
+KEY_VALUE(TAG, OpenGLESRenderContext)
 
-namespace view {
+namespace engine {
+namespace renderer {
 
-ViewCtrlEGLSurface::ViewCtrlEGLSurface()
+OpenGLESRenderContext::OpenGLESRenderContext()
     : mDisplay(EGL_NO_DISPLAY)
     , mConfig(nullptr)
     , mContext(EGL_NO_CONTEXT)
     , mSurface(EGL_NO_SURFACE) {
 }
 
-ViewCtrlEGLSurface::~ViewCtrlEGLSurface() {
-    release();
+OpenGLESRenderContext::~OpenGLESRenderContext() {
+    deInitialize();
 }
 
-bool ViewCtrlEGLSurface::initialize(std::int32_t gles) {
+bool OpenGLESRenderContext::initialize(std::int32_t gles) {
     LogI("%s initialize enter.", TAG);
 
     if (mInitialized) {
@@ -56,8 +57,8 @@ bool ViewCtrlEGLSurface::initialize(std::int32_t gles) {
     return true;
 }
 
-bool ViewCtrlEGLSurface::bind(ANativeWindow *window) {
-    LogI("%s bind enter.", TAG);
+bool OpenGLESRenderContext::beginPlay(ANativeWindow *window) {
+    LogI("%s beginPlay enter.", TAG);
 
     if (!mInitialized) {
         LogE("%s not initialized!", TAG);
@@ -86,11 +87,11 @@ bool ViewCtrlEGLSurface::bind(ANativeWindow *window) {
 
     mBound = true;
 
-    LogI("%s bind success: width=%d, height=%d.", TAG, mWidth, mHeight);
+    LogI("%s beginPlay success: width=%d, height=%d.", TAG, mWidth, mHeight);
     return true;
 }
 
-void ViewCtrlEGLSurface::setViewPort(std::int32_t w, std::int32_t h) {
+void OpenGLESRenderContext::setViewPort(std::int32_t w, std::int32_t h) {
     LogI("%s setViewPort, width=%d, height=%d", TAG, w, h);
     if (!mBound) {
         return;
@@ -100,12 +101,12 @@ void ViewCtrlEGLSurface::setViewPort(std::int32_t w, std::int32_t h) {
     glViewport(0, 0, w, h);
 }
 
-void ViewCtrlEGLSurface::swapBuffers() {
+void OpenGLESRenderContext::swapBuffers() {
     eglSwapBuffers(mDisplay, mSurface);
 }
 
-void ViewCtrlEGLSurface::unbind() {
-    LogI("%s unbind enter", TAG);
+void OpenGLESRenderContext::endPlay() {
+    LogI("%s endPlay enter", TAG);
 
     eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     if (mSurface != EGL_NO_SURFACE) {
@@ -114,11 +115,11 @@ void ViewCtrlEGLSurface::unbind() {
     }
     mBound = false;
 
-    LogI("%s unbind done", TAG);
+    LogI("%s endPlay done", TAG);
 }
 
-void ViewCtrlEGLSurface::release() {
-    LogI("%s release enter.", TAG);
+void OpenGLESRenderContext::deInitialize() {
+    LogI("%s deInitialize enter.", TAG);
 
     if (mDisplay != EGL_NO_DISPLAY) {
         eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -137,7 +138,8 @@ void ViewCtrlEGLSurface::release() {
     mInitialized = false;
     mBound = false;
 
-    LogI("%s release exit.", TAG);
+    LogI("%s deInitialize exit.", TAG);
 }
 
-}  // namespace view
+} // namespace renderer
+} // namespace engine

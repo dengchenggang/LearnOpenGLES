@@ -5,9 +5,13 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <atomic>
+#include <chrono>
 #include "level/Level.h"
 #include "level/ILevelManager.h"
 #include <common/Singleton.hpp>
+#include "OpenGLESRenderContext.h"
+#include "utils/TaskPool.h"
 
 namespace engine {
 
@@ -17,22 +21,36 @@ public:
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
 public:
-    void init(std::vector<LevelPtr>& levels, const std::string& startLevel);
-    void setViewPort(int32_t width, int32_t height);
-    void setBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-    void update(int64_t deltaTime);
-    void render(int64_t deltaTime);
+    void init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels);
+    void beginPlay(ANativeWindow* window);
+    void resize(std::int32_t w, std::int32_t h);
+    void endPlay();
     void deInit();
 public:
     void changeLevel(const std::string& levelName) override;
 private:
-    Engine() = default;
-    ~Engine() = default;
+    Engine();
+    ~Engine();
+private:
+    void renderFrame();
+    void scheduleNextFrame();
+private:
+    void update(int64_t deltaTime);
+    void render(int64_t deltaTime);
     void doChangeLevel(const std::string& levelName);
 private:
     std::map<std::string, LevelPtr> mLevels;
     Level* mActiveLevel;
     std::string mNextActiveLevelName;
+private:
+    renderer::OpenGLESRenderContext mRenderContext {};
+    std::unique_ptr<TaskPool> mTaskPool {std::make_unique<TaskPool>()};
+
+    std::atomic<bool> mRunning{false};
+    std::atomic<bool> mStopRequested{false};
+
+    std::int64_t mTargetFrameIntervalMs{33};
+    std::chrono::steady_clock::time_point mLastFrameTime;
 };
 
 } // namespace engine

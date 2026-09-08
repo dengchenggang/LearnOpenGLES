@@ -8,6 +8,7 @@ set(ENGINE_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/component/camera
     ${CMAKE_CURRENT_SOURCE_DIR}/component/transform
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer/render
+    ${CMAKE_CURRENT_SOURCE_DIR}/renderer/render/context
     ${CMAKE_CURRENT_SOURCE_DIR}/component
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
     PARENT_SCOPE)
@@ -21,6 +22,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component/transform ENGINE_COMP
 # ensure reconfigure picks up new files
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer           ENGINE_RENDERER_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/render    ENGINE_RENDERER_RENDER_SRC_LIST)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/render/context ENGINE_RENDERER_RENDER_CONTEXT_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component          ENGINE_COMPONENT_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}                    ENGINE_SRC_LIST)
 
@@ -33,6 +35,7 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_COMPONENT_TRANSFORM_SRC_LIST}
     ${ENGINE_RENDERER_SRC_LIST}
     ${ENGINE_RENDERER_RENDER_SRC_LIST}
+    ${ENGINE_RENDERER_RENDER_CONTEXT_SRC_LIST}
     ${ENGINE_COMPONENT_SRC_LIST}
     ${ENGINE_SRC_LIST}
     PARENT_SCOPE)

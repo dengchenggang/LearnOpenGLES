@@ -1,5 +1,7 @@
 #include "filesystem/FileSystem.h"
-#include "ViewManager.h"
+#include "Engine.h"
+#include "common/ModuleDef.h"
+#include "nvs/NVSModule.h"
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <jni.h>
@@ -18,28 +20,30 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
     FileSystem.SetReader(filesDirStr);
     FileSystem.SetReader(AAssetManager_fromJava(env, assetManager));
     FileSystem.SetWriter(filesDirStr);
-    ViewManager.init(gles);
+    std::map<std::string, engine::LevelPtr> levels;
+    levels.emplace(module::MODULE_NAME_NVS, std::make_unique<module::NVSModule>(Engine));
+    Engine.init(gles, std::move(levels));
 }
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeBind(JNIEnv* env, jclass, jobject surface) {
     ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
-    ViewManager.bind(window);
+    Engine.beginPlay(window);
 }
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeResize(JNIEnv* env, jclass, jint w, jint h) {
-    ViewManager.resize(w, h);
+    Engine.resize(w, h);
 }
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeUnbind(JNIEnv* env, jclass) {
-    ViewManager.unbind();
+    Engine.endPlay();
 }
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeDestroy(JNIEnv* env, jclass) {
-    ViewManager.deInit();
+    Engine.deInit();
     FileSystem.reset();
 }
 }

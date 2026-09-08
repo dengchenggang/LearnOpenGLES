@@ -1,26 +1,27 @@
-#ifndef LEARNOPENGLES_VIEWCTRLEGLSURFACE_H
-#define LEARNOPENGLES_VIEWCTRLEGLSURFACE_H
+#ifndef LEARNOPENGLES_OPENGLESRENDERCONTEXT_H
+#define LEARNOPENGLES_OPENGLESRENDERCONTEXT_H
 
 #include <EGL/egl.h>
 #include <android/native_window_jni.h>
 #include <cstdint>
 
-namespace view {
+namespace engine {
+namespace renderer {
 
-class ViewCtrlEGLSurface {
+class OpenGLESRenderContext {
 public:
-    ViewCtrlEGLSurface();
-    ~ViewCtrlEGLSurface();
+    OpenGLESRenderContext();
+    ~OpenGLESRenderContext();
 
-    ViewCtrlEGLSurface(const ViewCtrlEGLSurface&) = delete;
-    ViewCtrlEGLSurface& operator =(const ViewCtrlEGLSurface&) = delete;
+    OpenGLESRenderContext(const OpenGLESRenderContext&) = delete;
+    OpenGLESRenderContext& operator =(const OpenGLESRenderContext&) = delete;
 
 public:
     // EGL 初始化与释放
     bool initialize(std::int32_t gles);
-    bool bind(ANativeWindow *window);
-    void unbind();
-    void release();
+    bool beginPlay(ANativeWindow *window);
+    void endPlay();
+    void deInitialize();
 
     // 交换缓冲区
     void swapBuffers();
@@ -50,6 +51,7 @@ private:
     std::int32_t mGLESVersion{3};
 };
 
-}  // namespace view
+} // namespace renderer
+} // namespace engine
 
 #endif

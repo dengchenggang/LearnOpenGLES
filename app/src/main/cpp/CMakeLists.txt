@@ -37,13 +37,7 @@ include_directories(${ENGINE_INCLUDE_DIRS})
 add_subdirectory(module)
 include_directories(${MODULE_INCLUDE_DIRS})
 
-## view
-include_directories(${PROJECT_SOURCE_DIR}/view)
-
-aux_source_directory(${PROJECT_SOURCE_DIR}/view            VIEW_SRC_LIST)
-
 set(PLATFORM_ALL_SRC_LIST
-    ${VIEW_SRC_LIST}
     ${MODULE_ALL_SRC_LIST})
 
 ## 编译动态库
