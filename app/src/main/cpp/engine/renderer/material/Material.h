@@ -23,10 +23,11 @@ public:
     Shader& getShader() { return *mShader; }
     const Shader& getShader() const { return *mShader; }
 
-    // 设置纹理
-    void setTexture(std::shared_ptr<Texture> texture, uint32_t unit = 0);
+    // 设置纹理（可同时指定 sampler uniform 名称）
+    void setTexture(std::shared_ptr<Texture> texture, uint32_t unit, const std::string& samplerName);
     Texture& getTexture(uint32_t unit = 0);
     const Texture& getTexture(uint32_t unit = 0) const;
+    bool hasTexture(uint32_t unit = 0) const;
 
     // 绑定/解绑
     void bind() const;
@@ -52,6 +53,7 @@ private:
 
     std::shared_ptr<Shader> mShader;
     std::vector<TextureSlot> mTextures;
+    std::unordered_map<std::string, uint32_t> mSamplerUnits;
 };
 
 

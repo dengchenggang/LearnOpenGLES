@@ -22,7 +22,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
     FileSystem.SetWriter(filesDirStr);
     std::map<std::string, engine::LevelPtr> levels;
     levels.emplace(module::MODULE_NAME_NVS, std::make_unique<module::NVSModule>(Engine));
-    Engine.init(gles, std::move(levels));
+    Engine.init(gles, std::move(levels), module::MODULE_NAME_NVS);
 }
 
 JNIEXPORT void JNICALL

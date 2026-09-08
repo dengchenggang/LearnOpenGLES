@@ -19,11 +19,11 @@ RectTransform& RectTransform::setSize(const glm::vec2& size) {
 
 const glm::mat4& RectTransform::getModelMatrix() const {
     if (mModelDirty) {
-        glm::vec3 pivotOffset(-mPivot.x * mSize.x, -mPivot.y * mSize.y, 0.0f);
+        glm::vec3 pivotOffset(-mPivot.x, -mPivot.y, 0.0f);
 
         mModelMatrix = glm::translate(glm::mat4(1.0f), mPosition)
                      * glm::mat4_cast(mRotation)
-                     * glm::scale(glm::mat4(1.0f), mScale)
+                     * glm::scale(glm::mat4(1.0f), glm::vec3(mScale.x * mSize.x, mScale.y * mSize.y, mScale.z))
                      * glm::translate(glm::mat4(1.0f), pivotOffset);
         mModelDirty = false;
     }

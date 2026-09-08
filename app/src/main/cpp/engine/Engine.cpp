@@ -17,9 +17,11 @@ Engine::~Engine() {
     deInit();
 }
 
-void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels) {
+void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, const std::string& startLevel) {
+    LogI("init enter: startLevel=%s", startLevel.c_str());
     mTaskPool->start();
-    auto future = mTaskPool->submit([this, gles, levels = std::move(levels)]() mutable {
+    auto future = mTaskPool->submit([this, gles, levels = std::move(levels), startLevel]() mutable {
+        LogI("init task enter: startLevel=%s", startLevel.c_str());
         bool result = mRenderContext.initialize(gles);
         if (result) {
             mActiveLevel = nullptr;
@@ -35,7 +37,10 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels) {
             for (auto& pair : mLevels) {
                 pair.second->init();
             }
+
+            changeLevel(startLevel);
         }
+        LogI("init task exit: result=%d", result);
         return result;
     });
     future.get();
@@ -139,11 +144,6 @@ void Engine::renderFrame() {
     auto deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(frameStartTime - mLastFrameTime).count();
     mLastFrameTime = frameStartTime;
 
-    auto swapStart = std::chrono::steady_clock::now();
-    mRenderContext.swapBuffers();
-    auto swapCost = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::steady_clock::now() - swapStart).count();
-
     auto updateStart = std::chrono::steady_clock::now();
     update(deltaTime);
     auto updateCost = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -153,6 +153,11 @@ void Engine::renderFrame() {
     render(deltaTime);
     auto renderCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - renderStart).count();
+
+    auto swapStart = std::chrono::steady_clock::now();
+    mRenderContext.swapBuffers();
+    auto swapCost = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - swapStart).count();
 
     auto frameCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - frameStartTime).count();

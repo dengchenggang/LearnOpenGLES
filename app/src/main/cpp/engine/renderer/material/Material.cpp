@@ -5,14 +5,20 @@ namespace engine {
 namespace renderer {
 
 
-void Material::setTexture(std::shared_ptr<Texture> texture, uint32_t unit) {
+void Material::setTexture(std::shared_ptr<Texture> texture, uint32_t unit, const std::string& samplerName) {
     for (auto& slot : mTextures) {
         if (slot.unit == unit) {
             slot.texture = std::move(texture);
+            if (!samplerName.empty()) {
+                mSamplerUnits[samplerName] = unit;
+            }
             return;
         }
     }
     mTextures.push_back({std::move(texture), unit});
+    if (!samplerName.empty()) {
+        mSamplerUnits[samplerName] = unit;
+    }
 }
 
 Texture& Material::getTexture(uint32_t unit) {
@@ -33,6 +39,15 @@ const Texture& Material::getTexture(uint32_t unit) const {
     throw std::runtime_error("Texture not found");
 }
 
+bool Material::hasTexture(uint32_t unit) const {
+    for (const auto& slot : mTextures) {
+        if (slot.unit == unit && slot.texture) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Material::bind() const {
     if (mShader) {
         mShader->bind();
@@ -40,6 +55,12 @@ void Material::bind() const {
     for (const auto& slot : mTextures) {
         if (slot.texture) {
             slot.texture->bind(slot.unit);
+        }
+    }
+    // 自动设置 sampler uniform 对应的纹理单元
+    for (const auto& pair : mSamplerUnits) {
+        if (mShader) {
+            mShader->setUniformInt(pair.first, static_cast<int32_t>(pair.second));
         }
     }
 }

@@ -6,7 +6,7 @@ namespace module {
 class NVSModule : public engine::Level {
 public:
     explicit NVSModule(engine::ILevelManager& levelManager);
-    ~NVSModule();
+    ~NVSModule() override;
 public:
     void init() override;
     void deInit() override;

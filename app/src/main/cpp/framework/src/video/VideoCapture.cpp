@@ -52,11 +52,21 @@ std::unique_ptr<VideoPipeline> createPipeline(const std::string& url) {
                 LogE("invalid image url: %s", url.c_str());
                 return nullptr;
             }
-            std::string assetName = parts[0];
-            int width  = std::stoi(parts[1]);
-            int height = std::stoi(parts[2]);
-            VideoFormat format = parseFormat(parts[3]);
-            float fps = std::stof(parts[4]);
+            std::string fpsStr = parts.back(); parts.pop_back();
+            std::string formatStr = parts.back(); parts.pop_back();
+            std::string heightStr = parts.back(); parts.pop_back();
+            std::string widthStr = parts.back(); parts.pop_back();
+
+            std::string assetName;
+            for (size_t i = 0; i < parts.size(); ++i) {
+                if (i > 0) assetName += '/';
+                assetName += parts[i];
+            }
+
+            int width  = std::stoi(widthStr);
+            int height = std::stoi(heightStr);
+            VideoFormat format = parseFormat(formatStr);
+            float fps = std::stof(fpsStr);
             return std::make_unique<VideoPipelineImage>(assetName, width, height, format, fps);
         }
     } catch (...) {

@@ -44,15 +44,30 @@ void Image::onUpdate(float deltaTime) {
 }
 
 void Image::onRender() {
-    if (!mInitialized || !mMesh || !mMesh->isValid() || !mMaterial || !mMaterial->isValid()) {
+    if (!mInitialized) {
+        LogW("%s not initialized, skip render", TAG);
         return;
     }
+    if (!mMesh || !mMesh->isValid()) {
+        LogW("%s mesh invalid, skip render", TAG);
+        return;
+    }
+    if (!mMaterial || !mMaterial->isValid()) {
+        LogW("%s material invalid, skip render", TAG);
+        return;
+    }
+    if (!mMaterial->hasTexture(0)) {
+        LogW("%s no texture, skip render", TAG);
+        return;
+    }
+
+    // 绑定材质（必须先 useProgram 才能设置 uniform）
+    mMaterial->bind();
 
     // 更新变换矩阵和颜色
     updateTransform();
 
-    // 绑定材质并绘制
-    mMaterial->bind();
+    // 绘制
     mMesh->draw();
     mMaterial->unbind();
 }
@@ -99,23 +114,44 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
             return false;
     }
 
-    // 创建纹理
-    auto texture = std::make_shared<Texture>();
+    // 若 Texture 已存在且尺寸格式匹配，则更新数据
+    if (mMaterial->hasTexture(0)) {
+        auto& texture = mMaterial->getTexture(0);
+        if (texture.isValid() && texture.getWidth() == width && texture.getHeight() == height && texture.getFormat() == format) {
+            texture.updateData(buffer, 0, 0, width, height);
+            LogI("%s texture updated: %dx%d", TAG, width, height);
+        } else {
+            auto newTexture = std::make_shared<Texture>();
+            TextureDesc desc;
+            desc.width = width;
+            desc.height = height;
+            desc.format = format;
+            desc.initialData = buffer;
+            if (!newTexture->create(desc)) {
+                LogE("%s failed to create texture: %dx%d", TAG, width, height);
+                return false;
+            }
+            mMaterial->setTexture(std::move(newTexture), 0, "uTexture");
+            LogI("%s texture recreated: %dx%d", TAG, width, height);
+        }
+    } else {
+        // 创建纹理
+        auto texture = std::make_shared<Texture>();
 
-    TextureDesc desc;
-    desc.width = width;
-    desc.height = height;
-    desc.format = format;
-    desc.initialData = buffer;
+        TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = format;
+        desc.initialData = buffer;
 
-    if (!texture->create(desc)) {
-        LogE("%s failed to create texture: %dx%d", TAG, width, height);
-        return false;
+        if (!texture->create(desc)) {
+            LogE("%s failed to create texture: %dx%d", TAG, width, height);
+            return false;
+        }
+
+        mMaterial->setTexture(std::move(texture), 0, "uTexture");
+        LogI("%s texture created successfully: %dx%d", TAG, width, height);
     }
-
-    mMaterial->setTexture(std::move(texture), 0);
-
-    LogI("%s texture created successfully: %dx%d", TAG, width, height);
 
     // 保存图像原始大小
     mImageSize = glm::vec2(static_cast<float>(width), static_cast<float>(height));
@@ -165,6 +201,8 @@ void Image::createMesh() {
     mMesh->setAttributeData(0, positions, sizeof(positions));
     mMesh->setAttributeData(1, texCoords, sizeof(texCoords));
     mMesh->setIndexData(indices, sizeof(indices), DataType::UShort, 6);
+
+    LogI("%s mesh created: valid=%d", TAG, mMesh->isValid());
 }
 
 void Image::updateTransform() {
@@ -172,18 +210,22 @@ void Image::updateTransform() {
     const glm::mat4& model = mRectTransform.getModelMatrix();
 
     // 从 RenderInterface 获取视口尺寸并构建正交投影矩阵
-    int32_t x, viewportWidth, viewportHeight;
-    RenderInterface.getViewport(&x, &x, &viewportWidth, &viewportHeight);
+    int32_t x, y, viewportWidth, viewportHeight;
+    RenderInterface.getViewport(&x, &y, &viewportWidth, &viewportHeight);
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(viewportWidth),
                                       0.0f, static_cast<float>(viewportHeight),
                                       -1.0f, 1.0f);
+
+    auto pos = mRectTransform.getPosition();
+    auto size = mRectTransform.getSize();
+    LogD("%s render: pos=(%.1f,%.1f,%.1f) size=(%.1f,%.1f) viewport=%dx%d",
+         TAG, pos.x, pos.y, pos.z, size.x, size.y, viewportWidth, viewportHeight);
 
     // 设置 Uniform
     mMaterial->setUniformMat4("uModelMatrix", model);
     mMaterial->setUniformMat4("uViewMatrix", glm::mat4(1.0f));
     mMaterial->setUniformMat4("uProjectionMatrix", projection);
     mMaterial->setUniformVec4("uColor", mColor.r, mColor.g, mColor.b, mColor.a);
-    mMaterial->setUniformInt("uTexture", 0);
 }
 
 bool Image::loadDefaultShader() {
