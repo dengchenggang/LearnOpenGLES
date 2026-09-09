@@ -32,11 +32,15 @@ const char* formatToString(int32_t fmt) {
     }
 }
 
-VideoPipelineCamera::VideoPipelineCamera(int32_t cameraId, int32_t width, int32_t height, VideoFormat format)
-    : mCameraId(cameraId)
+VideoPipelineCamera::VideoPipelineCamera(int32_t cameraId, int32_t width, int32_t height, VideoFormat format, float fps, bool useHardwareBuffer)
+    : VideoPipeline(useHardwareBuffer)
+    , mCameraId(cameraId)
     , mWidth(width)
     , mHeight(height)
-    , mFormat(format) {
+    , mFormat(format)
+    , mFps(fps)
+{
+
 }
 
 VideoPipelineCamera::~VideoPipelineCamera() {
@@ -175,7 +179,14 @@ bool VideoPipelineCamera::createImageReader() {
         return false;
     }
 
-    media_status_t status = AImageReader_new(mWidth, mHeight, aFormat, 2, reinterpret_cast<AImageReader**>(&mImageReader));
+    media_status_t status;
+    if (useHardwareBuffer()) {
+        status = AImageReader_newWithUsage(mWidth, mHeight, aFormat,
+            AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE,
+            2, reinterpret_cast<AImageReader**>(&mImageReader));
+    } else {
+        status = AImageReader_new(mWidth, mHeight, aFormat, 2, reinterpret_cast<AImageReader**>(&mImageReader));
+    }
     if (status != AMEDIA_OK || !mImageReader) {
         LOG_EXIT("failed to create AImageReader, status: %d", status);
         return false;
@@ -347,25 +358,73 @@ void VideoPipelineCamera::handleSessionClosed(ACameraCaptureSession* session) {
 }
 
 void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
-    LogD("enter");
+    auto acquireStart = std::chrono::steady_clock::now();
     AImage* image = nullptr;
     media_status_t status = AImageReader_acquireLatestImage(reader, &image);
+    auto acquireElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - acquireStart).count();
     if (status != AMEDIA_OK || !image) {
         LogE("exit: failed to acquire latest image, status: %d", status);
         return;
     }
 
-    auto videoFrame = std::make_shared<VideoFrameCamera>(image);
-    dispath(videoFrame);
+    float fps = 0.0f;
+    float captureFps = 0.0f;
 
+    int64_t captureTime = 0;
+    AImage_getTimestamp(image, &captureTime);
+
+    if (mLastCaptureTime != 0) {
+        int64_t captureElapsedMs = (captureTime - mLastCaptureTime) / 1'000'000;
+        captureFps = captureElapsedMs > 0 ? 1000.0f / static_cast<float>(captureElapsedMs) : 0.0f;
+    }
+    mLastCaptureTime = captureTime;
+
+    auto currentTimePoint = std::chrono::steady_clock::now();
+    if (mLastDispatchTimePoint.time_since_epoch().count() != 0) {
+        auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTimePoint - mLastDispatchTimePoint).count();
+        fps = elapsedMs > 0 ? 1000.0f / static_cast<float>(elapsedMs) : 0.0f;
+    }
+    mLastDispatchTimePoint = currentTimePoint;
+
+    int64_t escaped = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        currentTimePoint.time_since_epoch()).count();
+    int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+
+    auto dispatchStart = std::chrono::steady_clock::now();
+    if (useHardwareBuffer()) {
+        dispatchHardwareBuffer(image, timestamp, mLastCaptureTime);
+    } else {
+        dispatchVideoFrame(image, timestamp, mLastCaptureTime);
+    }
+    auto dispatchElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - dispatchStart).count();
+
+    LogI("fps=%.2f, captureFps=%.2f, acquireTimeMs=%ld, dispatchTimeMs=%ld",
+        fps, captureFps, acquireElapsedMs, dispatchElapsedMs);
+}
+
+void VideoPipelineCamera::dispatchVideoFrame(AImage* image, int64_t timestamp, int64_t escaped) {
+    int32_t width = 0, height = 0;
+    AImage_getWidth(image, &width);
+    AImage_getHeight(image, &height);
+    int32_t aFormat = 0;
+    AImage_getFormat(image, &aFormat);
+    auto videoFrame = std::make_shared<VideoFrameCamera>(image, width, height, toVideoFormat(aFormat));
+    videoFrame->setTimestamp(timestamp);
+    videoFrame->setEscaped(escaped);
+    dispath(videoFrame);
+}
+
+void VideoPipelineCamera::dispatchHardwareBuffer(AImage* image, int64_t timestamp, int64_t escaped) {
     AHardwareBuffer* buffer = nullptr;
     AImage_getHardwareBuffer(image, &buffer);
     if (buffer) {
-        auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer);
+        auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer, timestamp, escaped);
         dispath(hardwareBuffer);
     }
-
-    LogD("exit");
+    AImage_delete(image);
 }
 
 } // namespace framework

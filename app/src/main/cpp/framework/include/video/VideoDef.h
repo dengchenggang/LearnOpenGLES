@@ -1,26 +1,69 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace framework {
 
-enum class VideoFormat : int32_t {
+enum class VideoFormat : uint32_t {
     RGBA_8888 = 1,    // AIMAGE_FORMAT_RGBA_8888
     RGB_888 = 3,      // AIMAGE_FORMAT_RGB_888
     YUV_420_888 = 35, // AIMAGE_FORMAT_YUV_420_888
     Unknown = 0
 };
 
-inline size_t calculateSize(int32_t width, int32_t height, VideoFormat format) {
+inline VideoFormat toVideoFormat(const char* format) {
+    if (strcmp(format, "RGBA_8888") == 0) {
+        return VideoFormat::RGBA_8888;
+    } else if (strcmp(format, "RGB_888") == 0) {
+        return VideoFormat::RGB_888;
+    } else if (strcmp(format, "YUV_420_888") == 0) {
+        return VideoFormat::YUV_420_888;
+    } else {
+        return VideoFormat::Unknown;
+    }
+}
+
+inline VideoFormat toVideoFormat(const std::string& format) {
+    return toVideoFormat(format.c_str());
+}
+
+inline const char* toString(VideoFormat videoFormat) {
+    switch (videoFormat) {
+        case VideoFormat::RGBA_8888:
+            return "RGBA_8888";
+        case VideoFormat::RGB_888:
+            return "RGB_888";
+        case VideoFormat::YUV_420_888:
+            return "YUV_420_888";
+        default:
+            return "Unknown";
+    }
+}
+
+inline int32_t calculateStride(int32_t width, VideoFormat format) {
     switch (format) {
         case VideoFormat::RGBA_8888:
-            return static_cast<size_t>(width) * height * 4;
+            return width * 4;
         case VideoFormat::RGB_888:
-            return static_cast<size_t>(width) * height * 3;
+            return width * 3;
         case VideoFormat::YUV_420_888:
-            return static_cast<size_t>(width) * height * 3 / 2;
+            return width;
         default:
-            return static_cast<size_t>(width) * height * 4;
+            return width;
+    }
+}
+
+inline int64_t calculateSize(int32_t width, int32_t height, VideoFormat format) {
+    switch (format) {
+        case VideoFormat::RGBA_8888:
+            return width * height * 4;
+        case VideoFormat::RGB_888:
+            return width * height * 3;
+        case VideoFormat::YUV_420_888:
+            return width * height * 3 / 2;
+        default:
+            return width * height;
     }
 }
 

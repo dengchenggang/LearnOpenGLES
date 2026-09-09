@@ -8,8 +8,8 @@ namespace framework {
 
 class VideoFrameBuffer : public VideoFrame {
 public:
-    VideoFrameBuffer(const uint8_t* buffer, int32_t width, int32_t height, VideoFormat format, int64_t timestamp)
-        : VideoFrame(width, height, format, timestamp)
+    VideoFrameBuffer(const uint8_t* buffer, int32_t width, int32_t height, VideoFormat format)
+        : VideoFrame(width, height, format)
         , mBuffer(std::make_unique<uint8_t[]>(getSize())) {
             std::memcpy(mBuffer.get(), buffer, getSize());
         }
@@ -19,7 +19,7 @@ public:
         return mBuffer.get();
     }
 
-    void resetBuffer(const uint8_t* buffer, size_t size) {
+    void setData(const uint8_t* buffer, size_t size) {
         if (size > getSize()) {
             return;
         }

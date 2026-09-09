@@ -8,10 +8,6 @@
 
 namespace framework {
 
-VideoCapture::VideoCapture() = default;
-
-VideoCapture::~VideoCapture() = default;
-
 std::vector<std::string> split(const std::string& s, char delimiter) {
     std::vector<std::string> tokens;
     std::stringstream ss(s);
@@ -24,76 +20,23 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
     return tokens;
 }
 
-VideoFormat parseFormat(const std::string& s) {
-    if (s == "RGBA_8888") return VideoFormat::RGBA_8888;
-    if (s == "RGB_888")   return VideoFormat::RGB_888;
-    if (s == "YUV_420_888") return VideoFormat::YUV_420_888;
-    return VideoFormat::RGBA_8888;
-}
-
-std::unique_ptr<VideoPipeline> createPipeline(const std::string& url) {
-    try {
-        if (url.find("camera://") == 0) {
-            auto parts = split(url.substr(9), '/');
-            if (parts.size() < 4) {
-                LogE("invalid camera url: %s", url.c_str());
-                return nullptr;
-            }
-            int32_t cameraId = std::stoi(parts[0]);
-            int32_t width    = std::stoi(parts[1]);
-            int32_t height   = std::stoi(parts[2]);
-            VideoFormat format = parseFormat(parts[3]);
-            return std::make_unique<VideoPipelineCamera>(cameraId, width, height, format);
-        }
-
-        if (url.find("image://") == 0) {
-            auto parts = split(url.substr(8), '/');
-            if (parts.size() < 5) {
-                LogE("invalid image url: %s", url.c_str());
-                return nullptr;
-            }
-            std::string fpsStr = parts.back(); parts.pop_back();
-            std::string formatStr = parts.back(); parts.pop_back();
-            std::string heightStr = parts.back(); parts.pop_back();
-            std::string widthStr = parts.back(); parts.pop_back();
-
-            std::string assetName;
-            for (size_t i = 0; i < parts.size(); ++i) {
-                if (i > 0) assetName += '/';
-                assetName += parts[i];
-            }
-
-            int width  = std::stoi(widthStr);
-            int height = std::stoi(heightStr);
-            VideoFormat format = parseFormat(formatStr);
-            float fps = std::stof(fpsStr);
-            return std::make_unique<VideoPipelineImage>(assetName, width, height, format, fps);
-        }
-    } catch (...) {
-        LogE("failed to parse url: %s", url.c_str());
-        return nullptr;
-    }
-
-    LogE("unsupported url scheme: %s", url.c_str());
-    return nullptr;
+bool VideoCapture::setVideoPipelineInfo(const std::string& url, int32_t width, int32_t height, VideoFormat format, float fps) {
+    std::lock_guard<std::mutex> lock(mMutex);
+    auto result = mVideoPipelineInfo.emplace(url, VideoPipelineInfo {url, width, height, format, fps});
+    return result.second;
 }
 
 bool VideoCapture::connect(const std::string& url, const std::string& moduleName, const VideoFrameCallback& callback) {
     LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
     std::lock_guard<std::mutex> lock(mMutex);
 
-    auto it = mVideoPipelines.find(url);
-    if (it == mVideoPipelines.end()) {
-        auto pipeline = createPipeline(url);
-        if (!pipeline) {
-            LogE("exit: failed to create pipeline for url: %s", url.c_str());
-            return false;
-        }
-        it = mVideoPipelines.emplace(url, std::move(pipeline)).first;
-        it->second->start();
+    auto pipeline = getOrCreatePipeline(url, false);
+    if (!pipeline) {
+        LogE("exit: failed to get or create pipeline for url: %s", url.c_str());
+        return false;
     }
 
-    auto result = it->second->connect(moduleName, callback);
+    auto result = pipeline->connect(moduleName, callback);
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
     return result.first != result.second;
 }
@@ -102,18 +45,13 @@ bool VideoCapture::connect(const std::string& url, const std::string& moduleName
     LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
     std::lock_guard<std::mutex> lock(mMutex);
 
-    auto it = mVideoPipelines.find(url);
-    if (it == mVideoPipelines.end()) {
-        auto pipeline = createPipeline(url);
-        if (!pipeline) {
-            LogE("exit: failed to create pipeline for url: %s", url.c_str());
-            return false;
-        }
-        it = mVideoPipelines.emplace(url, std::move(pipeline)).first;
-        it->second->start();
+    auto pipeline = getOrCreatePipeline(url, true);
+    if (!pipeline) {
+        LogE("exit: failed to get or create pipeline for url: %s", url.c_str());
+        return false;
     }
 
-    auto result = it->second->connect(moduleName, callback);
+    auto result = pipeline->connect(moduleName, callback);
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
     return result.first != result.second;
 }
@@ -137,6 +75,54 @@ bool VideoCapture::disconnect(const std::string& url, const std::string& moduleN
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
     return result.first != result.second;
 }
+
+VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool useHardwareBuffer) {
+    auto it = mVideoPipelines.find(url);
+    if (it != mVideoPipelines.end()) {
+        return it->second.get();
+    }
+
+    auto infoIt = mVideoPipelineInfo.find(url);
+    if (infoIt == mVideoPipelineInfo.end()) {
+        LogE("no pipeline info for url: %s", url.c_str());
+        return nullptr;
+    }
+    const auto& info = infoIt->second;
+
+    std::unique_ptr<VideoPipeline> pipeline;
+    try {
+        if (url.find("camera://") == 0) {
+            auto parts = split(url.substr(9), '/');
+            if (parts.empty()) {
+                LogE("invalid camera url: %s", url.c_str());
+                return nullptr;
+            }
+            int32_t cameraId = std::stoi(parts[0]);
+            pipeline = std::make_unique<VideoPipelineCamera>(cameraId, info.width, info.height, info.format, info.fps, useHardwareBuffer);
+        } else if (url.find("image://") == 0) {
+            std::string assetName = url.substr(8);
+            pipeline = std::make_unique<VideoPipelineImage>(assetName, info.width, info.height, info.format, info.fps, useHardwareBuffer);
+        } else {
+            LogE("unsupported url scheme: %s", url.c_str());
+            return nullptr;
+        }
+    } catch (...) {
+        LogE("failed to parse url: %s", url.c_str());
+        return nullptr;
+    }
+
+    if (!pipeline) {
+        return nullptr;
+    }
+
+    pipeline->start();
+    auto result = mVideoPipelines.emplace(url, std::move(pipeline));
+    return result.first->second.get();
+}
+
+VideoCapture::VideoCapture() = default;
+
+VideoCapture::~VideoCapture() = default;
 
 VideoCapture& GetVideoCaptureInstance() {
     return Singleton<VideoCapture>::getInstance();

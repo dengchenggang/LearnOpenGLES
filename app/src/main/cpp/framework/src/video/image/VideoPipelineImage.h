@@ -3,6 +3,7 @@
 
 #include "VideoPipeline.h"
 #include "VideoFrameBuffer.h"
+#include "video/VideoHardwareBuffer.h"
 #include "utils/TaskPool.h"
 #include "filesystem/FileSystem.h"
 #include <atomic>
@@ -13,7 +14,7 @@ namespace framework {
 
 class VideoPipelineImage : public VideoPipeline {
 public:
-    VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps);
+    VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps, bool useHardwareBuffer);
     ~VideoPipelineImage() override;
 
     VideoPipelineImage(const VideoPipelineImage&) = delete;
@@ -32,11 +33,12 @@ private:
     VideoFormat mFormat;
     float mFps;
 
-    std::vector<uint8_t> mImageData;
+    std::unique_ptr<FileData> mImageData;
     std::unique_ptr<TaskPool> mTaskPool;
     std::atomic<bool> mRunning{false};
     std::chrono::steady_clock::time_point mLastDispatchLoopTimePoint {};
     BufferPool<VideoFrameBuffer> mBufferPool {300 * 1024 * 1024};
+    VideoHardwareBufferPtr mHardwareBuffer;
 };
 
 } // namespace framework

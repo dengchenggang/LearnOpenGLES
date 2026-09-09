@@ -11,21 +11,25 @@ namespace framework {
 
 class VideoPipeline {
 public:
-    VideoPipeline() = default;
-    virtual ~VideoPipeline() = default;
+    explicit VideoPipeline(bool useHardwareBuffer);
+    virtual ~VideoPipeline();
     VideoPipeline(const VideoPipeline&) = delete;
     VideoPipeline& operator = (const VideoPipeline&) = delete;
 public:
+
     virtual void start() = 0;
     virtual void stop() = 0;
 
     std::pair<size_t, size_t> connect(const std::string& moduleName, VideoFrameCallback callback);
     std::pair<size_t, size_t> connect(const std::string& moduleName, VideoHardwareBufferCallback callback);
     std::pair<size_t, size_t> disconnect(const std::string& moduleName);
+
+    bool useHardwareBuffer() const { return mUseHardwareBuffer; }
 protected:
     void dispath(const VideoFramePtr&);
     void dispath(const VideoHardwareBufferPtr&);
 private:
+    const bool mUseHardwareBuffer;
     std::map<std::string, VideoFrameCallback> mConnections;
     std::map<std::string, VideoHardwareBufferCallback> mHardwareBufferConnections;
     mutable std::shared_mutex mConnectionsMutex;

@@ -15,13 +15,8 @@ VideoFormat toVideoFormat(int32_t aimageFormat) {
     }
 }
 
-VideoFrameCamera::VideoFrameCamera(AImage* image)
-    : VideoFrame(
-        [&]() { int32_t w = 0; if (image) AImage_getWidth(image, &w); return w; }(),
-        [&]() { int32_t h = 0; if (image) AImage_getHeight(image, &h); return h; }(),
-        [&]() { int32_t f = 0; if (image) AImage_getFormat(image, &f); return toVideoFormat(f); }(),
-        [&]() { int64_t t = 0; if (image) AImage_getTimestamp(image, &t); return t; }()
-      )
+VideoFrameCamera::VideoFrameCamera(AImage* image, int32_t width, int32_t height, VideoFormat format)
+    : VideoFrame(width, height, format)
     , mAImage(image) {
 }
 

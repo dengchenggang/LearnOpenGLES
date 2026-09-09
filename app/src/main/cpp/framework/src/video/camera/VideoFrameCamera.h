@@ -5,9 +5,11 @@
 
 namespace framework {
 
+VideoFormat toVideoFormat(int32_t aimageFormat);
+
 class VideoFrameCamera : public VideoFrame {
 public:
-    explicit VideoFrameCamera(AImage* image);
+    VideoFrameCamera(AImage* image, int32_t width, int32_t height, VideoFormat format);
     ~VideoFrameCamera() override;
     VideoFrameCamera(const VideoFrameCamera&) = delete;
     VideoFrameCamera& operator = (const VideoFrameCamera&) = delete;

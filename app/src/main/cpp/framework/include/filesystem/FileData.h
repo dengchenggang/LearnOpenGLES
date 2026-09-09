@@ -18,6 +18,8 @@ struct FileData {
         : buffer(std::move(buffer))
         , bufferSize(bufferSize) {}
 
+    virtual ~FileData() = default;
+
     bool empty() const { return bufferSize == 0 || !buffer; }
     size_t size() const { return bufferSize; }
     const uint8_t* data() const { return buffer.get(); }

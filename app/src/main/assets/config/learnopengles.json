@@ -1,0 +1,8 @@
+{
+    "video": {
+        "url": "textures/background.png",
+        "width": "1024",
+        "height": "683",
+        "format": "RGB_888"
+    }
+}

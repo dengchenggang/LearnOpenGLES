@@ -1,10 +1,52 @@
 #include "VideoPipelineImage.h"
 #include <chrono>
+#include "filesystem/ImageData.h"
+#include <android/hardware_buffer.h>
+#include <cstring>
 
 namespace framework {
 
-VideoPipelineImage::VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps)
-    : mAssetName(assetName)
+namespace {
+AHardwareBuffer* createHardwareBufferFromPixels(int width, int height, VideoFormat format, const uint8_t* data) {
+    AHardwareBuffer_Desc desc = {};
+    desc.width = width;
+    desc.height = height;
+    desc.layers = 1;
+    desc.usage = AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN | AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE;
+
+    switch (format) {
+        case VideoFormat::RGBA_8888:
+            desc.format = AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM;
+            break;
+        case VideoFormat::RGB_888:
+            desc.format = AHARDWAREBUFFER_FORMAT_R8G8B8_UNORM;
+            break;
+        default:
+            return nullptr;
+    }
+
+    AHardwareBuffer* buffer = nullptr;
+    if (AHardwareBuffer_allocate(&desc, &buffer) != 0) {
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    if (AHardwareBuffer_lock(buffer, desc.usage, -1, nullptr, &ptr) == 0) {
+        size_t size = calculateSize(width, height, format);
+        std::memcpy(ptr, data, size);
+        AHardwareBuffer_unlock(buffer, nullptr);
+    } else {
+        AHardwareBuffer_release(buffer);
+        return nullptr;
+    }
+
+    return buffer;
+}
+}
+
+VideoPipelineImage::VideoPipelineImage(const std::string& assetName, int width, int height, VideoFormat format, float fps, bool useHardwareBuffer)
+    : VideoPipeline(useHardwareBuffer)
+    , mAssetName(assetName)
     , mWidth(width)
     , mHeight(height)
     , mFormat(format)
@@ -28,7 +70,20 @@ void VideoPipelineImage::start() {
         return;
     }
 
-    mImageData.assign(data->data(), data->data() + data->size());
+    if (auto imageData = dynamic_cast<ImageData*>(data.get())) {
+        mWidth = imageData->width;
+        mHeight = imageData->height;
+    }
+
+    mImageData = std::move(data);
+
+    if (useHardwareBuffer()) {
+        AHardwareBuffer* buffer = createHardwareBufferFromPixels(mWidth, mHeight, mFormat, mImageData->data());
+        if (buffer) {
+            mHardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer, 0, 0);
+            AHardwareBuffer_release(buffer);
+        }
+    }
 
     mTaskPool->start();
     mRunning.store(true);
@@ -52,17 +107,26 @@ void VideoPipelineImage::dispatchLoop() {
 
     mLastDispatchLoopTimePoint = std::chrono::steady_clock::now();
 
-    int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    int64_t escaped   = std::chrono::duration_cast<std::chrono::nanoseconds>(mLastDispatchLoopTimePoint.time_since_epoch()).count();
 
-    size_t size = calculateSize(mWidth, mHeight, mFormat);
-    auto pair = mBufferPool.acquire(size, mImageData.data(), mWidth, mHeight, mFormat, timestamp);
-    if (!pair.second) {
-        pair.first->setTimestamp(timestamp);
+    if (useHardwareBuffer()) {
+        if (mHardwareBuffer) {
+            auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(mHardwareBuffer->get(), timestamp, escaped);
+            dispath(hardwareBuffer);
+        }
+    } else {
+        size_t size = calculateSize(mWidth, mHeight, mFormat);
+        auto pair = mBufferPool.acquire(size, mImageData->data(), mWidth, mHeight, mFormat);
+        if (!pair.second) {
+            pair.first->setTimestamp(timestamp);
+            pair.first->setEscaped(escaped);
+        }
+
+        auto videoFrame = pair.first;
+
+        dispath(videoFrame);
     }
-
-    auto videoFrame = pair.first;
-
-    dispath(videoFrame);
 
     auto currentTimePoint = std::chrono::steady_clock::now();
     auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTimePoint - mLastDispatchLoopTimePoint).count();

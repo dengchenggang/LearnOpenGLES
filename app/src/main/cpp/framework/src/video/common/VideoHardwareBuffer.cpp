@@ -3,8 +3,11 @@
 
 namespace framework {
 
-VideoHardwareBuffer::VideoHardwareBuffer(AHardwareBuffer* buffer)
-    : mBuffer(buffer) {
+VideoHardwareBuffer::VideoHardwareBuffer(AHardwareBuffer* buffer, int64_t timestamp, int64_t escaped)
+    : mBuffer(buffer)
+    , mTimestamp(timestamp)
+    , mEscaped(escaped)
+{
     if (mBuffer) {
         AHardwareBuffer_acquire(mBuffer);
     }
