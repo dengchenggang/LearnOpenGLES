@@ -1,11 +1,12 @@
 #ifndef C_JSON_CONFIG_LOADER_H
 #define C_JSON_CONFIG_LOADER_H
 
-#include <nlohmann/json.hpp>
+#include "utils/config/nlohmann/json.hpp"
 #include <string>
 #include <map>
 #include <vector>
 #include <shared_mutex>
+#include <memory>
 
 class JsonConfigLoader {
 public:
@@ -52,5 +53,8 @@ private:
     mutable std::map<std::string, nlohmann::json> mCache;
     mutable std::shared_mutex mMutex;
 };
+
+
+using JsonConfigLoaderPtr = std::shared_ptr<JsonConfigLoader>;
 
 #endif

@@ -1,15 +1,18 @@
 #pragma once
 #include "level/Level.h"
+#include "utils/config/JsonConfigLoader.h"
 
 namespace module {
 
 class NVSModule : public engine::Level {
 public:
-    explicit NVSModule(engine::ILevelManager& levelManager);
+    NVSModule(engine::ILevelManager& levelManager, const JsonConfigLoaderPtr& config);
     ~NVSModule() override;
-public:
-    void init() override;
-    void deInit() override;
+protected:
+    void onInit() override;
+    void onDeInit() override;
+private:
+    JsonConfigLoaderPtr mConfig;
 };
 
 }

@@ -9,7 +9,7 @@ VideoPipeline::VideoPipeline(bool useHardwareBuffer)
 }
 
 VideoPipeline::~VideoPipeline() {
-    stop();
+
 }
 
 std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoFrameCallback callback) {

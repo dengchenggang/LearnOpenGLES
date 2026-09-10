@@ -9,6 +9,7 @@ namespace engine {
 class ILevelManager;
 
 class Level {
+    friend class Engine;
 public:
     Level(const std::string& name, ILevelManager& levelManager);
     virtual ~Level();
@@ -16,12 +17,13 @@ public:
     Level& operator=(const Level&) = delete;
 public:
     const std::string& getId() const { return mName; }
-    virtual void init() = 0;
-    void beginPlay();
-    void update(int64_t deltaTime);
-    void render();
-    void endPlay();
-    virtual void deInit() = 0;
+protected:
+    virtual void onInit() = 0;
+    virtual void onBeginPlay();
+    virtual void onUpdate(int64_t deltaTime);
+    virtual void onRender();
+    virtual void onEndPlay();
+    virtual void onDeInit() {}
 protected:
     Actor& createActor();
     void changeLevel(const std::string& levelName);

@@ -46,6 +46,7 @@ std::unique_ptr<FileData> AssetManagerReader::readFile(const char* filePath) {
 }
 
 std::string AssetManagerReader::readString(const char* filePath) {
+    LogI("enter: readString: filePath=%s", filePath);
     std::lock_guard<std::mutex> lock(mMutex);
     if (!mAssetManager || !filePath) {
         return "";
@@ -54,6 +55,7 @@ std::string AssetManagerReader::readString(const char* filePath) {
     AAssetManager* mgr = static_cast<AAssetManager*>(mAssetManager);
     AAsset* asset = AAssetManager_open(mgr, filePath, AASSET_MODE_STREAMING);
     if (!asset) {
+        LogE("readString: AAssetManager_open is error. filePath=%s", filePath);
         return "";
     }
 
@@ -68,6 +70,7 @@ std::string AssetManagerReader::readString(const char* filePath) {
     }
 
     AAsset_close(asset);
+    LogI("exit: readString: filePath=%s, fileSize=%ld", filePath, fileSize);
     return result;
 }
 

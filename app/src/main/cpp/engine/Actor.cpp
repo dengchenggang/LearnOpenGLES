@@ -2,47 +2,70 @@
 
 namespace engine {
 
-Actor::Actor() = default;
+Actor::Actor()
+    : mEnabled(false, true)
+    , mVisible(false, true)
+{
 
-void Actor::beginPlay() {
+}
+
+Actor::~Actor() {}
+
+Actor& Actor::setEnabled(bool enabled) {
+    if (mEnabled.first != enabled) {
+        mEnabled.first = enabled;
+        mEnabled.second = true;
+    }
+    return *this;
+}
+
+Actor& Actor::setVisible(bool visible) {
+    if (mVisible.first != visible) {
+        mVisible.first = visible;
+        mVisible.second = true;
+    }
+    return *this;
+}
+
+void Actor::onBeginPlay() {
     for (auto& comp : mComponents) {
         comp->onBeginPlay();
     }
 }
 
-void Actor::update(float deltaTime) {
-    if (!mActive) return;
-    for (auto& comp : mComponents) {
-        if (comp->isEnabled()) {
+void Actor::onUpdate(float deltaTime) {
+    if (mEnabled.second) {
+        for (auto& comp : mComponents) {
+            comp->onEnabledChanged(mEnabled.first);
+        }
+        mEnabled.second = false;
+    }
+
+    if (mVisible.second) {
+        for (auto& comp : mComponents) {
+            comp->onVisibilityChanged(mVisible.first);
+        }
+        mVisible.second = false;
+    }
+
+    if (mEnabled.first) {
+        for (auto& comp : mComponents) {
             comp->onUpdate(deltaTime);
         }
     }
 }
 
-void Actor::render() {
-    if (!mActive) return;
-    for (auto& comp : mComponents) {
-        if (comp->isEnabled()) {
+void Actor::onRender() {
+    if (mVisible.first) {
+        for (auto& comp : mComponents) {
             comp->onRender();
         }
     }
 }
 
-void Actor::endPlay() {
+void Actor::onEndPlay() {
     for (auto& comp : mComponents) {
         comp->onEndPlay();
     }
 }
-
-void Actor::setActive(bool active) {
-    if (mActive != active) {
-        mActive = active;
-        if (mActive) {
-            beginPlay();
-        } else {
-            endPlay();
-        }
-    }
-}
-
 } // namespace engine

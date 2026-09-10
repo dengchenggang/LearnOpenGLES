@@ -6,10 +6,10 @@
 
 namespace engine {
 
-class Actor {
+class Actor final {
      friend class Level;
 public:
-    virtual ~Actor() = default;
+    ~Actor();
     Actor(const Actor&) = delete;
     Actor& operator=(const Actor&) = delete;
 public:
@@ -33,18 +33,22 @@ public:
         return nullptr;
     }
 
-    bool isActive() const { return mActive; }
-    void setActive(bool active);
+    bool isEnabled() const { return mEnabled.first; }
+    Actor& setEnabled(bool enabled);
+
+    bool isVisible() const { return mVisible.first; }
+    Actor& setVisible(bool visible);
 
 private:
     Actor();
 private:
-    void beginPlay();
-    void update(float deltaTime);
-    void render();
-    void endPlay();
+    void onBeginPlay();
+    void onUpdate(float deltaTime);
+    void onRender();
+    void onEndPlay();
 private:
-     bool mActive = true;
+    std::pair<bool, bool> mEnabled;
+    std::pair<bool, bool> mVisible;
     std::vector<ActorComponentPtr> mComponents;
 };
 

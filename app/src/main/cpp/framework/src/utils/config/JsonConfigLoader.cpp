@@ -1,4 +1,4 @@
-#include "utils/JsonConfigLoader.h"
+#include "utils/config/JsonConfigLoader.h"
 #include "utils/Log.h"
 #include <sstream>
 
@@ -15,6 +15,7 @@ std::vector<std::string> JsonConfigLoader::splitKey(const std::string& key) {
 }
 
 bool JsonConfigLoader::parse(const std::string& jsonString) {
+    LogI("enter: parse: jsonString=%s", jsonString.c_str());
     std::unique_lock<std::shared_mutex> lock(mMutex);
     try {
         mJson = nlohmann::json::parse(jsonString);
@@ -24,6 +25,7 @@ bool JsonConfigLoader::parse(const std::string& jsonString) {
         return false;
     }
 
+    LogI("exit: parse.");
     return true;
 }
 

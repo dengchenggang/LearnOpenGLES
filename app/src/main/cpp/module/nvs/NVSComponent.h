@@ -5,17 +5,19 @@
 #include "Image.h"
 #include "video/VideoCapture.h"
 #include "video/VideoFrame.h"
+#include "utils/config/JsonConfigLoader.h"
+#include <array>
 #include <memory>
 #include <mutex>
-#include <vector>
 
 namespace module {
 
 class NVSComponent : public engine::ActorComponent {
 public:
-    explicit NVSComponent(engine::Actor& owner, engine::Image& image);
+    explicit NVSComponent(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config);
     ~NVSComponent() override;
 
+protected:
     void onBeginPlay() override;
     void onUpdate(float deltaTime) override;
     void onEndPlay() override;
@@ -24,16 +26,12 @@ private:
     void onVideoFrame(const framework::VideoFramePtr& frame);
 private:
     engine::Image& mImage;
-
-    struct FrameInfo {
-        std::vector<uint8_t> data;
-        int32_t width = 0;
-        int32_t height = 0;
-        int32_t channels = 0;
-    };
-
+    JsonConfigLoaderPtr mConfig;
+private:
     std::mutex mFrameMutex;
-    std::unique_ptr<FrameInfo> mPendingFrame;
+    std::array<framework::VideoFramePtr, 2> mFrames;
+    int mWriteIndex = 0;
+    framework::VideoFramePtr mFrontFrame;
 };
 
 } // namespace module

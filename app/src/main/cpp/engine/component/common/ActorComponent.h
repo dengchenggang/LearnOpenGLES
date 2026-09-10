@@ -6,26 +6,24 @@ namespace engine {
 class Actor;
 
 class ActorComponent {
+    friend class Actor;
 public:
     explicit ActorComponent(Actor& owner);
-    virtual ~ActorComponent() = default;
+    virtual ~ActorComponent();
     ActorComponent(const ActorComponent&) = delete;
     ActorComponent& operator=(const ActorComponent&) = delete;
-
+public:
+    Actor& GetOwner() const { return mOwner; }
+protected:
     virtual void onAttach() {}
     virtual void onBeginPlay() {}
+    virtual void onEnabledChanged(bool enabled) {}
+    virtual void onVisibilityChanged(bool visible) {}
     virtual void onUpdate(float deltaTime) {}
     virtual void onRender() {}
     virtual void onEndPlay() {}
-
-    Actor& GetOwner() const { return mOwner; }
-
-    bool isEnabled() const { return mEnabled; }
-    void setEnabled(bool enabled) { mEnabled = enabled; }
-
 private:
     Actor& mOwner;
-    bool mEnabled = true;
 };
 
 using ActorComponentPtr = std::unique_ptr<ActorComponent>;

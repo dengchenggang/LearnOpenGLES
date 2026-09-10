@@ -15,7 +15,7 @@ public:
 
     MeshRenderer(const MeshRenderer&) = delete;
     MeshRenderer& operator=(const MeshRenderer&) = delete;
-
+public:
     void setMesh(std::shared_ptr<renderer::Mesh> mesh) { mMesh = std::move(mesh); }
     void setMaterial(std::shared_ptr<renderer::Material> material) { mMaterial = std::move(material); }
     void setCamera(const std::shared_ptr<Camera>& camera) { mCamera = camera; }
@@ -25,6 +25,7 @@ public:
 
     renderer::Renderable getRenderable() const;
 
+protected:
     void onRender() override;
 
 private:

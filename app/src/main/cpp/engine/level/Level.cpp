@@ -12,35 +12,31 @@ Level::Level(const std::string& name, ILevelManager& levelManager)
 Level::~Level() {
 }
 
-void Level::beginPlay() {
+void Level::onBeginPlay() {
     for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->beginPlay();
+        actor->onBeginPlay();
+    }
+}
+
+void Level::onUpdate(int64_t deltaTime) {
+    for (auto& actor : mActors) {
+        if (actor->isEnabled()) {
+            actor->onUpdate(deltaTime);
         }
     }
 }
 
-void Level::update(int64_t deltaTime) {
+void Level::onRender() {
     for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->update(deltaTime);
+        if (actor->isVisible()) {
+            actor->onRender();
         }
     }
 }
 
-void Level::render() {
+void Level::onEndPlay() {
     for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->render();
-        }
-    }
-}
-
-void Level::endPlay() {
-    for (auto& actor : mActors) {
-        if (actor->isActive()) {
-            actor->endPlay();
-        }
+        actor->onEndPlay();
     }
 }
 

@@ -6,9 +6,6 @@
 #include "filesystem/FileSystem.h"
 #include "utils/Log.h"
 
-constexpr const char* TAG {"Engine"};
-constexpr const char* BACKGROUD_PATH = "textures/background.png";
-
 namespace engine {
 
 Engine::Engine() = default;
@@ -18,10 +15,10 @@ Engine::~Engine() {
 }
 
 void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, const std::string& startLevel) {
-    LogI("init enter: startLevel=%s", startLevel.c_str());
+    LogI("tartLevel=%s", startLevel.c_str());
     mTaskPool->start();
     auto future = mTaskPool->submit([this, gles, levels = std::move(levels), startLevel]() mutable {
-        LogI("init task enter: startLevel=%s", startLevel.c_str());
+        LOG_ENTER(": task startLevel=%s", startLevel.c_str());
         bool result = mRenderContext.initialize(gles);
         if (result) {
             mActiveLevel = nullptr;
@@ -35,27 +32,27 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
             }
 
             for (auto& pair : mLevels) {
-                pair.second->init();
+                pair.second->onInit();
             }
 
             changeLevel(startLevel);
         }
-        LogI("init task exit: result=%d", result);
+        LOG_EXIT(": result=%d", result);
         return result;
     });
     future.get();
 }
 
 void Engine::beginPlay(ANativeWindow* window) {
-    LogI("%s beginPlay enter.", TAG);
+    LOG_ENTER(".");
 
     if (!mRenderContext.isInitialized()) {
-        LogE("%s EGL not initialized!", TAG);
+        LogE("EGL not initialized!");
         return;
     }
 
     if (mRunning) {
-        LogW("%s render loop already running!", TAG);
+        LogW("render loop already running!");
         return;
     }
 
@@ -73,31 +70,31 @@ void Engine::beginPlay(ANativeWindow* window) {
         mRunning = true;
         mLastFrameTime = std::chrono::steady_clock::now();
         mTaskPool->detach([this]() { renderFrame(); });
-        LogI("%s render loop started.", TAG);
+        LogI("render loop started.");
     }
 
-    LogI("%s beginPlay exit.", TAG);
+    LOG_EXIT(".");
 }
 
 void Engine::resize(std::int32_t w, std::int32_t h) {
     mTaskPool->detach([this, w, h]() {
-        LogI("%s resize enter, width=%d, height=%d", TAG, w, h);
+        LOG_ENTER(": width=%d, height=%d", w, h);
         if (!mRenderContext.isBound()) {
             return;
         }
         mRenderContext.setViewPort(w, h);
         RenderInterface.setViewport(0, 0, w, h);
-        LogI("%s resize exit.", TAG);
+        LOG_EXIT(".");
     });
 }
 
 void Engine::endPlay() {
-    LogI("%s endPlay enter", TAG);
+    LOG_ENTER(".");
 
     if (mRunning) {
         mStopRequested = true;
         mRunning = false;
-        LogI("%s render loop stopping...", TAG);
+        LogI("render loop stopping...");
     }
 
     auto future = mTaskPool->submit([this]() {
@@ -105,7 +102,7 @@ void Engine::endPlay() {
     });
     future.wait();
 
-    LogI("%s endPlay exit", TAG);
+    LOG_EXIT(".");
 }
 
 void Engine::deInit() {
@@ -130,13 +127,13 @@ void Engine::deInit() {
 }
 
 void Engine::changeLevel(const std::string& levelName) {
-    LogI("changeLevel: %s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
+    LogI("%s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
     mNextActiveLevelName = levelName;
 }
 
 void Engine::renderFrame() {
     if (mStopRequested || !mRunning) {
-        LogI("%s renderFrame stopped.", TAG);
+        LOG_EXIT(": mStopRequested=%d, mRunning=%d", mStopRequested.load(), mRunning.load());
         return;
     }
 
@@ -159,29 +156,17 @@ void Engine::renderFrame() {
     auto swapCost = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - swapStart).count();
 
-    auto frameCost = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::steady_clock::now() - frameStartTime).count();
-
-    LogI("%s renderFrame: deltaTime=%lld ms, update=%lld us, render=%lld us, swap=%lld us, total=%lld us",
-         TAG, deltaTime, updateCost, renderCost, swapCost, frameCost);
-
-    scheduleNextFrame();
-}
-
-void Engine::scheduleNextFrame() {
-    if (mStopRequested || !mRunning) {
-        return;
-    }
-
+    auto fps = 1000.0f / deltaTime;
     auto currentTime = std::chrono::steady_clock::now();
     auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mLastFrameTime).count();
     auto delayMs = mTargetFrameIntervalMs - elapsedMs;
-
     if (delayMs < 0) {
         delayMs = 0;
     }
 
     mTaskPool->detachDelayed(delayMs, [this]() { renderFrame(); });
+    LogI("fps=%f, update=%lld us, render=%lld us, swap=%lld us, total=%lld ms, delay=%lld ms",
+         fps, updateCost, renderCost, swapCost, elapsedMs, delayMs);
 }
 
 void Engine::update(int64_t deltaTime) {
@@ -190,14 +175,14 @@ void Engine::update(int64_t deltaTime) {
     }
 
     if (mActiveLevel) {
-        mActiveLevel->update(deltaTime);
+        mActiveLevel->onUpdate(deltaTime);
     }
 }
 
 void Engine::render(int64_t deltaTime) {
     RenderInterface.clear(true, true, false);
     if (mActiveLevel) {
-        mActiveLevel->render();
+        mActiveLevel->onRender();
     }
 }
 
@@ -208,10 +193,10 @@ void Engine::doChangeLevel(const std::string& levelName) {
         auto oldLevel = mActiveLevel;
         mActiveLevel = it->second.get();
         if (oldLevel) {
-            oldLevel->endPlay();
+            oldLevel->onEndPlay();
         }
         if (mActiveLevel) {
-            mActiveLevel->beginPlay();
+            mActiveLevel->onBeginPlay();
         }
     } else {
         LogE("doChangeLevel: %s not found", levelName.c_str());

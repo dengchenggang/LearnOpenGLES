@@ -33,7 +33,6 @@ private:
     ~Engine();
 private:
     void renderFrame();
-    void scheduleNextFrame();
 private:
     void update(int64_t deltaTime);
     void render(int64_t deltaTime);

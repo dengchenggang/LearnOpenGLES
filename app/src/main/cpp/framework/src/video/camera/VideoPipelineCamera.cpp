@@ -401,7 +401,7 @@ void VideoPipelineCamera::handleImageAvailable(AImageReader* reader) {
     auto dispatchElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - dispatchStart).count();
 
-    LogI("fps=%.2f, captureFps=%.2f, acquireTimeMs=%ld, dispatchTimeMs=%ld",
+    LogI("fps=%.2f, captureFps=%.2f, acquireTimeMs=%lld, dispatchTimeMs=%lld",
         fps, captureFps, acquireElapsedMs, dispatchElapsedMs);
 }
 

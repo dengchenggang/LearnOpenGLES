@@ -21,8 +21,10 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
 }
 
 bool VideoCapture::setVideoPipelineInfo(const std::string& url, int32_t width, int32_t height, VideoFormat format, float fps) {
+    LogI("enter: setVideoPipelineInfo: url=%s, width=%d, height=%d, format=%d, fps=%f", url.c_str(), width, height, format, fps);
     std::lock_guard<std::mutex> lock(mMutex);
     auto result = mVideoPipelineInfo.emplace(url, VideoPipelineInfo {url, width, height, format, fps});
+    LogI("exit: result=%d", result.second);
     return result.second;
 }
 
