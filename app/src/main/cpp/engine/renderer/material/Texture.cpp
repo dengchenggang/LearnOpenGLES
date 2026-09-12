@@ -128,7 +128,7 @@ void Texture::updateData(const void* data, int32_t x, int32_t y, int32_t width, 
     }
 
     // 使用渲染接口更新纹理数据
-    RenderInterface.updateTexture2D(mHandle, x, y, width, height, data);
+    RenderInterface.updateTexture2D(mHandle, mFormat, x, y, width, height, data);
 }
 
 void Texture::generateMipmap() {

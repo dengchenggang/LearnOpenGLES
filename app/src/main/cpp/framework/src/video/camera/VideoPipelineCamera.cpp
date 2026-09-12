@@ -7,6 +7,8 @@
 #include <camera/NdkCaptureRequest.h>
 #include <media/NdkImageReader.h>
 #include <android/native_window.h>
+#include <algorithm>
+#include <cmath>
 
 namespace framework {
 
@@ -58,28 +60,36 @@ void VideoPipelineCamera::start() {
         return;
     }
 
+    resetFirstFrameNotification();
+    notify(VideoPipelineState::Starting);
+
     if (!openCamera()) {
+        notify(VideoPipelineState::Error, -1, "failed to open camera");
         stop();
         LOG_EXIT();
         return;
     }
     if (!createImageReader()) {
+        notify(VideoPipelineState::Error, -1, "failed to create image reader");
         stop();
         LOG_EXIT();
         return;
     }
     if (!createCaptureSession()) {
+        notify(VideoPipelineState::Error, -1, "failed to create capture session");
         stop();
         LOG_EXIT();
         return;
     }
     if (!startPreview()) {
+        notify(VideoPipelineState::Error, -1, "failed to start camera preview");
         stop();
         LOG_EXIT();
         return;
     }
 
     mRunning = true;
+    notify(VideoPipelineState::Running);
     LOG_EXIT("camera %d started, %dx%d, format: %d", mCameraId, mWidth, mHeight, static_cast<int32_t>(mFormat));
 }
 
@@ -244,11 +254,25 @@ bool VideoPipelineCamera::startPreview() {
     ACameraOutputTarget_create(reinterpret_cast<ANativeWindow*>(mNativeWindow), &target);
     ACaptureRequest_addTarget(request, target);
 
+    int32_t targetFps = std::max(1, static_cast<int32_t>(std::lround(mFps)));
+    int32_t fpsRange[] = {targetFps, targetFps};
+    if (ACaptureRequest_setEntry_i32(request, ACAMERA_CONTROL_AE_TARGET_FPS_RANGE, 2, fpsRange) != ACAMERA_OK) {
+        ACameraOutputTarget_free(target);
+        ACaptureRequest_free(request);
+        LOG_EXIT("failed to set camera fps: %d", targetFps);
+        return false;
+    }
+
     int seqId = 0;
-    ACameraCaptureSession_setRepeatingRequest(reinterpret_cast<ACameraCaptureSession*>(mCaptureSession), nullptr, 1, &request, &seqId);
+    int ret = ACameraCaptureSession_setRepeatingRequest(
+        reinterpret_cast<ACameraCaptureSession*>(mCaptureSession), nullptr, 1, &request, &seqId);
 
     ACameraOutputTarget_free(target);
     ACaptureRequest_free(request);
+    if (ret != ACAMERA_OK) {
+        LOG_EXIT("failed to start repeating request, ret: %d", ret);
+        return false;
+    }
     LOG_EXIT();
     return true;
 }
@@ -285,6 +309,7 @@ void VideoPipelineCamera::stop() {
         ACameraManager_delete(reinterpret_cast<ACameraManager*>(mCameraManager));
         mCameraManager = nullptr;
     }
+    notify(VideoPipelineState::Stopped);
     LOG_EXIT();
 }
 
@@ -332,12 +357,14 @@ void VideoPipelineCamera::onSessionClosed(void* context, ACameraCaptureSession* 
 
 void VideoPipelineCamera::handleDeviceDisconnected(ACameraDevice* device) {
     LOG_ENTER("camera device disconnected");
+    notify(VideoPipelineState::Error, -1, "camera device disconnected");
     ACameraDevice_close(device);
     LOG_EXIT();
 }
 
 void VideoPipelineCamera::handleDeviceError(ACameraDevice* device, int error) {
     LOG_ENTER("camera device error: %d", error);
+    notify(VideoPipelineState::Error, error, "camera device error");
     ACameraDevice_close(device);
     LOG_EXIT();
 }
@@ -414,6 +441,7 @@ void VideoPipelineCamera::dispatchVideoFrame(AImage* image, int64_t timestamp, i
     auto videoFrame = std::make_shared<VideoFrameCamera>(image, width, height, toVideoFormat(aFormat));
     videoFrame->setTimestamp(timestamp);
     videoFrame->setEscaped(escaped);
+    notifyFirstFrame();
     dispath(videoFrame);
 }
 
@@ -422,6 +450,7 @@ void VideoPipelineCamera::dispatchHardwareBuffer(AImage* image, int64_t timestam
     AImage_getHardwareBuffer(image, &buffer);
     if (buffer) {
         auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer, timestamp, escaped);
+        notifyFirstFrame();
         dispath(hardwareBuffer);
     }
     AImage_delete(image);

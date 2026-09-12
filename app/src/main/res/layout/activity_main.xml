@@ -9,7 +9,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.dcg.learnopengles.EGLSurfaceView
+        <com.dcg.learnopengles.view.EGLSurfaceView
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <TextView

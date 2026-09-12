@@ -90,7 +90,8 @@
 # WIN11上设置环境变量
 SystemPropertiesAdvanced
 
-adb connect 127.0.0.1:16384
+adb connect 127.0.0.1:5557
+adb -s 127.0.0.1:5557 shell appops set com.dcg.learnopengles SYSTEM_ALERT_WINDOW allow
 
 git remote add origin git@github.com:dengchenggang/LearnOpenGLES.git
 ```
@@ -99,5 +100,9 @@ git remote add origin git@github.com:dengchenggang/LearnOpenGLES.git
 
 ```sh
 adb shell am start-foreground-service -n com.dcg.learnopengles/.service.RenderService
-killall -9 com.dcg.learnopengles
+adb shell am force-stop com.dcg.learnopengles
+
+adb -s 127.0.0.1:5557 shell appops set com.dcg.learnopengles SYSTEM_ALERT_WINDOW allow
+adb -s 127.0.0.1:5557 shell am start-foreground-service -n com.dcg.learnopengles/.service.RenderService
+adb -s 127.0.0.1:5557 shell am force-stop com.dcg.learnopengles
 ```

@@ -65,8 +65,12 @@ void VideoPipelineImage::start() {
         return;
     }
 
+    resetFirstFrameNotification();
+    notify(VideoPipelineState::Starting);
+
     auto data = FileSystem.readFile(mAssetName.c_str());
     if (!data || data->empty()) {
+        notify(VideoPipelineState::Error, -1, "failed to read image: " + mAssetName);
         return;
     }
 
@@ -82,11 +86,15 @@ void VideoPipelineImage::start() {
         if (buffer) {
             mHardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer, 0, 0);
             AHardwareBuffer_release(buffer);
+        } else {
+            notify(VideoPipelineState::Error, -1, "failed to create hardware buffer");
+            return;
         }
     }
 
     mTaskPool->start();
     mRunning.store(true);
+    notify(VideoPipelineState::Running);
 
     dispatchLoop();
 }
@@ -98,6 +106,7 @@ void VideoPipelineImage::stop() {
 
     mRunning.store(false);
     mTaskPool->stop();
+    notify(VideoPipelineState::Stopped);
 }
 
 void VideoPipelineImage::dispatchLoop() {
@@ -113,6 +122,7 @@ void VideoPipelineImage::dispatchLoop() {
     if (useHardwareBuffer()) {
         if (mHardwareBuffer) {
             auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(mHardwareBuffer->get(), timestamp, escaped);
+            notifyFirstFrame();
             dispath(hardwareBuffer);
         }
     } else {
@@ -125,6 +135,7 @@ void VideoPipelineImage::dispatchLoop() {
 
         auto videoFrame = pair.first;
 
+        notifyFirstFrame();
         dispath(videoFrame);
     }
 

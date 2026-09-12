@@ -5,13 +5,17 @@ import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.dcg.utils.Debug;
 import com.dcg.learnopengles.R;
 
 public class FloatingWindowView extends FrameLayout {
+    private static final String TAG = "FloatingWindowView";
     private final WindowManager mWindowManager;
     private OnCloseListener mOnCloseListener;
+    private boolean mWindowAdded;
 
     public interface OnCloseListener {
         void onClose();
@@ -33,7 +37,11 @@ public class FloatingWindowView extends FrameLayout {
         mOnCloseListener = listener;
     }
 
-    public void attachToWindow() {
+    public synchronized void attachToWindow() {
+        if (mWindowAdded) {
+            Debug.logI(TAG, "attachToWindow: already added");
+            return;
+        }
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -44,9 +52,16 @@ public class FloatingWindowView extends FrameLayout {
         params.x = 0;
         params.y = 0;
         mWindowManager.addView(this, params);
+        mWindowAdded = true;
+        Debug.logI(TAG, "attachToWindow: added, size=%dx%d, position=(%d,%d)",
+                getWidth(), getHeight(), params.x, params.y);
     }
 
-    public void detachFromWindow() {
-        mWindowManager.removeView(this);
+    public synchronized void detachFromWindow() {
+        if (mWindowAdded) {
+            mWindowManager.removeView(this);
+            mWindowAdded = false;
+            Debug.logI(TAG, "detachFromWindow: removed");
+        }
     }
 }

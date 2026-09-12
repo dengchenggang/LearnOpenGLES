@@ -27,7 +27,7 @@ public class EGLSurfaceView extends SurfaceView {
     public EGLSurfaceView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
+        getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
                 NativeBridge.nativeBind(holder.getSurface());
@@ -42,7 +42,6 @@ public class EGLSurfaceView extends SurfaceView {
             public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
                 NativeBridge.nativeUnbind();
             }
-        };
-        this.getHolder().addCallback(mSurfaceHolderCallback);
+        });
     }
 }

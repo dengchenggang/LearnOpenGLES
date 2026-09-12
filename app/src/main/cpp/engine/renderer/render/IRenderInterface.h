@@ -70,7 +70,7 @@ public:
     virtual void setTextureFilter(TextureFilter minFilter, TextureFilter magFilter) = 0;
     virtual void setTextureWrap(TextureWrap wrapS, TextureWrap wrapT) = 0;
     virtual void generateMipmap() = 0;
-    virtual void updateTexture2D(RenderResourceHandle texture, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) = 0;
+    virtual void updateTexture2D(RenderResourceHandle texture, TextureFormat format, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) = 0;
 
     // 帧缓冲
     virtual RenderResourceHandle createFramebuffer() = 0;

@@ -230,7 +230,7 @@ void OpenGLESRenderInterface::generateMipmap() {
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void OpenGLESRenderInterface::updateTexture2D(RenderResourceHandle texture, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) {
+void OpenGLESRenderInterface::updateTexture2D(RenderResourceHandle texture, TextureFormat format, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) {
     if (texture == INVALID_HANDLE || !data || width <= 0 || height <= 0) {
         return;
     }
@@ -241,7 +241,7 @@ void OpenGLESRenderInterface::updateTexture2D(RenderResourceHandle texture, int3
 
     // 绑定目标纹理并更新数据
     glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(texture));
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, toGLTextureFormat(format), GL_UNSIGNED_BYTE, data);
 
     // 恢复之前的绑定
     glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(prevTexture));

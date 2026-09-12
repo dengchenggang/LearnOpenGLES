@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import com.dcg.utils.Debug;
 
 import androidx.core.app.NotificationCompat;
@@ -26,13 +27,22 @@ public class RenderService extends Service {
         Debug.logI(TAG, "onCreate");
         mFloatingWindowView = new FloatingWindowView(this);
         mFloatingWindowView.setOnCloseListener(this::stopSelf);
-        mFloatingWindowView.attachToWindow();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Debug.logI(TAG, "onStartCommand: startId=%d, intent=%s", startId, intent);
         startForeground(NOTIFICATION_ID, buildNotification());
+
+        if (!Settings.canDrawOverlays(this)) {
+            Debug.logE(TAG, "SYSTEM_ALERT_WINDOW permission is not granted");
+            stopSelfResult(startId);
+            return START_NOT_STICKY;
+        }
+
+        if (mFloatingWindowView != null) {
+            mFloatingWindowView.attachToWindow();
+        }
         return START_STICKY;
     }
 
@@ -40,7 +50,7 @@ public class RenderService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Debug.logI(TAG, "onDestroy");
-        if (mFloatingWindowView != null) {
+        if (mFloatingWindowView != null && mFloatingWindowView.isAttachedToWindow()) {
             mFloatingWindowView.detachFromWindow();
         }
         stopForeground(STOP_FOREGROUND_REMOVE);

@@ -28,6 +28,9 @@ set(FRAMEWORK_ALL_SRC_LIST
 
 add_library(framework SHARED ${FRAMEWORK_ALL_SRC_LIST})
 
+target_link_options(framework PRIVATE
+    "-Wl,-z,max-page-size=16384")
+
 target_include_directories(framework PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

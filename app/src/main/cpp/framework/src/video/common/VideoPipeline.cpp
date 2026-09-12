@@ -1,15 +1,48 @@
 #include "VideoPipeline.h"
+#include <utility>
 
 namespace framework {
 
 VideoPipeline::VideoPipeline(bool useHardwareBuffer)
     : mUseHardwareBuffer(useHardwareBuffer)
+    , mNotificationTaskPool(std::make_unique<TaskPool>())
 {
-
+    mNotificationTaskPool->start();
 }
 
 VideoPipeline::~VideoPipeline() {
+    mNotificationTaskPool->stop();
+}
 
+void VideoPipeline::restart() {
+    stop();
+    start();
+}
+
+void VideoPipeline::notify(VideoPipelineState state, int32_t errorCode, std::string message) {
+    VideoPipelineNotification notification;
+    {
+        std::lock_guard<std::mutex> lock(mNotificationMutex);
+        notification = mNotification;
+    }
+    if (notification) {
+        mNotificationTaskPool->detach(
+            [notification = std::move(notification), state, errorCode, message = std::move(message)]() {
+                notification(state, errorCode, message);
+            }
+        );
+    }
+}
+
+void VideoPipeline::notifyFirstFrame() {
+    bool expected = false;
+    if (mFirstFrameNotified.compare_exchange_strong(expected, true)) {
+        notify(VideoPipelineState::FirstFrame);
+    }
+}
+
+void VideoPipeline::resetFirstFrameNotification() {
+    mFirstFrameNotified.store(false);
 }
 
 std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoFrameCallback callback) {

@@ -18,6 +18,8 @@ public:
     VideoCapture& operator=(const VideoCapture&) = delete;
 public:
     bool setVideoPipelineInfo(const std::string& url, int32_t width, int32_t height, VideoFormat format, float fps);
+    void setPipelineNotification(VideoPipelineNotification notification);
+    bool restart(const std::string& url);
     bool connect(const std::string& url, const std::string& moduleName, const VideoFrameCallback& callback);
     bool connect(const std::string& url, const std::string& moduleName, const VideoHardwareBufferCallback& callback);
     bool disconnect(const std::string& url, const std::string& moduleName);
@@ -35,6 +37,8 @@ private:
     VideoCapture();
     ~VideoCapture();
 private:
+    VideoPipelineNotification mPipelineNotification;
+    std::mutex mPipelineNotificationMutex;
     std::map<std::string, VideoPipelineInfo> mVideoPipelineInfo;
     std::map<std::string, std::unique_ptr<VideoPipeline>> mVideoPipelines;
     std::mutex mMutex;

@@ -19,6 +19,7 @@ public:
     const std::string& getId() const { return mName; }
 protected:
     virtual void onInit() = 0;
+    virtual void onResize(int32_t width, int32_t height) {}
     virtual void onBeginPlay();
     virtual void onUpdate(int64_t deltaTime);
     virtual void onRender();

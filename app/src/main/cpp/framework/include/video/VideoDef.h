@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 
 namespace framework {
@@ -11,6 +12,16 @@ enum class VideoFormat : uint32_t {
     YUV_420_888 = 35, // AIMAGE_FORMAT_YUV_420_888
     Unknown = 0
 };
+
+enum class VideoPipelineState : uint32_t {
+    Starting,
+    Running,
+    FirstFrame,
+    Stopped,
+    Error
+};
+
+using VideoPipelineNotification = std::function<void(VideoPipelineState, int32_t, const std::string&)>;
 
 inline VideoFormat toVideoFormat(const char* format) {
     if (strcmp(format, "RGBA_8888") == 0) {

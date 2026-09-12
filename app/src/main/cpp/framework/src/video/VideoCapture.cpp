@@ -28,6 +28,26 @@ bool VideoCapture::setVideoPipelineInfo(const std::string& url, int32_t width, i
     return result.second;
 }
 
+void VideoCapture::setPipelineNotification(VideoPipelineNotification notification) {
+    std::lock_guard<std::mutex> lock(mPipelineNotificationMutex);
+    mPipelineNotification = std::move(notification);
+}
+
+bool VideoCapture::restart(const std::string& url) {
+    LOG_ENTER("url=%s", url.c_str());
+    std::lock_guard<std::mutex> lock(mMutex);
+
+    auto it = mVideoPipelines.find(url);
+    if (it == mVideoPipelines.end()) {
+        LOG_EXIT("pipeline for %s not found", url.c_str());
+        return false;
+    }
+
+    it->second->restart();
+    LOG_EXIT("url=%s", url.c_str());
+    return true;
+}
+
 bool VideoCapture::connect(const std::string& url, const std::string& moduleName, const VideoFrameCallback& callback) {
     LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
     std::lock_guard<std::mutex> lock(mMutex);
@@ -81,6 +101,10 @@ bool VideoCapture::disconnect(const std::string& url, const std::string& moduleN
 VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool useHardwareBuffer) {
     auto it = mVideoPipelines.find(url);
     if (it != mVideoPipelines.end()) {
+        if (it->second->useHardwareBuffer() != useHardwareBuffer) {
+            LogE("pipeline for url %s uses a different hardware buffer mode", url.c_str());
+            return nullptr;
+        }
         return it->second.get();
     }
 
@@ -117,6 +141,17 @@ VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool us
         return nullptr;
     }
 
+    pipeline->setNotification([this, url](VideoPipelineState state, int32_t errorCode, const std::string& message) {
+        std::string pipelineMessage = url + ": " + message;
+        VideoPipelineNotification notification;
+        {
+            std::lock_guard<std::mutex> lock(mPipelineNotificationMutex);
+            notification = mPipelineNotification;
+        }
+        if (notification) {
+            notification(state, errorCode, pipelineMessage);
+        }
+    });
     pipeline->start();
     auto result = mVideoPipelines.emplace(url, std::move(pipeline));
     return result.first->second.get();
