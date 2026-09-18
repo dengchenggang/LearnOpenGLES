@@ -10,7 +10,7 @@ namespace engine {
 MeshRenderer::MeshRenderer(Actor& owner) : SceneComponent(owner) {}
 
 renderer::Renderable MeshRenderer::getRenderable() const {
-    return renderer::Renderable(*mMesh, *mMaterial, getTransform());
+    return renderer::Renderable(*mMesh, *mMaterial, getWorldMatrix());
 }
 
 void MeshRenderer::onRender() {
@@ -20,7 +20,7 @@ void MeshRenderer::onRender() {
 
     glm::mat4 mvp = mCamera->getProjectionMatrix() *
                     mCamera->getViewMatrix() *
-                    getTransform().getModelMatrix();
+                    getWorldMatrix();
 
     mMaterial->setUniformMat4("uMVP", mvp);
     mMaterial->bind();

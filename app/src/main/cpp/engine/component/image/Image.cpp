@@ -206,8 +206,8 @@ void Image::createMesh() {
 }
 
 void Image::updateTransform() {
-    // 从 RectTransform 获取模型矩阵
-    const glm::mat4& model = mRectTransform.getModelMatrix();
+    // 获取世界矩阵（支持父子挂载级联）
+    glm::mat4 model = getWorldMatrix();
 
     // 从 RenderInterface 获取视口尺寸并构建正交投影矩阵
     int32_t x, y, viewportWidth, viewportHeight;

@@ -14,13 +14,15 @@ Level::~Level() {
 
 void Level::onBeginPlay() {
     for (auto& actor : mActors) {
-        actor->onBeginPlay();
+        if (!actor->getAttachParentActor()) {
+            actor->onBeginPlay();
+        }
     }
 }
 
 void Level::onUpdate(int64_t deltaTime) {
     for (auto& actor : mActors) {
-        if (actor->isEnabled()) {
+        if (!actor->getAttachParentActor() && actor->isEnabled()) {
             actor->onUpdate(deltaTime);
         }
     }
@@ -28,7 +30,7 @@ void Level::onUpdate(int64_t deltaTime) {
 
 void Level::onRender() {
     for (auto& actor : mActors) {
-        if (actor->isVisible()) {
+        if (!actor->getAttachParentActor() && actor->isVisible()) {
             actor->onRender();
         }
     }
@@ -36,13 +38,10 @@ void Level::onRender() {
 
 void Level::onEndPlay() {
     for (auto& actor : mActors) {
-        actor->onEndPlay();
+        if (!actor->getAttachParentActor()) {
+            actor->onEndPlay();
+        }
     }
-}
-
-Actor& Level::createActor() {
-    mActors.emplace_back(new Actor());
-    return *mActors.back();
 }
 
 void Level::changeLevel(const std::string& levelName) {

@@ -26,9 +26,15 @@ protected:
     virtual void onEndPlay();
     virtual void onDeInit() {}
 protected:
-    Actor& createActor();
+    template<typename T = Actor, typename... Args>
+    T& createActor(Args&&... args) {
+        static_assert(std::is_base_of_v<Actor, T>, "T must derive from Actor");
+        auto actor = std::unique_ptr<T>(new T(*this, std::forward<Args>(args)...));
+        T* ptr = actor.get();
+        mActors.push_back(std::move(actor));
+        return *ptr;
+    }
     void changeLevel(const std::string& levelName);
-
 private:
     ILevelManager& mLevelManager;
     std::string mName;

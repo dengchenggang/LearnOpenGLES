@@ -2,14 +2,18 @@
 
 #include <vector>
 #include <memory>
+#include <type_traits>
 #include "ActorComponent.h"
 
 namespace engine {
 
-class Actor final {
+class Level;
+class SceneComponent;
+
+class Actor {
      friend class Level;
 public:
-    ~Actor();
+    virtual ~Actor();
     Actor(const Actor&) = delete;
     Actor& operator=(const Actor&) = delete;
 public:
@@ -19,6 +23,11 @@ public:
         auto comp = std::make_unique<T>(*this, std::forward<Args>(args)...);
         T* ptr = comp.get();
         mComponents.push_back(std::move(comp));
+        if constexpr (std::is_base_of_v<SceneComponent, T>) {
+            if (!mRootComponent) {
+                mRootComponent = static_cast<SceneComponent*>(ptr);
+            }
+        }
         ptr->onAttach();
         return *ptr;
     }
@@ -39,17 +48,25 @@ public:
     bool isVisible() const { return mVisible.first; }
     Actor& setVisible(bool visible);
 
-private:
-    Actor();
-private:
-    void onBeginPlay();
-    void onUpdate(float deltaTime);
-    void onRender();
-    void onEndPlay();
-private:
+    SceneComponent* getRootComponent() const { return mRootComponent; }
+
+    void attachToActor(Actor& parent);
+    void detachFromActor();
+    Actor* getAttachParentActor() const;
+
+protected:
+    Actor(Level& level);
+protected:
+    virtual void onBeginPlay();
+    virtual void onUpdate(float deltaTime);
+    virtual void onRender();
+    virtual void onEndPlay();
+protected:
+    Level& mLevel;
     std::pair<bool, bool> mEnabled;
     std::pair<bool, bool> mVisible;
     std::vector<ActorComponentPtr> mComponents;
+    SceneComponent* mRootComponent = nullptr;
 };
 
 using ActorPtr = std::unique_ptr<Actor>;
