@@ -20,6 +20,9 @@ public:
 public:
     void start() override;
     void stop() override;
+    void resume() override;
+    void pause() override;
+    void restart(bool hardRestart = true) override;
 private:
     void handleImageAvailable(AImageReader* reader);
     void dispatchVideoFrame(AImage* image, int64_t timestamp, int64_t escaped);
@@ -34,6 +37,7 @@ private:
     bool createImageReader();
     bool createCaptureSession();
     bool startPreview();
+    void releaseCameraResources();
 
 private:
     static void onImageAvailable(void* context, AImageReader* reader);
@@ -55,9 +59,11 @@ private:
     void* mCaptureSession = nullptr;
     void* mImageReader = nullptr;
     void* mNativeWindow = nullptr;
-    bool mRunning = false;
     std::chrono::steady_clock::time_point mLastDispatchTimePoint;
     int64_t mLastCaptureTime = 0;
+    std::atomic<bool> mFirstFrameNotified{false};
+    std::atomic<int32_t> mStreamingErrorCount{0};
+    std::atomic<bool> mClosingByUs{false};
 };
 
 } // namespace framework

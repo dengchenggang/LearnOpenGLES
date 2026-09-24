@@ -19,10 +19,10 @@ public:
 public:
     bool setVideoPipelineInfo(const std::string& url, int32_t width, int32_t height, VideoFormat format, float fps);
     void setPipelineNotification(VideoPipelineNotification notification);
-    bool restart(const std::string& url);
+    bool restart(const std::string& url, bool hardRestart = true);
     bool connect(const std::string& url, const std::string& moduleName, const VideoFrameCallback& callback);
     bool connect(const std::string& url, const std::string& moduleName, const VideoHardwareBufferCallback& callback);
-    bool disconnect(const std::string& url, const std::string& moduleName);
+    bool disconnect(const std::string& url, const std::string& moduleName, bool releaseIfNoObserver = true);
 private:
     struct VideoPipelineInfo {
         std::string url;

@@ -14,35 +14,18 @@ VideoPipeline::~VideoPipeline() {
     mNotificationTaskPool->stop();
 }
 
-void VideoPipeline::restart() {
-    stop();
-    start();
-}
-
-void VideoPipeline::notify(VideoPipelineState state, int32_t errorCode, std::string message) {
-    VideoPipelineNotification notification;
-    {
+void VideoPipeline::notify(VideoPipelineEvent event, int32_t errorCode, std::string message) {
+    auto notification = [this]() {
         std::lock_guard<std::mutex> lock(mNotificationMutex);
-        notification = mNotification;
-    }
+        return mNotification;
+    }();
     if (notification) {
         mNotificationTaskPool->detach(
-            [notification = std::move(notification), state, errorCode, message = std::move(message)]() {
-                notification(state, errorCode, message);
+            [notification = std::move(notification), event, errorCode, message = std::move(message)]() {
+                notification(event, errorCode, message);
             }
         );
     }
-}
-
-void VideoPipeline::notifyFirstFrame() {
-    bool expected = false;
-    if (mFirstFrameNotified.compare_exchange_strong(expected, true)) {
-        notify(VideoPipelineState::FirstFrame);
-    }
-}
-
-void VideoPipeline::resetFirstFrameNotification() {
-    mFirstFrameNotified.store(false);
 }
 
 std::pair<size_t, size_t> VideoPipeline::connect(const std::string& moduleName, VideoFrameCallback callback) {
@@ -92,30 +75,34 @@ std::pair<size_t, size_t> VideoPipeline::disconnect(const std::string& moduleNam
     return {oldSize, newSize};
 }
 
-void VideoPipeline::dispath(const VideoFramePtr& videoFrame) {
+void VideoPipeline::dispatch(const VideoFramePtr& videoFrame) {
     if (!videoFrame) {
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
-
-    for (auto& [name, callback] : mConnections) {
+    std::shared_lock<std::shared_mutex> lock(mConnectionsMutex);
+    for (auto& pair : mConnections) {
+        auto& callback = pair.second;
         if (callback) {
-            callback(videoFrame);
+            mNotificationTaskPool->detach([callback, videoFrame]() {
+                callback(videoFrame);
+            });
         }
     }
 }
 
-void VideoPipeline::dispath(const VideoHardwareBufferPtr& hardwareBuffer) {
+void VideoPipeline::dispatch(const VideoHardwareBufferPtr& hardwareBuffer) {
     if (!hardwareBuffer) {
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(mConnectionsMutex);
-
-    for (auto& [name, callback] : mHardwareBufferConnections) {
+    std::shared_lock<std::shared_mutex> lock(mConnectionsMutex);
+    for (auto& pair : mHardwareBufferConnections) {
+        auto& callback = pair.second;
         if (callback) {
-            callback(hardwareBuffer);
+            mNotificationTaskPool->detach([callback, hardwareBuffer]() {
+                callback(hardwareBuffer);
+            });
         }
     }
 }

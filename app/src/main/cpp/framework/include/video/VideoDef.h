@@ -13,15 +13,25 @@ enum class VideoFormat : uint32_t {
     Unknown = 0
 };
 
-enum class VideoPipelineState : uint32_t {
-    Starting,
-    Running,
-    FirstFrame,
-    Stopped,
-    Error
+enum class VideoPipelineEvent : int32_t {
+    Start = 0,
+    Resume = 1,
+    FirstFrame = 2,
+    Pause = 3,
+    Stop = 4,
+
+    StartFailed = 100,
+    ResumeFailed = 101,
+    SourceDisconnected = 102,
+    SourceError = 103,
+    StreamingError = 104,
 };
 
-using VideoPipelineNotification = std::function<void(VideoPipelineState, int32_t, const std::string&)>;
+inline bool isErrorEvent(VideoPipelineEvent event) {
+    return static_cast<int32_t>(event) >= 100;
+}
+
+using VideoPipelineNotification = std::function<void(const std::string&, VideoPipelineEvent, int32_t, const std::string&)>;
 
 inline VideoFormat toVideoFormat(const char* format) {
     if (strcmp(format, "RGBA_8888") == 0) {

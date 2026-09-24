@@ -33,8 +33,8 @@ void VideoCapture::setPipelineNotification(VideoPipelineNotification notificatio
     mPipelineNotification = std::move(notification);
 }
 
-bool VideoCapture::restart(const std::string& url) {
-    LOG_ENTER("url=%s", url.c_str());
+bool VideoCapture::restart(const std::string& url, bool hardRestart) {
+    LOG_ENTER("url=%s, hardRestart=%d", url.c_str(), hardRestart);
     std::lock_guard<std::mutex> lock(mMutex);
 
     auto it = mVideoPipelines.find(url);
@@ -43,7 +43,7 @@ bool VideoCapture::restart(const std::string& url) {
         return false;
     }
 
-    it->second->restart();
+    it->second->restart(hardRestart);
     LOG_EXIT("url=%s", url.c_str());
     return true;
 }
@@ -57,6 +57,8 @@ bool VideoCapture::connect(const std::string& url, const std::string& moduleName
         LogE("exit: failed to get or create pipeline for url: %s", url.c_str());
         return false;
     }
+
+    pipeline->resume();
 
     auto result = pipeline->connect(moduleName, callback);
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
@@ -73,12 +75,14 @@ bool VideoCapture::connect(const std::string& url, const std::string& moduleName
         return false;
     }
 
+    pipeline->resume();
+
     auto result = pipeline->connect(moduleName, callback);
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
     return result.first != result.second;
 }
 
-bool VideoCapture::disconnect(const std::string& url, const std::string& moduleName) {
+bool VideoCapture::disconnect(const std::string& url, const std::string& moduleName, bool releaseIfNoObserver) {
     LOG_ENTER("url=%s, moduleName=%s", url.c_str(), moduleName.c_str());
     std::lock_guard<std::mutex> lock(mMutex);
 
@@ -90,8 +94,12 @@ bool VideoCapture::disconnect(const std::string& url, const std::string& moduleN
 
     auto result = it->second->disconnect(moduleName);
     if (result.second == 0) {
-        it->second->stop();
-        mVideoPipelines.erase(it);
+        if (releaseIfNoObserver) {
+            it->second->stop();
+            mVideoPipelines.erase(it);
+        } else {
+            it->second->pause();
+        }
     }
 
     LOG_EXIT("url=%s, moduleName=%s, %zu ?= %zu", url.c_str(), moduleName.c_str(), result.first, result.second);
@@ -141,7 +149,7 @@ VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool us
         return nullptr;
     }
 
-    pipeline->setNotification([this, url](VideoPipelineState state, int32_t errorCode, const std::string& message) {
+    pipeline->setNotification([this, url](VideoPipelineEvent event, int32_t errorCode, const std::string& message) {
         std::string pipelineMessage = url + ": " + message;
         VideoPipelineNotification notification;
         {
@@ -149,7 +157,7 @@ VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool us
             notification = mPipelineNotification;
         }
         if (notification) {
-            notification(state, errorCode, pipelineMessage);
+            notification(url, event, errorCode, pipelineMessage);
         }
     });
     pipeline->start();

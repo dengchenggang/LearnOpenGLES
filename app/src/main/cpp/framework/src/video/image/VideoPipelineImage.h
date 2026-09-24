@@ -22,6 +22,9 @@ public:
 
     void start() override;
     void stop() override;
+    void resume() override;
+    void pause() override;
+    void restart(bool hardRestart = true) override;
 
 private:
     void dispatchLoop();
@@ -35,10 +38,10 @@ private:
 
     std::unique_ptr<FileData> mImageData;
     std::unique_ptr<TaskPool> mTaskPool;
-    std::atomic<bool> mRunning{false};
-    std::chrono::steady_clock::time_point mLastDispatchLoopTimePoint {};
+    std::chrono::steady_clock::time_point mLastFrameTime {};
     BufferPool<VideoFrameBuffer> mBufferPool {300 * 1024 * 1024};
     VideoHardwareBufferPtr mHardwareBuffer;
+    std::atomic<bool> mFirstFrameNotified{false};
 };
 
 } // namespace framework

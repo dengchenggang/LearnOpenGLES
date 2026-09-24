@@ -52,25 +52,26 @@ VideoPipelineImage::VideoPipelineImage(const std::string& assetName, int width, 
     , mFormat(format)
     , mFps(fps)
     , mTaskPool(std::make_unique<TaskPool>()) {
+    mTaskPool->start();
 }
 
 VideoPipelineImage::~VideoPipelineImage() {
-    if (mRunning.load()) {
-        stop();
-    }
+    stop();
+    mTaskPool->stop();
 }
 
 void VideoPipelineImage::start() {
-    if (mRunning.load()) {
+    if (getState() != State::Idle) {
         return;
     }
 
-    resetFirstFrameNotification();
-    notify(VideoPipelineState::Starting);
+    setState(State::Started);
+    mFirstFrameNotified.store(false);
 
     auto data = FileSystem.readFile(mAssetName.c_str());
     if (!data || data->empty()) {
-        notify(VideoPipelineState::Error, -1, "failed to read image: " + mAssetName);
+        setState(State::Idle);
+        notify(VideoPipelineEvent::StartFailed, -1, "failed to read image: " + mAssetName);
         return;
     }
 
@@ -87,43 +88,76 @@ void VideoPipelineImage::start() {
             mHardwareBuffer = std::make_shared<VideoHardwareBuffer>(buffer, 0, 0);
             AHardwareBuffer_release(buffer);
         } else {
-            notify(VideoPipelineState::Error, -1, "failed to create hardware buffer");
+            mImageData.reset();
+            setState(State::Idle);
+            notify(VideoPipelineEvent::StartFailed, -1, "failed to create hardware buffer");
             return;
         }
     }
 
-    mTaskPool->start();
-    mRunning.store(true);
-    notify(VideoPipelineState::Running);
+    notify(VideoPipelineEvent::Start);
+}
 
+void VideoPipelineImage::resume() {
+    auto prevState = getState();
+    if (prevState != State::Started && prevState != State::Paused) {
+        return;
+    }
+
+    setState(State::Resumed);
+    mLastFrameTime = std::chrono::steady_clock::now();
     dispatchLoop();
+    notify(VideoPipelineEvent::Resume);
+}
+
+void VideoPipelineImage::pause() {
+    if (getState() != State::Resumed) {
+        return;
+    }
+
+    setState(State::Paused);
+    notify(VideoPipelineEvent::Pause);
 }
 
 void VideoPipelineImage::stop() {
-    if (!mRunning.load()) {
+    if (getState() == State::Idle) {
         return;
     }
 
-    mRunning.store(false);
-    mTaskPool->stop();
-    notify(VideoPipelineState::Stopped);
+    setState(State::Idle);
+    mImageData.reset();
+    mHardwareBuffer.reset();
+    notify(VideoPipelineEvent::Stop);
+}
+
+void VideoPipelineImage::restart(bool hardRestart) {
+    pause();
+    if (hardRestart) {
+        stop();
+        start();
+    }
+    if (getConnectionCount() > 0) {
+        resume();
+    }
 }
 
 void VideoPipelineImage::dispatchLoop() {
-    if (!mRunning.load()) {
+    if (getState() != State::Resumed) {
         return;
     }
 
-    mLastDispatchLoopTimePoint = std::chrono::steady_clock::now();
-
+    auto now = std::chrono::steady_clock::now();
     int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    int64_t escaped   = std::chrono::duration_cast<std::chrono::nanoseconds>(mLastDispatchLoopTimePoint.time_since_epoch()).count();
+    int64_t escaped   = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
 
     if (useHardwareBuffer()) {
         if (mHardwareBuffer) {
             auto hardwareBuffer = std::make_shared<VideoHardwareBuffer>(mHardwareBuffer->get(), timestamp, escaped);
-            notifyFirstFrame();
-            dispath(hardwareBuffer);
+            bool expected = false;
+            if (mFirstFrameNotified.compare_exchange_strong(expected, true)) {
+                notify(VideoPipelineEvent::FirstFrame);
+            }
+            dispatch(hardwareBuffer);
         }
     } else {
         size_t size = calculateSize(mWidth, mHeight, mFormat);
@@ -135,18 +169,21 @@ void VideoPipelineImage::dispatchLoop() {
 
         auto videoFrame = pair.first;
 
-        notifyFirstFrame();
-        dispath(videoFrame);
+        bool expected = false;
+        if (mFirstFrameNotified.compare_exchange_strong(expected, true)) {
+            notify(VideoPipelineEvent::FirstFrame);
+        }
+        dispatch(videoFrame);
     }
 
-    auto currentTimePoint = std::chrono::steady_clock::now();
-    auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTimePoint - mLastDispatchLoopTimePoint).count();
-    int64_t targetDelayMs = static_cast<int64_t>(1000.0f / mFps);
-    int64_t delayMs = targetDelayMs - elapsedMs;
-    if (delayMs < 0) {
-        delayMs = 0;
+    auto intervalMs = std::chrono::milliseconds(static_cast<int64_t>(1000.0f / mFps));
+    mLastFrameTime += intervalMs;
+    auto delay = mLastFrameTime - std::chrono::steady_clock::now();
+    if (delay < std::chrono::milliseconds(0)) {
+        delay = std::chrono::milliseconds(0);
+        mLastFrameTime = std::chrono::steady_clock::now();
     }
-    mTaskPool->detachDelayed(delayMs, &VideoPipelineImage::dispatchLoop, this);
+    mTaskPool->detachDelayed(delay.count(), &VideoPipelineImage::dispatchLoop, this);
 }
 
 } // namespace framework
