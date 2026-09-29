@@ -196,6 +196,12 @@ RenderResourceHandle OpenGLESRenderInterface::createTexture2D(int32_t width, int
     return static_cast<RenderResourceHandle>(texture);
 }
 
+RenderResourceHandle OpenGLESRenderInterface::genTexture2D() {
+    GLuint texture;
+    glGenTextures(1, &texture);
+    return static_cast<RenderResourceHandle>(texture);
+}
+
 void OpenGLESRenderInterface::deleteTexture(RenderResourceHandle texture) {
     GLuint glTexture = static_cast<GLuint>(texture);
     glDeleteTextures(1, &glTexture);
@@ -542,6 +548,50 @@ GLenum OpenGLESRenderInterface::toGLFramebufferAttachment(FramebufferAttachment 
         case FramebufferAttachment::DepthStencil: return GL_DEPTH_STENCIL_ATTACHMENT;
     }
     return GL_COLOR_ATTACHMENT0;
+}
+
+void* OpenGLESRenderInterface::createImageKHR(void* nativeBuffer) {
+    EGLDisplay display = eglGetCurrentDisplay();
+    if (display == EGL_NO_DISPLAY) {
+        LogE("%s no current EGL display", TAG);
+        return nullptr;
+    }
+
+    EGLint attrs[] = {
+        EGL_IMAGE_PRESERVED_KHR, EGL_TRUE,
+        EGL_NONE
+    };
+    EGLImageKHR image = eglCreateImageKHR(
+        display,
+        EGL_NO_CONTEXT,
+        EGL_NATIVE_BUFFER_ANDROID,
+        static_cast<EGLClientBuffer>(nativeBuffer),
+        attrs);
+
+    if (image == EGL_NO_IMAGE_KHR) {
+        LogE("%s eglCreateImageKHR failed: 0x%x", TAG, eglGetError());
+        return nullptr;
+    }
+
+    return static_cast<void*>(image);
+}
+
+void OpenGLESRenderInterface::destroyImageKHR(void* image) {
+    if (!image) return;
+
+    EGLDisplay display = eglGetCurrentDisplay();
+    if (display == EGL_NO_DISPLAY) {
+        LogE("%s no current EGL display, cannot destroy image", TAG);
+        return;
+    }
+
+    eglDestroyImageKHR(display, static_cast<EGLImageKHR>(image));
+}
+
+void OpenGLESRenderInterface::bindImageToTexture2D(void* image) {
+    if (!image) return;
+
+    glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, static_cast<GLeglImageOES>(image));
 }
 
 } // namespace renderer

@@ -2,7 +2,7 @@
 #define MATERIAL_H
 
 #include "Shader.h"
-#include "Texture.h"
+#include "texture/Texture.h"
 #include <memory>
 #include <vector>
 

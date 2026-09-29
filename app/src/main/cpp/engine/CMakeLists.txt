@@ -5,6 +5,7 @@ set(ENGINE_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer/mesh
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer/material
+    ${CMAKE_CURRENT_SOURCE_DIR}/renderer/material/texture
     ${CMAKE_CURRENT_SOURCE_DIR}/component/base/camera
     ${CMAKE_CURRENT_SOURCE_DIR}/component/base/transform
     ${CMAKE_CURRENT_SOURCE_DIR}/component/common
@@ -19,6 +20,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/common             ENGINE_COMMO
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/level              ENGINE_LEVEL_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/mesh      ENGINE_RENDERER_MESH_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/material  ENGINE_RENDERER_MATERIAL_SRC_LIST)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/renderer/material/texture ENGINE_RENDERER_MATERIAL_TEXTURE_SRC_LIST) # texture subdir
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component/base/camera    ENGINE_COMPONENT_CAMERA_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component/base/transform ENGINE_COMPONENT_TRANSFORM_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/component/common    ENGINE_COMPONENT_COMMON_SRC_LIST)
@@ -35,6 +37,7 @@ set(ENGINE_ALL_SRC_LIST
     ${ENGINE_LEVEL_SRC_LIST}
     ${ENGINE_RENDERER_MESH_SRC_LIST}
     ${ENGINE_RENDERER_MATERIAL_SRC_LIST}
+    ${ENGINE_RENDERER_MATERIAL_TEXTURE_SRC_LIST}
     ${ENGINE_COMPONENT_CAMERA_SRC_LIST}
     ${ENGINE_COMPONENT_TRANSFORM_SRC_LIST}
     ${ENGINE_COMPONENT_COMMON_SRC_LIST}

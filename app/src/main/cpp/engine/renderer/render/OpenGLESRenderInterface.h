@@ -1,9 +1,19 @@
 #ifndef OPENGLES_RENDER_INTERFACE_H
 #define OPENGLES_RENDER_INTERFACE_H
 
+#ifndef EGL_EGLEXT_PROTOTYPES
+#define EGL_EGLEXT_PROTOTYPES
+#endif
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+
 #include "IRenderInterface.h"
 #include "common/Singleton.hpp"
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include <GLES3/gl3.h>
+#include <GLES2/gl2ext.h>
 #include <string>
 #include <queue>
 
@@ -50,6 +60,7 @@ public:
 
     // 纹理管理
     RenderResourceHandle createTexture2D(int32_t width, int32_t height, TextureFormat format, const void* data) override;
+    RenderResourceHandle genTexture2D() override;
     void deleteTexture(RenderResourceHandle texture) override;
     void bindTexture2D(RenderResourceHandle texture, uint32_t unit) override;
     void activeTextureUnit(uint32_t unit) override;
@@ -58,6 +69,11 @@ public:
     void setTextureWrap(TextureWrap wrapS, TextureWrap wrapT) override;
     void generateMipmap() override;
     void updateTexture2D(RenderResourceHandle texture, TextureFormat format, int32_t x, int32_t y, int32_t width, int32_t height, const void* data) override;
+
+    // HardwareBuffer 纹理（EGLImage）
+    void* createImageKHR(void* nativeBuffer) override;
+    void destroyImageKHR(void* image) override;
+    void bindImageToTexture2D(void* image) override;
 
     // 帧缓冲
     RenderResourceHandle createFramebuffer() override;

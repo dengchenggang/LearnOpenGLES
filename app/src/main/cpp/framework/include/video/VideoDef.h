@@ -31,7 +31,6 @@ inline bool isErrorEvent(VideoPipelineEvent event) {
     return static_cast<int32_t>(event) >= 100;
 }
 
-using VideoPipelineNotification = std::function<void(const std::string&, VideoPipelineEvent, int32_t, const std::string&)>;
 
 inline VideoFormat toVideoFormat(const char* format) {
     if (strcmp(format, "RGBA_8888") == 0) {

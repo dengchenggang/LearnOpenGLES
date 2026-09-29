@@ -18,9 +18,9 @@ NVSModule::NVSModule(engine::ILevelManager& levelManager, const JsonConfigLoader
 
 NVSModule::~NVSModule() = default;
 
-void NVSModule::onInit() {
-    LogI("NVSModule onInit");
-    mActor = std::make_unique<Referrence<engine::Actor>>(createActor());
+void NVSModule::onBeginPlay() {
+    LogI("NVSModule onBeginPlay");
+    mActor = std::make_unique<engine::reference_t<engine::Actor>>(createActor());
     mActor->ref.setEnabled(true).setVisible(true);
     auto& image = mActor->ref.addComponent<engine::Image>();
     int32_t viewportX = 0;
@@ -39,6 +39,10 @@ void NVSModule::onInit() {
     mActor->ref.addComponent<NVSComponent>(image, mConfig);
 }
 
+void NVSModule::onEnter() {
+    LogI("NVSModule onEnter");
+}
+
 void NVSModule::onResize(int32_t width, int32_t height) {
     LogI("NVSModule onResize: %dx%d", width, height);
     if (width > 0 && height > 0) {
@@ -51,14 +55,18 @@ void NVSModule::onResize(int32_t width, int32_t height) {
         } else {
             LogW("NVSModule image component is null");
         }
-        
+
     } else {
         LogW("NVSModule invalid viewport: %dx%d", width, height);
     }
 }
 
-void NVSModule::onDeInit() {
-    LogI("NVSModule onDeInit");
+void NVSModule::onExit() {
+    LogI("NVSModule onExit");
+}
+
+void NVSModule::onEndPlay() {
+    LogI("NVSModule onEndPlay");
 }
 
 }

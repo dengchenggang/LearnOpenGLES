@@ -28,7 +28,7 @@ bool VideoCapture::setVideoPipelineInfo(const std::string& url, int32_t width, i
     return result.second;
 }
 
-void VideoCapture::setPipelineNotification(VideoPipelineNotification notification) {
+void VideoCapture::setPipelineNotification(Notification notification) {
     std::lock_guard<std::mutex> lock(mPipelineNotificationMutex);
     mPipelineNotification = std::move(notification);
 }
@@ -151,7 +151,7 @@ VideoPipeline* VideoCapture::getOrCreatePipeline(const std::string& url, bool us
 
     pipeline->setNotification([this, url](VideoPipelineEvent event, int32_t errorCode, const std::string& message) {
         std::string pipelineMessage = url + ": " + message;
-        VideoPipelineNotification notification;
+        Notification notification;
         {
             std::lock_guard<std::mutex> lock(mPipelineNotificationMutex);
             notification = mPipelineNotification;

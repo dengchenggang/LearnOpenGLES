@@ -2,6 +2,7 @@
 #include "filesystem/FileSystem.h"
 #include "RenderInterface.h"
 #include "utils/Log.h"
+#include "texture/Texture2D.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace engine {
@@ -118,10 +119,10 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
     if (mMaterial->hasTexture(0)) {
         auto& texture = mMaterial->getTexture(0);
         if (texture.isValid() && texture.getWidth() == width && texture.getHeight() == height && texture.getFormat() == format) {
-            texture.updateData(buffer, 0, 0, width, height);
+            static_cast<Texture2D&>(texture).updateData(buffer, 0, 0, width, height);
             LogI("%s texture updated: %dx%d", TAG, width, height);
         } else {
-            auto newTexture = std::make_shared<Texture>();
+            auto newTexture = std::make_shared<Texture2D>();
             TextureDesc desc;
             desc.width = width;
             desc.height = height;
@@ -136,7 +137,7 @@ bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t c
         }
     } else {
         // 创建纹理
-        auto texture = std::make_shared<Texture>();
+        auto texture = std::make_shared<Texture2D>();
 
         TextureDesc desc;
         desc.width = width;

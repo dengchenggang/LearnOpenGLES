@@ -18,13 +18,13 @@ public:
 public:
     const std::string& getId() const { return mName; }
 protected:
-    virtual void onInit() = 0;
-    virtual void onResize(int32_t width, int32_t height) {}
-    virtual void onBeginPlay();
+    virtual void onBeginPlay() = 0;
+    virtual void onResize(int32_t width, int32_t height) = 0;
+    virtual void onEnter() = 0;
     virtual void onUpdate(int64_t deltaTime);
     virtual void onRender();
-    virtual void onEndPlay();
-    virtual void onDeInit() {}
+    virtual void onExit() = 0;
+    virtual void onEndPlay() = 0;
 protected:
     template<typename T = Actor, typename... Args>
     T& createActor(Args&&... args) {

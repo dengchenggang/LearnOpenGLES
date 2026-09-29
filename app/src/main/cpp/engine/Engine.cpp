@@ -32,7 +32,7 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
             }
 
             for (auto& pair : mLevels) {
-                pair.second->onInit();
+                pair.second->onBeginPlay();
             }
 
             changeLevel(startLevel);
@@ -196,10 +196,10 @@ void Engine::doChangeLevel(const std::string& levelName) {
         auto oldLevel = mActiveLevel;
         mActiveLevel = it->second.get();
         if (oldLevel) {
-            oldLevel->onEndPlay();
+            oldLevel->onExit();
         }
         if (mActiveLevel) {
-            mActiveLevel->onBeginPlay();
+            mActiveLevel->onEnter();
         }
     } else {
         LogE("doChangeLevel: %s not found", levelName.c_str());
