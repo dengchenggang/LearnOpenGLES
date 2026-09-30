@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "ActorComponent.h"
 
+
 namespace engine {
 
 class Level;
@@ -28,12 +29,12 @@ public:
                 mRootComponent = static_cast<SceneComponent*>(ptr);
             }
         }
-        ptr->onAttach();
         return *ptr;
     }
 
     template<typename T>
     T* getComponent() const {
+        static_assert(std::is_base_of_v<ActorComponent, T>, "T must derive from ActorComponent");
         for (const auto& comp : mComponents) {
             if (auto* p = dynamic_cast<T*>(comp.get())) {
                 return p;

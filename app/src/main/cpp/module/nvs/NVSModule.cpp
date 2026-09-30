@@ -11,7 +11,7 @@ namespace module {
 NVSModule::NVSModule(engine::ILevelManager& levelManager, const JsonConfigLoaderPtr& config)
     : engine::Level(MODULE_NAME_NVS, levelManager)
     , mConfig(config)
-    , mActor(nullptr)
+    , mActor(createActor())
 {
 
 }
@@ -20,9 +20,8 @@ NVSModule::~NVSModule() = default;
 
 void NVSModule::onBeginPlay() {
     LogI("NVSModule onBeginPlay");
-    mActor = std::make_unique<engine::reference_t<engine::Actor>>(createActor());
-    mActor->ref.setEnabled(true).setVisible(true);
-    auto& image = mActor->ref.addComponent<engine::Image>();
+    mActor.setEnabled(true).setVisible(true);
+    auto& image = mActor.addComponent<engine::Image>();
     int32_t viewportX = 0;
     int32_t viewportY = 0;
     int32_t viewportWidth = 0;
@@ -36,7 +35,7 @@ void NVSModule::onBeginPlay() {
     } else {
         LogW("NVSModule invalid viewport: %dx%d", viewportWidth, viewportHeight);
     }
-    mActor->ref.addComponent<NVSComponent>(image, mConfig);
+    mActor.addComponent<NVSComponent>(image, mConfig);
 }
 
 void NVSModule::onEnter() {
@@ -46,7 +45,7 @@ void NVSModule::onEnter() {
 void NVSModule::onResize(int32_t width, int32_t height) {
     LogI("NVSModule onResize: %dx%d", width, height);
     if (width > 0 && height > 0) {
-        auto image = mActor->ref.getComponent<engine::Image>();
+        auto image = mActor.getComponent<engine::Image>();
         if (image) {
             auto& rectTransform = image->getRectTransform();
             rectTransform.setPosition(glm::vec3(0.0f + width / 2.0f, 0.0f + height / 2.0f, 0.0f));

@@ -22,8 +22,8 @@ void MeshRenderer::onRender() {
                     mCamera->getViewMatrix() *
                     getWorldMatrix();
 
-    mMaterial->setUniformMat4("uMVP", mvp);
     mMaterial->bind();
+    mMaterial->setUniformMat4("uMVP", mvp);
     mMesh->draw();
     mMaterial->unbind();
 }

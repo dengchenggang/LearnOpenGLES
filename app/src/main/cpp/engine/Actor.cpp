@@ -81,8 +81,8 @@ void Actor::onUpdate(float deltaTime) {
     }
 
     if (mVisible.second) {
-        for (auto& comp : mComponents) {
-            comp->onVisibilityChanged(mVisible.first);
+        if (mRootComponent) {
+            mRootComponent->onVisibilityChanged(mVisible.first);
         }
         mVisible.second = false;
     }
@@ -106,8 +106,8 @@ void Actor::onRender() {
     if (!mVisible.first) {
         return;
     }
-    for (auto& comp : mComponents) {
-        comp->onRender();
+    if (mRootComponent) {
+        mRootComponent->onRender();
     }
     if (mRootComponent) {
         for (auto* childComp : mRootComponent->getAttachChildren()) {

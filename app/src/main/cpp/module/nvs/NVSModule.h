@@ -1,6 +1,5 @@
 #pragma once
 #include "level/Level.h"
-#include "reference_t.hpp"
 #include "utils/config/JsonConfigLoader.h"
 #include <memory>
 
@@ -18,7 +17,7 @@ protected:
     void onEndPlay() override;
 private:
     JsonConfigLoaderPtr mConfig;
-    engine::reference_ptr_t<engine::Actor> mActor;
+    engine::Actor& mActor;
 };
 
 }

@@ -15,12 +15,9 @@ public:
 public:
     Actor& GetOwner() const { return mOwner; }
 protected:
-    virtual void onAttach() {}
     virtual void onBeginPlay() {}
     virtual void onEnabledChanged(bool enabled) {}
-    virtual void onVisibilityChanged(bool visible) {}
     virtual void onUpdate(float deltaTime) {}
-    virtual void onRender() {}
     virtual void onEndPlay() {}
 private:
     Actor& mOwner;
