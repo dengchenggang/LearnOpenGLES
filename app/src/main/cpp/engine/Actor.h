@@ -43,6 +43,8 @@ public:
         return nullptr;
     }
 
+    uint64_t getId() const { return mId; }
+
     bool isEnabled() const { return mEnabled.first; }
     Actor& setEnabled(bool enabled);
 
@@ -56,7 +58,7 @@ public:
     Actor* getAttachParentActor() const;
 
 protected:
-    Actor(Level& level);
+    Actor(Level& level, uint64_t id);
 protected:
     virtual void onBeginPlay();
     virtual void onUpdate(float deltaTime);
@@ -64,6 +66,7 @@ protected:
     virtual void onEndPlay();
 protected:
     Level& mLevel;
+    uint64_t mId;
     std::pair<bool, bool> mEnabled;
     std::pair<bool, bool> mVisible;
     std::vector<ActorComponentPtr> mComponents;

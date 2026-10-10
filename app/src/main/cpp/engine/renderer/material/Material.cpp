@@ -5,7 +5,7 @@ namespace engine {
 namespace renderer {
 
 
-void Material::setTexture(std::shared_ptr<Texture> texture, uint32_t unit, const std::string& samplerName) {
+void Material::setTexture(TexturePtr texture, uint32_t unit, const std::string& samplerName) {
     for (auto& slot : mTextures) {
         if (slot.unit == unit) {
             slot.texture = std::move(texture);

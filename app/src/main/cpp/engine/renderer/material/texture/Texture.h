@@ -66,8 +66,7 @@ protected:
     RenderResourceHandle mHandle = INVALID_HANDLE;
 };
 
-using TexturePtr = std::unique_ptr<Texture>;
-using TextureSharedPtr = std::shared_ptr<Texture>;
+using TexturePtr = std::shared_ptr<Texture>;
 
 } // namespace renderer
 } // namespace engine

@@ -1,7 +1,10 @@
 #include "Level.h"
 #include "ILevelManager.h"
+#include <algorithm>
 
 namespace engine {
+
+uint64_t Level::sNextActorId = 1;
 
 Level::Level(const std::string& name, ILevelManager& levelManager)
     : mLevelManager(levelManager)
@@ -25,6 +28,16 @@ void Level::onRender() {
         if (!actor->getAttachParentActor() && actor->isVisible()) {
             actor->onRender();
         }
+    }
+}
+
+void Level::destroyActor(uint64_t actorId) {
+    auto it = std::find_if(mActors.begin(), mActors.end(),
+        [actorId](const ActorPtr& actor) { return actor->getId() == actorId; });
+    if (it != mActors.end()) {
+        (*it)->onEndPlay();
+        (*it)->detachFromActor();
+        mActors.erase(it);
     }
 }
 

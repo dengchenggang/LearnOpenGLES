@@ -28,11 +28,11 @@ protected:
      * 调用时机：attachTo() 内部建立父子关系之后立即调用。
      * 派生类可重写此方法，在挂载时同步父级状态或执行自定义初始化逻辑。
      */
-    virtual void onAttachedTo(SceneComponent* parent) {}
+    virtual void onAttachedTo(SceneComponent* parent) = 0;
 
-    virtual void onVisibilityChanged(bool visible) {}
+    virtual void onVisibilityChanged(bool visible) = 0;
 
-    virtual void onRender() {}
+    virtual void onRender() = 0;
     /**
      * 当前组件从父组件卸载后的回调。
      * @param parent 原父组件，不会为 nullptr
@@ -41,7 +41,7 @@ protected:
      * 组件析构时也会先触发 detachFromParent()，进而调用此方法。
      * 派生类可重写此方法，在卸载时清理与父级相关的状态。
      */
-    virtual void onDetachedFrom(SceneComponent* parent) {}
+    virtual void onDetachedFrom(SceneComponent* parent) = 0;
 private:
     /**
      * 将当前组件挂载到指定的父组件下，形成场景图层级关系。

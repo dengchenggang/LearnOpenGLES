@@ -26,7 +26,14 @@ public:
     renderer::Renderable getRenderable() const;
 
 protected:
+    void onBeginPlay() override {}
+    void onEnabledChanged(bool enabled) override {}
+    void onUpdate(float deltaTime) override {}
     void onRender() override;
+    void onEndPlay() override {}
+    void onAttachedTo(SceneComponent* parent) override {}
+    void onVisibilityChanged(bool visible) override {}
+    void onDetachedFrom(SceneComponent* parent) override {}
 
 private:
     std::shared_ptr<renderer::Mesh> mMesh;

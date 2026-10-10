@@ -15,10 +15,10 @@ public:
 public:
     Actor& GetOwner() const { return mOwner; }
 protected:
-    virtual void onBeginPlay() {}
-    virtual void onEnabledChanged(bool enabled) {}
-    virtual void onUpdate(float deltaTime) {}
-    virtual void onEndPlay() {}
+    virtual void onBeginPlay() = 0;
+    virtual void onEnabledChanged(bool enabled) = 0;
+    virtual void onUpdate(float deltaTime) = 0;
+    virtual void onEndPlay() = 0;
 private:
     Actor& mOwner;
 };

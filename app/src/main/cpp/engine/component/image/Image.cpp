@@ -3,6 +3,7 @@
 #include "RenderInterface.h"
 #include "utils/Log.h"
 #include "texture/Texture2D.h"
+#include "AssetManager.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace engine {
@@ -41,7 +42,6 @@ void Image::onBeginPlay() {
 }
 
 void Image::onUpdate(float deltaTime) {
-    // 更新逻辑（如动画）
 }
 
 void Image::onRender() {
@@ -81,6 +81,44 @@ void Image::onEndPlay() {
 
     mInitialized = false;
     LogI("%s released", TAG);
+}
+
+bool Image::setPath(const std::string& path) {
+    if (!mInitialized) {
+        LogE("%s not initialized, cannot load image", TAG);
+        return false;
+    }
+
+    auto texture = AssetManager.loadTexture(path);
+    if (!texture || !texture->isValid()) {
+        LogE("%s failed to load texture: path=%s", TAG, path.c_str());
+        return false;
+    }
+
+    mImageSize = glm::vec2(static_cast<float>(texture->getWidth()),
+                           static_cast<float>(texture->getHeight()));
+    mMaterial->setTexture(std::move(texture), 0, "uTexture");
+    LogI("%s texture loaded: path=%s, size=%.0fx%.0f", TAG, path.c_str(), mImageSize.x, mImageSize.y);
+    return true;
+}
+
+bool Image::setHardwareBuffer(const std::string& url, AHardwareBuffer* buffer) {
+    if (!mInitialized) {
+        LogE("%s not initialized, cannot load hw buffer", TAG);
+        return false;
+    }
+
+    auto texture = AssetManager.loadTexture(url, buffer);
+    if (!texture || !texture->isValid()) {
+        LogE("%s failed to load hw texture: url=%s", TAG, url.c_str());
+        return false;
+    }
+
+    mImageSize = glm::vec2(static_cast<float>(texture->getWidth()),
+                           static_cast<float>(texture->getHeight()));
+    mMaterial->setTexture(std::move(texture), 0, "uTexture");
+    LogI("%s hw texture loaded: url=%s, size=%.0fx%.0f", TAG, url.c_str(), mImageSize.x, mImageSize.y);
+    return true;
 }
 
 bool Image::load(const uint8_t* buffer, int32_t width, int32_t height, int32_t channels) {

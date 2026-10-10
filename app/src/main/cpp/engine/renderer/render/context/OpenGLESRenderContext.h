@@ -19,6 +19,7 @@ public:
 public:
     // EGL 初始化与释放
     bool initialize(std::int32_t gles);
+    bool preBeginPlay();
     bool beginPlay(ANativeWindow *window);
     void endPlay();
     void deInitialize();
@@ -42,6 +43,7 @@ private:
     EGLConfig mConfig;
     EGLContext mContext;
     EGLSurface mSurface;
+    EGLSurface mPbufferSurface;
 
     std::int32_t mWidth{0};
     std::int32_t mHeight{0};

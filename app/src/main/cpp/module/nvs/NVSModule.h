@@ -1,5 +1,6 @@
 #pragma once
 #include "level/Level.h"
+#include "NVSActor.h"
 #include "utils/config/JsonConfigLoader.h"
 #include <memory>
 
@@ -17,7 +18,7 @@ protected:
     void onEndPlay() override;
 private:
     JsonConfigLoaderPtr mConfig;
-    engine::Actor& mActor;
+    NVSActor& mActor;
 };
 
 }

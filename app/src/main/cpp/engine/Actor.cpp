@@ -3,8 +3,9 @@
 
 namespace engine {
 
-Actor::Actor(Level& level)
+Actor::Actor(Level& level, uint64_t id)
     : mLevel(level)
+    , mId(id)
     , mEnabled(false, true)
     , mVisible(false, true)
 {

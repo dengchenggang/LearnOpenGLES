@@ -12,7 +12,8 @@ OpenGLESRenderContext::OpenGLESRenderContext()
     : mDisplay(EGL_NO_DISPLAY)
     , mConfig(nullptr)
     , mContext(EGL_NO_CONTEXT)
-    , mSurface(EGL_NO_SURFACE) {
+    , mSurface(EGL_NO_SURFACE)
+    , mPbufferSurface(EGL_NO_SURFACE) {
 }
 
 OpenGLESRenderContext::~OpenGLESRenderContext() {
@@ -37,7 +38,7 @@ bool OpenGLESRenderContext::initialize(std::int32_t gles) {
     eglInitialize(mDisplay, nullptr, nullptr);
     const EGLint cfgAttr[] = {
             EGL_RENDERABLE_TYPE, gles >= 3 ? EGL_OPENGL_ES3_BIT : EGL_OPENGL_ES2_BIT,
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
             EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8,
             EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 16,
             EGL_NONE
@@ -57,6 +58,33 @@ bool OpenGLESRenderContext::initialize(std::int32_t gles) {
     return true;
 }
 
+bool OpenGLESRenderContext::preBeginPlay() {
+    LogI("%s preBeginPlay enter.", TAG);
+
+    if (!mInitialized) {
+        LogE("%s not initialized!", TAG);
+        return false;
+    }
+
+    const EGLint pbufferAttr[] = {EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE};
+    mPbufferSurface = eglCreatePbufferSurface(mDisplay, mConfig, pbufferAttr);
+    if (mPbufferSurface == EGL_NO_SURFACE) {
+        LogE("%s eglCreatePbufferSurface failed!", TAG);
+        return false;
+    }
+
+    if (!eglMakeCurrent(mDisplay, mPbufferSurface, mPbufferSurface, mContext)) {
+        LogE("%s eglMakeCurrent(pbuffer) failed!", TAG);
+        eglDestroySurface(mDisplay, mPbufferSurface);
+        mPbufferSurface = EGL_NO_SURFACE;
+        return false;
+    }
+
+    mBound = true;
+    LogI("%s preBeginPlay success, pbuffer context active.", TAG);
+    return true;
+}
+
 bool OpenGLESRenderContext::beginPlay(ANativeWindow *window) {
     LogI("%s beginPlay enter.", TAG);
 
@@ -68,6 +96,13 @@ bool OpenGLESRenderContext::beginPlay(ANativeWindow *window) {
     if (mSurface != EGL_NO_SURFACE) {
         LogE("mSurface already exists!");
         return false;
+    }
+
+    if (mPbufferSurface != EGL_NO_SURFACE) {
+        eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        eglDestroySurface(mDisplay, mPbufferSurface);
+        mPbufferSurface = EGL_NO_SURFACE;
+        mBound = false;
     }
 
     mSurface = eglCreateWindowSurface(mDisplay, mConfig, window, nullptr);
@@ -113,6 +148,10 @@ void OpenGLESRenderContext::endPlay() {
         eglDestroySurface(mDisplay, mSurface);
         mSurface = EGL_NO_SURFACE;
     }
+    if (mPbufferSurface != EGL_NO_SURFACE) {
+        eglDestroySurface(mDisplay, mPbufferSurface);
+        mPbufferSurface = EGL_NO_SURFACE;
+    }
     mBound = false;
 
     LogI("%s endPlay done", TAG);
@@ -126,6 +165,10 @@ void OpenGLESRenderContext::deInitialize() {
         if (mSurface != EGL_NO_SURFACE) {
             eglDestroySurface(mDisplay, mSurface);
             mSurface = EGL_NO_SURFACE;
+        }
+        if (mPbufferSurface != EGL_NO_SURFACE) {
+            eglDestroySurface(mDisplay, mPbufferSurface);
+            mPbufferSurface = EGL_NO_SURFACE;
         }
         if (mContext != EGL_NO_CONTEXT) {
             eglDestroyContext(mDisplay, mContext);

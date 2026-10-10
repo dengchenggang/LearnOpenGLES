@@ -19,6 +19,7 @@ public:
 
 protected:
     void onBeginPlay() override;
+    void onEnabledChanged(bool enabled) override {}
     void onUpdate(float deltaTime) override;
     void onEndPlay() override;
 

@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+typedef struct AHardwareBuffer AHardwareBuffer;
 
 namespace engine {
 
@@ -24,12 +25,13 @@ public:
     Image(Image&&) = delete;
     Image& operator=(Image&&) = delete;
 public:
-    void onBeginPlay() override;
-    void onUpdate(float deltaTime) override;
-    void onRender() override;
-    void onEndPlay() override;
-
     RectTransform& getRectTransform() const { return mRectTransform; }
+    // 设置图像路径（通过 AssetManager 加载）
+    bool setPath(const std::string& path);
+
+    // 设置 AHardwareBuffer（通过 AssetManager 零拷贝加载）
+    bool setHardwareBuffer(const std::string& url, AHardwareBuffer* buffer);
+
     // 加载图像（从内存数据）
     bool load(const uint8_t* buffer, int32_t width, int32_t height, int32_t channels);
 
@@ -41,6 +43,16 @@ public:
 
     // 检查是否有效
     bool isValid() const;
+
+protected:
+    void onBeginPlay() override;
+    void onEnabledChanged(bool enabled) override {}
+    void onUpdate(float deltaTime) override;
+    void onRender() override;
+    void onEndPlay() override;
+    void onAttachedTo(SceneComponent* parent) override {}
+    void onVisibilityChanged(bool visible) override {}
+    void onDetachedFrom(SceneComponent* parent) override {}
 
 private:
     RectTransform& mRectTransform;

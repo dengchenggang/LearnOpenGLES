@@ -22,6 +22,7 @@ public:
     Engine& operator=(const Engine&) = delete;
 public:
     void init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, const std::string& startLevel);
+    void preBeginPlay();
     void beginPlay(ANativeWindow* window);
     void resize(std::int32_t w, std::int32_t h);
     void endPlay();

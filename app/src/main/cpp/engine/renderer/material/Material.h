@@ -24,7 +24,7 @@ public:
     const Shader& getShader() const { return *mShader; }
 
     // 设置纹理（可同时指定 sampler uniform 名称）
-    void setTexture(std::shared_ptr<Texture> texture, uint32_t unit, const std::string& samplerName);
+    void setTexture(TexturePtr texture, uint32_t unit, const std::string& samplerName);
     Texture& getTexture(uint32_t unit = 0);
     const Texture& getTexture(uint32_t unit = 0) const;
     bool hasTexture(uint32_t unit = 0) const;
@@ -47,7 +47,7 @@ public:
 
 private:
     struct TextureSlot {
-        std::shared_ptr<Texture> texture;
+        TexturePtr texture;
         uint32_t unit = 0;
     };
 

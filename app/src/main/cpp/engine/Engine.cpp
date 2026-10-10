@@ -21,6 +21,9 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
         LOG_ENTER(": task startLevel=%s", startLevel.c_str());
         bool result = mRenderContext.initialize(gles);
         if (result) {
+            mRenderContext.preBeginPlay();
+        }
+        if (result) {
             mActiveLevel = nullptr;
             mNextActiveLevelName.clear();
             mLevels.clear();
@@ -41,6 +44,25 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
         return result;
     });
     future.get();
+}
+
+void Engine::preBeginPlay() {
+    LOG_ENTER(".");
+
+    if (!mRenderContext.isInitialized()) {
+        LogE("EGL not initialized!");
+        return;
+    }
+
+    auto future = mTaskPool->submit([this]() {
+        update(0);
+        render(0);
+        mRenderContext.swapBuffers();
+        LogI("GPU pipeline pre-warmed.");
+    });
+    future.get();
+
+    LOG_EXIT(".");
 }
 
 void Engine::beginPlay(ANativeWindow* window) {
