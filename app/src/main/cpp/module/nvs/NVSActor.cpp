@@ -1,5 +1,5 @@
 #include "NVSActor.h"
-#include "NVSComponent.h"
+#include "NVSComponentVideo.h"
 #include "RectTransform.h"
 #include "RenderInterface.h"
 #include "utils/Log.h"
@@ -13,8 +13,9 @@ NVSActor::NVSActor(engine::Level& level, uint64_t id, const JsonConfigLoaderPtr&
     : engine::Actor(level, id)
     , mConfig(config)
     , mImage(addComponent<engine::Image>())
+    , mTarget(addComponent<NVSComponentTarget>(level))
+    , mVideo(addComponent<NVSComponentVideo>(mImage, mConfig))
 {
-    addComponent<NVSComponent>(mImage, mConfig);
 }
 
 NVSActor::~NVSActor() = default;

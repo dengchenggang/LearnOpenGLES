@@ -12,10 +12,10 @@
 
 namespace module {
 
-class NVSComponent : public engine::ActorComponent {
+class NVSComponentVideo : public engine::ActorComponent {
 public:
-    explicit NVSComponent(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config);
-    ~NVSComponent() override;
+    explicit NVSComponentVideo(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config);
+    ~NVSComponentVideo() override;
 
 protected:
     void onBeginPlay() override;

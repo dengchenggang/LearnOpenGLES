@@ -1,12 +1,12 @@
-#include "NVSComponent.h"
+#include "NVSComponentVideo.h"
 #include "Actor.h"
 #include "utils/Log.h"
 
 namespace module {
 
-KEY_VALUE(TAG, NVSComponent)
+KEY_VALUE(TAG, NVSComponentVideo)
 
-NVSComponent::NVSComponent(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config)
+NVSComponentVideo::NVSComponentVideo(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config)
     : engine::ActorComponent(owner)
     , mImage(image)
     , mConfig(config)
@@ -22,15 +22,15 @@ NVSComponent::NVSComponent(engine::Actor& owner, engine::Image& image, const Jso
     LogI("url=%s, width=%d, height=%d, format=%s", url.c_str(), width, height, format.c_str());
 }
 
-NVSComponent::~NVSComponent() = default;
+NVSComponentVideo::~NVSComponentVideo() = default;
 
-void NVSComponent::onBeginPlay() {
+void NVSComponentVideo::onBeginPlay() {
     auto url = mConfig->get<std::string>("video.url", "");
-    bool connected = VideoCapture.connect(url, TAG, std::bind(&NVSComponent::onVideoFrame, this, std::placeholders::_1));
+    bool connected = VideoCapture.connect(url, TAG, std::bind(&NVSComponentVideo::onVideoFrame, this, std::placeholders::_1));
     LogI("url=%s, connected=%d", url.c_str(), connected);
 }
 
-void NVSComponent::onUpdate(float deltaTime) {
+void NVSComponentVideo::onUpdate(float deltaTime) {
     framework::VideoFramePtr newFrame;
     {
         std::lock_guard<std::mutex> lock(mFrameMutex);
@@ -56,13 +56,13 @@ void NVSComponent::onUpdate(float deltaTime) {
     }
 }
 
-void NVSComponent::onEndPlay() {
+void NVSComponentVideo::onEndPlay() {
     auto url = mConfig->get<std::string>("video.url", "");
     VideoCapture.disconnect(url, TAG);
     LogI("url=%s", url.c_str());
 }
 
-void NVSComponent::onVideoFrame(const framework::VideoFramePtr& frame) {
+void NVSComponentVideo::onVideoFrame(const framework::VideoFramePtr& frame) {
     if (!frame) {
         LogE("frame is null");
         return;

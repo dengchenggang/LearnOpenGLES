@@ -4,24 +4,18 @@
 #include "Image.h"
 #include <string>
 
-typedef struct AHardwareBuffer AHardwareBuffer;
-
 namespace module {
 
 class IconActor : public engine::Actor {
+    friend class engine::Level;
 public:
     ~IconActor() override;
 
     IconActor(const IconActor&) = delete;
     IconActor& operator=(const IconActor&) = delete;
 
-    engine::Image& getImage() const { return mImage; }
-
-    bool setPath(const std::string& path);
-    bool setHardwareBuffer(const std::string& url, AHardwareBuffer* buffer);
-
-    void setPosition(float x, float y);
-    void setSize(float width, float height);
+    void show(const std::string& path, int32_t x, int32_t y, int32_t width, int32_t height);
+    void setColor(float r, float g, float b, float a);
 
 protected:
     IconActor(engine::Level& level, uint64_t id);

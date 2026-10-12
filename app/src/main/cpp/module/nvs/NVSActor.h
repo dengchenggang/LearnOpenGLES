@@ -2,6 +2,8 @@
 
 #include "Actor.h"
 #include "Image.h"
+#include "NVSComponentTarget.h"
+#include "NVSComponentVideo.h"
 #include "utils/config/JsonConfigLoader.h"
 
 namespace module {
@@ -16,6 +18,8 @@ public:
 
     void Resize(int32_t width, int32_t height);
 
+    NVSComponentTarget& getTarget() const { return mTarget; }
+
 protected:
     NVSActor(engine::Level& level, uint64_t id, const JsonConfigLoaderPtr& config);
 
@@ -25,6 +29,8 @@ protected:
 private:
     JsonConfigLoaderPtr mConfig;
     engine::Image& mImage;
+    NVSComponentVideo& mVideo;
+    NVSComponentTarget& mTarget;
 };
 
 } // namespace module
