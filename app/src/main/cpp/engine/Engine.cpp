@@ -105,7 +105,6 @@ void Engine::resize(std::int32_t w, std::int32_t h) {
             return;
         }
         mRenderContext.setViewPort(w, h);
-        RenderInterface.setViewport(0, 0, w, h);
         for (auto& pair : mLevels) {
             pair.second->onResize(w, h);
         }
