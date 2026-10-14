@@ -25,7 +25,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
     config->parse(FileSystem.readString("config/learnopengles.json"));
 
     std::map<std::string, engine::LevelPtr> levels;
-    levels.emplace(module::MODULE_NAME_NVS, std::make_unique<module::NVSModule>(Engine, config));
+    levels.emplace(module::MODULE_NAME_NVS, std::make_unique<module::NVSModule>(Engine, Engine.getCamera(), config));
     Engine.init(gles, std::move(levels), module::MODULE_NAME_NVS);
 }
 

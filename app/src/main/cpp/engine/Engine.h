@@ -7,6 +7,7 @@
 #include <string>
 #include <atomic>
 #include <chrono>
+#include "Camera.h"
 #include "level/Level.h"
 #include "level/ILevelManager.h"
 #include <common/Singleton.hpp>
@@ -29,6 +30,7 @@ public:
     void deInit();
 public:
     void changeLevel(const std::string& levelName) override;
+    Camera& getCamera() { return mCamera; }
 private:
     Engine();
     ~Engine();
@@ -39,6 +41,7 @@ private:
     void render(int64_t deltaTime);
     void doChangeLevel(const std::string& levelName);
 private:
+    Camera mCamera;
     std::map<std::string, LevelPtr> mLevels;
     Level* mActiveLevel;
     std::string mNextActiveLevelName;

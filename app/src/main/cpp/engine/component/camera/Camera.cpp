@@ -19,23 +19,16 @@ void Camera::setUp(const glm::vec3& up) {
     markViewDirty();
 }
 
-void Camera::setPerspective(float fov, float aspect, float nearPlane, float farPlane) {
-    mFov = fov;
-    mAspect = aspect;
-    mNearPlane = nearPlane;
-    mFarPlane = farPlane;
-    mIsPerspective = true;
+void Camera::setViewport(float width, float height) {
+    mViewportWidth = width;
+    mViewportHeight = height;
     markProjectionDirty();
 }
 
-void Camera::setOrtho(float left, float right, float bottom, float top, float nearPlane, float farPlane) {
-    mLeft = left;
-    mRight = right;
-    mBottom = bottom;
-    mTop = top;
+void Camera::setPerspective(float fov, float nearPlane, float farPlane) {
+    mFov = fov;
     mNearPlane = nearPlane;
     mFarPlane = farPlane;
-    mIsPerspective = false;
     markProjectionDirty();
 }
 
@@ -49,14 +42,21 @@ const glm::mat4& Camera::getViewMatrix() const {
 
 const glm::mat4& Camera::getProjectionMatrix() const {
     if (mProjectionDirty) {
-        if (mIsPerspective) {
-            mProjectionMatrix = glm::perspective(glm::radians(mFov), mAspect, mNearPlane, mFarPlane);
-        } else {
-            mProjectionMatrix = glm::ortho(mLeft, mRight, mBottom, mTop, mNearPlane, mFarPlane);
-        }
+        float aspect = mViewportWidth / mViewportHeight;
+        mProjectionMatrix = glm::perspective(glm::radians(mFov), aspect, mNearPlane, mFarPlane);
         mProjectionDirty = false;
     }
     return mProjectionMatrix;
+}
+
+const glm::mat4& Camera::getOrthoMatrix() const {
+    if (mOrthoDirty) {
+        mOrthoMatrix = glm::ortho(-mViewportWidth * 0.5f, mViewportWidth * 0.5f,
+                                  -mViewportHeight * 0.5f, mViewportHeight * 0.5f,
+                                  0.0f, mFarPlane);
+        mOrthoDirty = false;
+    }
+    return mOrthoMatrix;
 }
 
 } // namespace engine

@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include "SceneComponent.h"
+#include "Level.h"
 
 namespace engine {
 
@@ -13,6 +14,10 @@ Actor::Actor(Level& level, uint64_t id)
 }
 
 Actor::~Actor() {}
+
+Camera& Actor::getCamera() const {
+    return mLevel.getCamera();
+}
 
 Actor& Actor::setEnabled(bool enabled) {
     if (mEnabled.first != enabled) {

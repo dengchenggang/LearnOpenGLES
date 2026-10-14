@@ -7,16 +7,18 @@
 
 namespace engine {
 class ILevelManager;
+class Camera;
 
 class Level {
     friend class Engine;
 public:
-    Level(const std::string& name, ILevelManager& levelManager);
+    Level(const std::string& name, ILevelManager& levelManager, Camera& camera);
     virtual ~Level();
     Level(const Level&) = delete;
     Level& operator=(const Level&) = delete;
 public:
     const std::string& getId() const { return mName; }
+    Camera& getCamera() const { return mCamera; }
 
     template<typename T = Actor, typename... Args>
     T& createActor(Args&&... args) {
@@ -40,6 +42,7 @@ protected:
 private:
     static uint64_t sNextActorId;
     ILevelManager& mLevelManager;
+    Camera& mCamera;
     std::string mName;
     std::vector<ActorPtr> mActors;
 };

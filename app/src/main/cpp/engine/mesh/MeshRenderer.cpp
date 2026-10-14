@@ -14,12 +14,13 @@ renderer::Renderable MeshRenderer::getRenderable() const {
 }
 
 void MeshRenderer::onRender() {
-    if (!mMesh || !mMaterial || !mCamera) {
+    if (!mMesh || !mMaterial) {
         return;
     }
 
-    glm::mat4 mvp = mCamera->getProjectionMatrix() *
-                    mCamera->getViewMatrix() *
+    auto& camera = GetOwner().getCamera();
+    glm::mat4 mvp = camera.getProjectionMatrix() *
+                    camera.getViewMatrix() *
                     getWorldMatrix();
 
     mMaterial->bind();

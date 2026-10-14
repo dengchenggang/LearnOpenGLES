@@ -104,6 +104,7 @@ void Engine::resize(std::int32_t w, std::int32_t h) {
         if (!mRenderContext.isBound()) {
             return;
         }
+        mCamera.setViewport(w, h);
         mRenderContext.setViewPort(w, h);
         for (auto& pair : mLevels) {
             pair.second->onResize(w, h);

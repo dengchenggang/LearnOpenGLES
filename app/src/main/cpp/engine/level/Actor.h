@@ -10,6 +10,7 @@ namespace engine {
 
 class Level;
 class SceneComponent;
+class Camera;
 
 class Actor {
      friend class Level;
@@ -44,6 +45,7 @@ public:
     }
 
     uint64_t getId() const { return mId; }
+    Camera& getCamera() const;
 
     bool isEnabled() const { return mEnabled.first; }
     Actor& setEnabled(bool enabled);
@@ -56,7 +58,6 @@ public:
     void attachToActor(Actor& parent);
     void detachFromActor();
     Actor* getAttachParentActor() const;
-
 protected:
     Actor(Level& level, uint64_t id);
 protected:

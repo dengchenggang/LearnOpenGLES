@@ -4,8 +4,8 @@
 
 namespace module {
 
-NVSModule::NVSModule(engine::ILevelManager& levelManager, const JsonConfigLoaderPtr& config)
-    : engine::Level(MODULE_NAME_NVS, levelManager)
+NVSModule::NVSModule(engine::ILevelManager& levelManager, engine::Camera& camera, const JsonConfigLoaderPtr& config)
+    : engine::Level(MODULE_NAME_NVS, levelManager, camera)
     , mConfig(config)
     , mActor(createActor<NVSActor>(config))
 {

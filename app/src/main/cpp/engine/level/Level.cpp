@@ -1,13 +1,15 @@
 #include "Level.h"
 #include "ILevelManager.h"
+#include "component/camera/Camera.h"
 #include <algorithm>
 
 namespace engine {
 
 uint64_t Level::sNextActorId = 1;
 
-Level::Level(const std::string& name, ILevelManager& levelManager)
+Level::Level(const std::string& name, ILevelManager& levelManager, Camera& camera)
     : mLevelManager(levelManager)
+    , mCamera(camera)
     , mName(name)
 {
 }

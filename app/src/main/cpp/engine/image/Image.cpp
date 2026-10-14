@@ -1,4 +1,6 @@
 #include "Image.h"
+#include "Actor.h"
+#include "component/camera/Camera.h"
 #include "filesystem/FileSystem.h"
 #include "RenderInterface.h"
 #include "utils/Log.h"
@@ -248,17 +250,14 @@ void Image::updateTransform() {
     // 获取世界矩阵（支持父子挂载级联）
     glm::mat4 model = getWorldMatrix();
 
-    // 从 RenderInterface 获取视口尺寸并构建正交投影矩阵
-    int32_t x, y, viewportWidth, viewportHeight;
-    RenderInterface.getViewport(&x, &y, &viewportWidth, &viewportHeight);
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(viewportWidth),
-                                      0.0f, static_cast<float>(viewportHeight),
-                                      -1.0f, 1.0f);
+    // 从 Camera 获取正交投影矩阵
+    auto& camera = GetOwner().getCamera();
+    auto projection = camera.getOrthoMatrix();
 
     auto pos = mRectTransform.getPosition();
     auto size = mRectTransform.getSize();
-    LogD("%s render: pos=(%.1f,%.1f,%.1f) size=(%.1f,%.1f) viewport=%dx%d",
-         TAG, pos.x, pos.y, pos.z, size.x, size.y, viewportWidth, viewportHeight);
+    LogD("%s render: pos=(%.1f,%.1f,%.1f) size=(%.1f,%.1f)",
+         TAG, pos.x, pos.y, pos.z, size.x, size.y);
 
     // 设置 Uniform
     mMaterial->setUniformMat4("uModelMatrix", model);
