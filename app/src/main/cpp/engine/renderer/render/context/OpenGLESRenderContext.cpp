@@ -58,8 +58,8 @@ bool OpenGLESRenderContext::initialize(std::int32_t gles) {
     return true;
 }
 
-bool OpenGLESRenderContext::preBeginPlay() {
-    LogI("%s preBeginPlay enter.", TAG);
+bool OpenGLESRenderContext::attachOffscreenSurface() {
+    LogI("%s attachOffscreenSurface enter.", TAG);
 
     if (!mInitialized) {
         LogE("%s not initialized!", TAG);
@@ -81,12 +81,12 @@ bool OpenGLESRenderContext::preBeginPlay() {
     }
 
     mBound = true;
-    LogI("%s preBeginPlay success, pbuffer context active.", TAG);
+    LogI("%s attachOffscreenSurface success, pbuffer context active.", TAG);
     return true;
 }
 
-bool OpenGLESRenderContext::beginPlay(ANativeWindow *window) {
-    LogI("%s beginPlay enter.", TAG);
+bool OpenGLESRenderContext::attachSurface(ANativeWindow *window) {
+    LogI("%s attachSurface enter.", TAG);
 
     if (!mInitialized) {
         LogE("%s not initialized!", TAG);
@@ -122,26 +122,24 @@ bool OpenGLESRenderContext::beginPlay(ANativeWindow *window) {
 
     mBound = true;
 
-    LogI("%s beginPlay success: width=%d, height=%d.", TAG, mWidth, mHeight);
+    LogI("%s attachSurface success: width=%d, height=%d.", TAG, mWidth, mHeight);
     return true;
 }
 
-void OpenGLESRenderContext::setViewPort(std::int32_t w, std::int32_t h) {
-    LogI("%s setViewPort, width=%d, height=%d", TAG, w, h);
+void OpenGLESRenderContext::setViewPort(std::int32_t x, std::int32_t y, std::int32_t w, std::int32_t h) {
+    LogI("%s setViewPort, x=%d, y=%d, width=%d, height=%d", TAG, x, y, w, h);
     if (!mBound) {
         return;
     }
-    mWidth = w;
-    mHeight = h;
-    glViewport(0, 0, w, h);
+    glViewport(x, y, w, h);
 }
 
 void OpenGLESRenderContext::swapBuffers() {
     eglSwapBuffers(mDisplay, mSurface);
 }
 
-void OpenGLESRenderContext::endPlay() {
-    LogI("%s endPlay enter", TAG);
+void OpenGLESRenderContext::detachSurface() {
+    LogI("%s detachSurface enter", TAG);
 
     eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     if (mSurface != EGL_NO_SURFACE) {
@@ -154,7 +152,7 @@ void OpenGLESRenderContext::endPlay() {
     }
     mBound = false;
 
-    LogI("%s endPlay done", TAG);
+    LogI("%s detachSurface done", TAG);
 }
 
 void OpenGLESRenderContext::deInitialize() {

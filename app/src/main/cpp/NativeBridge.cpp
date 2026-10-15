@@ -32,7 +32,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeInit(JNIEnv* env, jclass , jobject
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeBind(JNIEnv* env, jclass, jobject surface) {
     ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
-    Engine.beginPlay(window);
+    Engine.attachSurface(window);
 }
 
 JNIEXPORT void JNICALL
@@ -42,7 +42,7 @@ Java_com_dcg_learnopengles_NativeBridge_nativeResize(JNIEnv* env, jclass, jint w
 
 JNIEXPORT void JNICALL
 Java_com_dcg_learnopengles_NativeBridge_nativeUnbind(JNIEnv* env, jclass) {
-    Engine.endPlay();
+    Engine.detachSurface();
 }
 
 JNIEXPORT void JNICALL

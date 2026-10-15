@@ -19,16 +19,16 @@ public:
 public:
     // EGL 初始化与释放
     bool initialize(std::int32_t gles);
-    bool preBeginPlay();
-    bool beginPlay(ANativeWindow *window);
-    void endPlay();
+    bool attachOffscreenSurface();
+    bool attachSurface(ANativeWindow *window);
+    void detachSurface();
     void deInitialize();
 
     // 交换缓冲区
     void swapBuffers();
 
-    // 设置 OpenGL viewport
-    void setViewPort(std::int32_t w, std::int32_t h);
+    // 设置 OpenGL viewport，x/y 为相对 surface 左下角的偏移
+    void setViewPort(std::int32_t x, std::int32_t y, std::int32_t w, std::int32_t h);
 
     // 获取 surface 尺寸
     std::int32_t getWidth() const { return mWidth; }

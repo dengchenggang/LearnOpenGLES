@@ -19,7 +19,9 @@ void Camera::setUp(const glm::vec3& up) {
     markViewDirty();
 }
 
-void Camera::setViewport(float width, float height) {
+void Camera::setViewport(float left, float bottom, float width, float height) {
+    mViewportLeft = left;
+    mViewportBottom = bottom;
     mViewportWidth = width;
     mViewportHeight = height;
     markProjectionDirty();
@@ -51,8 +53,8 @@ const glm::mat4& Camera::getProjectionMatrix() const {
 
 const glm::mat4& Camera::getOrthoMatrix() const {
     if (mOrthoDirty) {
-        mOrthoMatrix = glm::ortho(-mViewportWidth * 0.5f, mViewportWidth * 0.5f,
-                                  -mViewportHeight * 0.5f, mViewportHeight * 0.5f,
+        mOrthoMatrix = glm::ortho(mViewportLeft, mViewportLeft + mViewportWidth,
+                                  mViewportBottom, mViewportBottom + mViewportHeight,
                                   0.0f, mFarPlane);
         mOrthoDirty = false;
     }

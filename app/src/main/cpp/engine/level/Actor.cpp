@@ -65,6 +65,10 @@ Actor* Actor::getAttachParentActor() const {
 }
 
 void Actor::onBeginPlay() {
+    if (mBegunPlay) {
+        return;
+    }
+    mBegunPlay = true;
     for (auto& comp : mComponents) {
         comp->onBeginPlay();
     }
@@ -126,6 +130,10 @@ void Actor::onRender() {
 }
 
 void Actor::onEndPlay() {
+    if (!mBegunPlay) {
+        return;
+    }
+    mBegunPlay = false;
     for (auto& comp : mComponents) {
         comp->onEndPlay();
     }

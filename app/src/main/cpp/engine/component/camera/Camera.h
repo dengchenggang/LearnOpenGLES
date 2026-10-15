@@ -35,11 +35,14 @@ public:
     void setUp(const glm::vec3& up);
 
     /**
-     * 设置视口宽高，投影矩阵将据此自动计算宽高比
-     * @param width  视口宽度（像素）
-     * @param height 视口高度（像素）
+     * 设置逻辑视口矩形，由 Level 的设计尺寸适配后得出，并非物理像素
+     * 正交投影范围为 [left, left + width] x [bottom, bottom + height]
+     * @param left   逻辑左边界
+     * @param bottom 逻辑下边界
+     * @param width  逻辑宽度
+     * @param height 逻辑高度
      */
-    void setViewport(float width, float height);
+    void setViewport(float left, float bottom, float width, float height);
 
     /**
      * 设置透视投影参数，fov 为角度制
@@ -62,7 +65,7 @@ public:
     const glm::mat4& getProjectionMatrix() const;
 
     /**
-     * 获取正交投影矩阵（懒计算，内部缓存）
+     * 获取正交投影矩阵（懒计算，内部缓存），范围由 setViewport 指定的逻辑矩形决定
      * @return 当前相机的正交投影矩阵
      */
     const glm::mat4& getOrthoMatrix() const;
@@ -99,6 +102,8 @@ private:
     glm::vec3 mTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    float mViewportLeft = 0.0f;
+    float mViewportBottom = 0.0f;
     float mViewportWidth = 16.0f;
     float mViewportHeight = 9.0f;
     float mFov = 45.0f;

@@ -16,8 +16,6 @@ public:
     NVSActor(const NVSActor&) = delete;
     NVSActor& operator=(const NVSActor&) = delete;
 
-    void Resize(int32_t width, int32_t height);
-
     NVSComponentTarget& getTarget() const { return mTarget; }
 
 protected:

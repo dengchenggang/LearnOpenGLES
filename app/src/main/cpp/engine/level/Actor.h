@@ -72,6 +72,7 @@ protected:
     std::pair<bool, bool> mVisible;
     std::vector<ActorComponentPtr> mComponents;
     SceneComponent* mRootComponent = nullptr;
+    bool mBegunPlay = false;
 };
 
 using ActorPtr = std::unique_ptr<Actor>;

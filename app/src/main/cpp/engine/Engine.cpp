@@ -8,7 +8,11 @@
 
 namespace engine {
 
-Engine::Engine() = default;
+Engine::Engine()
+    : mRenderLoopStarted(false)
+{
+
+}
 
 Engine::~Engine() {
     deInit();
@@ -21,7 +25,7 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
         LOG_ENTER(": task startLevel=%s", startLevel.c_str());
         bool result = mRenderContext.initialize(gles);
         if (result) {
-            mRenderContext.preBeginPlay();
+            mRenderContext.attachOffscreenSurface();
         }
         if (result) {
             mActiveLevel = nullptr;
@@ -39,6 +43,11 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
             }
 
             changeLevel(startLevel);
+
+            // 在 1x1 pbuffer 上空跑一帧，逼驱动提前完成 shader 的最终编译
+            update(0);
+            render(0);
+            RenderInterface.finish();
         }
         LOG_EXIT(": result=%d", result);
         return result;
@@ -46,26 +55,7 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
     future.get();
 }
 
-void Engine::preBeginPlay() {
-    LOG_ENTER(".");
-
-    if (!mRenderContext.isInitialized()) {
-        LogE("EGL not initialized!");
-        return;
-    }
-
-    auto future = mTaskPool->submit([this]() {
-        update(0);
-        render(0);
-        mRenderContext.swapBuffers();
-        LogI("GPU pipeline pre-warmed.");
-    });
-    future.get();
-
-    LOG_EXIT(".");
-}
-
-void Engine::beginPlay(ANativeWindow* window) {
+void Engine::attachSurface(ANativeWindow* window) {
     LOG_ENTER(".");
 
     if (!mRenderContext.isInitialized()) {
@@ -79,7 +69,7 @@ void Engine::beginPlay(ANativeWindow* window) {
     }
 
     auto future = mTaskPool->submit([this, window]() {
-        bool result = mRenderContext.beginPlay(window);
+        bool result = mRenderContext.attachSurface(window);
         if (result) {
             RenderInterface.setClearColor(0, 0, 0, 0);
         }
@@ -90,9 +80,7 @@ void Engine::beginPlay(ANativeWindow* window) {
     if (result) {
         mStopRequested = false;
         mRunning = true;
-        mLastFrameTime = std::chrono::steady_clock::now();
-        mTaskPool->detach([this]() { renderFrame(); });
-        LogI("render loop started.");
+        LogI("render loop armed, waiting for first resize.");
     }
 
     LOG_EXIT(".");
@@ -104,16 +92,20 @@ void Engine::resize(std::int32_t w, std::int32_t h) {
         if (!mRenderContext.isBound()) {
             return;
         }
-        mCamera.setViewport(w, h);
-        mRenderContext.setViewPort(w, h);
         for (auto& pair : mLevels) {
             pair.second->onResize(w, h);
         }
+        applyLevelViewport();
         LOG_EXIT(".");
+        if (mRunning && !mRenderLoopStarted.exchange(true)) {
+            LogI("render loop started.");
+            mLastFrameTime = std::chrono::steady_clock::now();
+            renderFrame();
+        }
     });
 }
 
-void Engine::endPlay() {
+void Engine::detachSurface() {
     LOG_ENTER(".");
 
     if (mRunning) {
@@ -121,9 +113,10 @@ void Engine::endPlay() {
         mRunning = false;
         LogI("render loop stopping...");
     }
+    mRenderLoopStarted = false;
 
     auto future = mTaskPool->submit([this]() {
-        mRenderContext.endPlay();
+        mRenderContext.detachSurface();
     });
     future.wait();
 
@@ -138,6 +131,9 @@ void Engine::deInit() {
 
     if (mTaskPool && mTaskPool->isRunning()) {
         auto future = mTaskPool->submit([this]() {
+            for (auto& pair : mLevels) {
+                pair.second->onEndPlay();
+            }
             mActiveLevel = nullptr;
             mNextActiveLevelName = "";
             mRenderContext.deInitialize();
@@ -154,6 +150,17 @@ void Engine::deInit() {
 void Engine::changeLevel(const std::string& levelName) {
     LogI("%s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
     mNextActiveLevelName = levelName;
+}
+
+void Engine::applyLevelViewport() {
+    if (!mActiveLevel || !mRenderContext.isBound()) {
+        return;
+    }
+    const auto& logical = mActiveLevel->getLogicalRect();
+    const auto& rect = mActiveLevel->getViewportRect();
+    mCamera.setViewport(logical.x, logical.y, logical.z, logical.w);
+    mRenderContext.setViewPort(static_cast<int32_t>(rect.x), static_cast<int32_t>(rect.y),
+                               static_cast<int32_t>(rect.z), static_cast<int32_t>(rect.w));
 }
 
 void Engine::renderFrame() {
@@ -222,6 +229,7 @@ void Engine::doChangeLevel(const std::string& levelName) {
         }
         if (mActiveLevel) {
             mActiveLevel->onEnter();
+            applyLevelViewport();
         }
     } else {
         LogE("doChangeLevel: %s not found", levelName.c_str());

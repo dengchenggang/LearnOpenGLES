@@ -1,4 +1,9 @@
 {
+    "level": {
+        "designWidth": 1024,
+        "designHeight": 683,
+        "scaleMode": "fit"
+    },
     "video": {
         "url": "image://textures/background.png",
         "width": 1024,

@@ -1,4 +1,5 @@
 #include "NVSActor.h"
+#include "Level.h"
 #include "NVSComponentVideo.h"
 #include "RectTransform.h"
 #include "RenderInterface.h"
@@ -20,32 +21,15 @@ NVSActor::NVSActor(engine::Level& level, uint64_t id, const JsonConfigLoaderPtr&
 
 NVSActor::~NVSActor() = default;
 
-void NVSActor::Resize(int32_t width, int32_t height) {
-    if (width > 0 && height > 0) {
-        auto& rectTransform = mImage.getRectTransform();
-        rectTransform.setPosition(glm::vec3(width / 2.0f, height / 2.0f, 0.0f));
-        rectTransform.setSize(glm::vec2(width, height));
-        LogI("%s image resized: %dx%d", TAG, width, height);
-    } else {
-        LogW("%s invalid resize: %dx%d", TAG, width, height);
-    }
-}
-
 void NVSActor::onBeginPlay() {
     LogI("%s onBeginPlay", TAG);
 
     setEnabled(true).setVisible(true);
 
-    int32_t viewportX = 0, viewportY = 0, viewportWidth = 0, viewportHeight = 0;
-    RenderInterface.getViewport(&viewportX, &viewportY, &viewportWidth, &viewportHeight);
-    if (viewportWidth > 0 && viewportHeight > 0) {
-        auto& rectTransform = mImage.getRectTransform();
-        rectTransform.setPosition(glm::vec3(viewportX + viewportWidth / 2.0f, viewportY + viewportHeight / 2.0f, 0.0f));
-        rectTransform.setSize(glm::vec2(viewportWidth, viewportHeight));
-        LogI("%s image size: %dx%d", TAG, viewportWidth, viewportHeight);
-    } else {
-        LogW("%s invalid viewport: %dx%d", TAG, viewportWidth, viewportHeight);
-    }
+    const auto& designSize = mLevel.getDesignSize();
+    auto& rectTransform = mImage.getRectTransform();
+    rectTransform.setPosition(glm::vec3(designSize.x * 0.5f, designSize.y * 0.5f, 0.0f));
+    rectTransform.setSize(designSize);
 
     Actor::onBeginPlay();
 }
