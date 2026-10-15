@@ -30,6 +30,9 @@ public:
                 mRootComponent = static_cast<SceneComponent*>(ptr);
             }
         }
+        if (mBegunPlay) {
+            static_cast<ActorComponent*>(ptr)->onBeginPlay();
+        }
         return *ptr;
     }
 

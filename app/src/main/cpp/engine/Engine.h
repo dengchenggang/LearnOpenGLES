@@ -45,6 +45,7 @@ private:
     std::map<std::string, LevelPtr> mLevels;
     Level* mActiveLevel;
     std::string mNextActiveLevelName;
+    std::string mPreviousActiveLevelName;
 private:
     renderer::OpenGLESRenderContext mRenderContext {};
     std::unique_ptr<TaskPool> mTaskPool {std::make_unique<TaskPool>()};

@@ -34,8 +34,9 @@ public:
     // 适配后的逻辑矩形 (left, bottom, width, height)，即相机正交投影的范围
     // Fit/Fill 下恒为 (0, 0, 设计宽, 设计高)；Expand 下扩展的一边向两侧均分，使设计区域保持居中
     const glm::vec4& getLogicalRect() const { return mLogicalRect; }
-    // 适配后的 glViewport 矩形 (x, y, width, height)，单位为物理像素
-    const glm::vec4& getViewportRect() const { return mViewportRect; }
+    // 适配后的渲染输出矩形 (x, y, width, height)，单位为物理像素
+    // Fit/Fill 下可能不等于物理视口（等比缩放后居中）；Expand 下与物理视口一致
+    const glm::vec4& getRenderRect() const { return mRenderRect; }
 
     ScaleMode getScaleMode() const { return mScaleMode; }
     void setScaleMode(ScaleMode scaleMode);
@@ -57,13 +58,13 @@ protected:
 protected:
     virtual void onBeginPlay();
     virtual void onResize(int32_t width, int32_t height);
-    virtual void onEnter() = 0;
+    virtual void onEnter(int32_t width, int32_t height);
     virtual void onUpdate(int64_t deltaTime);
     virtual void onRender();
     virtual void onExit() = 0;
     virtual void onEndPlay();
 private:
-    void updateAdaption();
+    void updateAdaption(int32_t width, int32_t height);
 private:
     static uint64_t sNextActorId;
     bool mBegunPlay = false;
@@ -74,9 +75,8 @@ private:
 
     glm::vec2 mDesignSize;
     ScaleMode mScaleMode;
-    glm::vec2 mViewportSize {0.0f, 0.0f};
     glm::vec4 mLogicalRect;
-    glm::vec4 mViewportRect;
+    glm::vec4 mRenderRect;
 };
 
 using LevelPtr = std::unique_ptr<Level>;

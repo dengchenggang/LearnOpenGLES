@@ -12,7 +12,7 @@ public:
     ~NVSModule() override;
 protected:
     void onBeginPlay() override;
-    void onEnter() override;
+    void onEnter(int32_t width, int32_t height) override;
     void onExit() override;
     void onEndPlay() override;
 private:

@@ -38,8 +38,9 @@ void NVSModule::onBeginPlay() {
     engine::Level::onBeginPlay();
 }
 
-void NVSModule::onEnter() {
-    LogI("NVSModule onEnter");
+void NVSModule::onEnter(int32_t width, int32_t height) {
+    LogI("NVSModule onEnter: %dx%d", width, height);
+    engine::Level::onEnter(width, height);
 }
 
 void NVSModule::onExit() {

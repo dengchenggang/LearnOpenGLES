@@ -4,6 +4,7 @@
 
 #include "RenderInterface.h"
 #include "filesystem/FileSystem.h"
+#include "level/NilLevel.h"
 #include "utils/Log.h"
 
 namespace engine {
@@ -37,11 +38,13 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
                     mLevels[pair.first] = std::move(pair.second);
                 }
             }
+            mLevels[NilLevel::NAME] = std::make_unique<NilLevel>(*this, mCamera);
 
             for (auto& pair : mLevels) {
                 pair.second->onBeginPlay();
             }
 
+            setViewportSize(1, 1);
             changeLevel(startLevel);
 
             // 在 1x1 pbuffer 上空跑一帧，逼驱动提前完成 shader 的最终编译
@@ -80,6 +83,10 @@ void Engine::attachSurface(ANativeWindow* window) {
     if (result) {
         mStopRequested = false;
         mRunning = true;
+        if (!mPreviousActiveLevelName.empty()) {
+            changeLevel(mPreviousActiveLevelName);
+            mPreviousActiveLevelName.clear();
+        }
         LogI("render loop armed, waiting for first resize.");
     }
 
@@ -92,8 +99,9 @@ void Engine::resize(std::int32_t w, std::int32_t h) {
         if (!mRenderContext.isBound()) {
             return;
         }
-        for (auto& pair : mLevels) {
-            pair.second->onResize(w, h);
+        setViewportSize(w, h);
+        if (mActiveLevel) {
+            mActiveLevel->onResize(w, h);
         }
         applyLevelViewport();
         LOG_EXIT(".");
@@ -116,6 +124,10 @@ void Engine::detachSurface() {
     mRenderLoopStarted = false;
 
     auto future = mTaskPool->submit([this]() {
+        if (mActiveLevel && mActiveLevel->getId() != NilLevel::NAME) {
+            mPreviousActiveLevelName = mActiveLevel->getId();
+            doChangeLevel(NilLevel::NAME);
+        }
         mRenderContext.detachSurface();
     });
     future.wait();
@@ -157,7 +169,7 @@ void Engine::applyLevelViewport() {
         return;
     }
     const auto& logical = mActiveLevel->getLogicalRect();
-    const auto& rect = mActiveLevel->getViewportRect();
+    const auto& rect = mActiveLevel->getRenderRect();
     mCamera.setViewport(logical.x, logical.y, logical.z, logical.w);
     mRenderContext.setViewPort(static_cast<int32_t>(rect.x), static_cast<int32_t>(rect.y),
                                static_cast<int32_t>(rect.z), static_cast<int32_t>(rect.w));
@@ -228,7 +240,7 @@ void Engine::doChangeLevel(const std::string& levelName) {
             oldLevel->onExit();
         }
         if (mActiveLevel) {
-            mActiveLevel->onEnter();
+            mActiveLevel->onEnter(mViewportWidth, mViewportHeight);
             applyLevelViewport();
         }
     } else {

@@ -15,7 +15,7 @@ Level::Level(const std::string& name, ILevelManager& levelManager, Camera& camer
     , mDesignSize(designSize)
     , mScaleMode(scaleMode)
     , mLogicalRect(0.0f, 0.0f, designSize.x, designSize.y)
-    , mViewportRect(0.0f, 0.0f, designSize.x, designSize.y)
+    , mRenderRect(0.0f, 0.0f, designSize.x, designSize.y)
 {
 }
 
@@ -45,46 +45,44 @@ void Level::setScaleMode(ScaleMode scaleMode) {
         return;
     }
     mScaleMode = scaleMode;
-    updateAdaption();
+    updateAdaption(mLevelManager.getViewportWidth(), mLevelManager.getViewportHeight());
 }
 
 void Level::onResize(int32_t width, int32_t height) {
-    if (width <= 0 || height <= 0) {
-        return;
-    }
-    mViewportSize = glm::vec2(width, height);
-    updateAdaption();
+    updateAdaption(width, height);
 }
 
-void Level::updateAdaption() {
-    if (mViewportSize.x <= 0.0f || mViewportSize.y <= 0.0f ||
-        mDesignSize.x <= 0.0f || mDesignSize.y <= 0.0f) {
+void Level::onEnter(int32_t width, int32_t height) {
+    updateAdaption(width, height);
+}
+
+void Level::updateAdaption(int32_t width, int32_t height) {
+    if (width <= 0 || height <= 0 || mDesignSize.x <= 0.0f || mDesignSize.y <= 0.0f) {
         return;
     }
 
-    float scaleX = mViewportSize.x / mDesignSize.x;
-    float scaleY = mViewportSize.y / mDesignSize.y;
+    float scaleX = static_cast<float>(width) / mDesignSize.x;
+    float scaleY = static_cast<float>(height) / mDesignSize.y;
 
     if (mScaleMode == ScaleMode::Expand) {
         // 固定较短的一边，另一边按视口比例扩展，扩展出的空间向两侧均分使设计区域保持居中
         glm::vec2 logical = (scaleX > scaleY)
-            ? glm::vec2(mDesignSize.y * mViewportSize.x / mViewportSize.y, mDesignSize.y)
-            : glm::vec2(mDesignSize.x, mDesignSize.x * mViewportSize.y / mViewportSize.x);
+            ? glm::vec2(mDesignSize.y * width / height, mDesignSize.y)
+            : glm::vec2(mDesignSize.x, mDesignSize.x * height / width);
         mLogicalRect = glm::vec4((mDesignSize.x - logical.x) * 0.5f,
                                  (mDesignSize.y - logical.y) * 0.5f,
                                  logical.x, logical.y);
-        mViewportRect = glm::vec4(0.0f, 0.0f, mViewportSize.x, mViewportSize.y);
-        return;
+        mRenderRect = glm::vec4(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+    } else {
+        float scale = (mScaleMode == ScaleMode::Fill) ? std::max(scaleX, scaleY)
+                                                      : std::min(scaleX, scaleY);
+        glm::vec2 scaled = mDesignSize * scale;
+        mLogicalRect = glm::vec4(0.0f, 0.0f, mDesignSize.x, mDesignSize.y);
+        // Fill 下 scaled 大于视口，偏移为负，超出部分由 GL 裁剪
+        mRenderRect = glm::vec4((static_cast<float>(width) - scaled.x) * 0.5f,
+                                (static_cast<float>(height) - scaled.y) * 0.5f,
+                                scaled.x, scaled.y);
     }
-
-    float scale = (mScaleMode == ScaleMode::Fill) ? std::max(scaleX, scaleY)
-                                                  : std::min(scaleX, scaleY);
-    glm::vec2 scaled = mDesignSize * scale;
-    mLogicalRect = glm::vec4(0.0f, 0.0f, mDesignSize.x, mDesignSize.y);
-    // Fill 下 scaled 大于视口，偏移为负，超出部分由 GL 裁剪
-    mViewportRect = glm::vec4((mViewportSize.x - scaled.x) * 0.5f,
-                              (mViewportSize.y - scaled.y) * 0.5f,
-                              scaled.x, scaled.y);
 }
 
 void Level::onUpdate(int64_t deltaTime) {
