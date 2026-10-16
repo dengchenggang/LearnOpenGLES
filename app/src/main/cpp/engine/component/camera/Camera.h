@@ -56,19 +56,19 @@ public:
      * 获取观察矩阵（懒计算，内部缓存）
      * @return 当前相机的观察矩阵
      */
-    const glm::mat4& getViewMatrix() const;
+    const std::pair<glm::mat4, uint64_t>& getViewMatrix() const;
 
     /**
      * 获取投影矩阵（懒计算，内部缓存）
      * @return 当前相机的透视投影矩阵
      */
-    const glm::mat4& getProjectionMatrix() const;
+    const std::pair<glm::mat4, uint64_t>& getProjectionMatrix() const;
 
     /**
      * 获取正交投影矩阵（懒计算，内部缓存），范围由 setViewport 指定的逻辑矩形决定
      * @return 当前相机的正交投影矩阵
      */
-    const glm::mat4& getOrthoMatrix() const;
+    const std::pair<glm::mat4, uint64_t>& getOrthoMatrix() const;
 
     /**
      * 获取相机当前位置
@@ -94,9 +94,9 @@ private:
     mutable bool mViewDirty = true;
     mutable bool mProjectionDirty = true;
     mutable bool mOrthoDirty = true;
-    mutable glm::mat4 mViewMatrix = glm::mat4(1.0f);
-    mutable glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
-    mutable glm::mat4 mOrthoMatrix = glm::mat4(1.0f);
+    mutable std::pair<glm::mat4, uint64_t> mViewMatrix = {glm::mat4(1.0f), 0};
+    mutable std::pair<glm::mat4, uint64_t> mProjectionMatrix = {glm::mat4(1.0f), 0};
+    mutable std::pair<glm::mat4, uint64_t> mOrthoMatrix = {glm::mat4(1.0f), 0};
 
     glm::vec3 mPosition = glm::vec3(0.0f, 0.0f, 5.0f);
     glm::vec3 mTarget = glm::vec3(0.0f, 0.0f, 0.0f);

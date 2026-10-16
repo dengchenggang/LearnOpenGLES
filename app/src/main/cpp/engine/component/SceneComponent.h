@@ -2,6 +2,7 @@
 #include "ActorComponent.h"
 #include "Transform.h"
 #include <vector>
+#include <cstdint>
 #include <glm/glm.hpp>
 
 namespace engine {
@@ -16,9 +17,8 @@ public:
     SceneComponent& operator=(const SceneComponent&) = delete;
 public:
     Transform& getTransform() const { return *mTransform; }
-    const glm::mat4& getLocalMatrix() const { return mTransform->getModelMatrix(); }
-    glm::mat4 getWorldMatrix() const;
-    glm::vec3 getWorldPosition() const;
+    const std::pair<glm::mat4, uint64_t>& getWorldMatrix() const { return mTransform->getModelMatrix(); }
+    const glm::vec3& getWorldPosition() const { return mTransform->getPosition(); }
 
 protected:
     /**
@@ -28,11 +28,11 @@ protected:
      * 调用时机：attachTo() 内部建立父子关系之后立即调用。
      * 派生类可重写此方法，在挂载时同步父级状态或执行自定义初始化逻辑。
      */
-    virtual void onAttachedTo(SceneComponent* parent) = 0;
+    virtual void onAttachedTo(SceneComponent* parent);
 
-    virtual void onVisibilityChanged(bool visible) = 0;
+    virtual void onVisibilityChanged(bool visible);
 
-    virtual void onRender() = 0;
+    virtual void onRender();
     /**
      * 当前组件从父组件卸载后的回调。
      * @param parent 原父组件，不会为 nullptr
@@ -41,7 +41,7 @@ protected:
      * 组件析构时也会先触发 detachFromParent()，进而调用此方法。
      * 派生类可重写此方法，在卸载时清理与父级相关的状态。
      */
-    virtual void onDetachedFrom(SceneComponent* parent) = 0;
+    virtual void onDetachedFrom(SceneComponent* parent);
 private:
     /**
      * 将当前组件挂载到指定的父组件下，形成场景图层级关系。

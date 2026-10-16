@@ -119,11 +119,12 @@ void Transform::cvtQuatToEulerAngles(const glm::quat& q, float& pitch, float& ya
     roll  = euler.z;
 }
 
-const glm::mat4& Transform::getModelMatrix() const {
+const std::pair<glm::mat4, uint64_t>& Transform::getModelMatrix() const {
     if (mModelDirty) {
-        mModelMatrix = glm::translate(glm::mat4(1.0f), mPosition)
+        mModelMatrix.first = glm::translate(glm::mat4(1.0f), mPosition)
                      * glm::mat4_cast(mRotation)
                      * glm::scale(glm::mat4(1.0f), mScale);
+        ++mModelMatrix.second;
         mModelDirty = false;
     }
     return mModelMatrix;

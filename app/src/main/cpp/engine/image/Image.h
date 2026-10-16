@@ -50,9 +50,9 @@ protected:
     void onUpdate(float deltaTime) override;
     void onRender() override;
     void onEndPlay() override;
-    void onAttachedTo(SceneComponent* parent) override {}
-    void onVisibilityChanged(bool visible) override {}
-    void onDetachedFrom(SceneComponent* parent) override {}
+    void onAttachedTo(SceneComponent* parent) override { SceneComponent::onAttachedTo(parent); }
+    void onVisibilityChanged(bool visible) override { SceneComponent::onVisibilityChanged(visible); }
+    void onDetachedFrom(SceneComponent* parent) override { SceneComponent::onDetachedFrom(parent); }
 
 private:
     RectTransform& mRectTransform;
@@ -62,6 +62,11 @@ private:
 
     glm::vec2 mImageSize = glm::vec2(1.0f, 1.0f);
     glm::vec4 mColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.3f);
+
+    // 合并后的 MVP 矩阵缓存
+    glm::mat4 mCachedMVP = glm::mat4(0.0f);
+    uint64_t mLastModelVersion = 0;
+    uint64_t mLastProjectionVersion = 0;
 
     // 是否已初始化
     bool mInitialized = false;

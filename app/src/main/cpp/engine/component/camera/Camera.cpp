@@ -34,28 +34,31 @@ void Camera::setPerspective(float fov, float nearPlane, float farPlane) {
     markProjectionDirty();
 }
 
-const glm::mat4& Camera::getViewMatrix() const {
+const std::pair<glm::mat4, uint64_t>& Camera::getViewMatrix() const {
     if (mViewDirty) {
-        mViewMatrix = glm::lookAt(mPosition, mTarget, mUp);
+        mViewMatrix.first = glm::lookAt(mPosition, mTarget, mUp);
+        ++mViewMatrix.second;
         mViewDirty = false;
     }
     return mViewMatrix;
 }
 
-const glm::mat4& Camera::getProjectionMatrix() const {
+const std::pair<glm::mat4, uint64_t>& Camera::getProjectionMatrix() const {
     if (mProjectionDirty) {
         float aspect = mViewportWidth / mViewportHeight;
-        mProjectionMatrix = glm::perspective(glm::radians(mFov), aspect, mNearPlane, mFarPlane);
+        mProjectionMatrix.first = glm::perspective(glm::radians(mFov), aspect, mNearPlane, mFarPlane);
+        ++mProjectionMatrix.second;
         mProjectionDirty = false;
     }
     return mProjectionMatrix;
 }
 
-const glm::mat4& Camera::getOrthoMatrix() const {
+const std::pair<glm::mat4, uint64_t>& Camera::getOrthoMatrix() const {
     if (mOrthoDirty) {
-        mOrthoMatrix = glm::ortho(mViewportLeft, mViewportLeft + mViewportWidth,
-                                  mViewportBottom, mViewportBottom + mViewportHeight,
-                                  0.0f, mFarPlane);
+        mOrthoMatrix.first = glm::ortho(mViewportLeft, mViewportLeft + mViewportWidth,
+                                        mViewportBottom, mViewportBottom + mViewportHeight,
+                                        0.0f, mFarPlane);
+        ++mOrthoMatrix.second;
         mOrthoDirty = false;
     }
     return mOrthoMatrix;

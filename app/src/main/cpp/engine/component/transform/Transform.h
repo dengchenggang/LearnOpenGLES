@@ -45,13 +45,15 @@ public:
     static glm::quat cvtEulerAnglesToQuat(float pitch, float yaw, float roll);
     static void cvtQuatToEulerAngles(const glm::quat& q, float& pitch, float& yaw, float& roll);
 
-    virtual const glm::mat4& getModelMatrix() const;
+    virtual const std::pair<glm::mat4, uint64_t>& getModelMatrix() const;
+
+    bool isDirty() const { return mModelDirty; }
 
 protected:
     void markDirty() { mModelDirty = true; }
 
     mutable bool mModelDirty = true;
-    mutable glm::mat4 mModelMatrix = glm::mat4(1.0f);
+    mutable std::pair<glm::mat4, uint64_t> mModelMatrix = {glm::mat4(1.0f), 0};
 
     glm::vec3 mPosition;
     glm::quat mRotation;

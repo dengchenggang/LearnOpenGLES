@@ -30,13 +30,19 @@ protected:
     void onUpdate(float deltaTime) override {}
     void onRender() override;
     void onEndPlay() override {}
-    void onAttachedTo(SceneComponent* parent) override {}
-    void onVisibilityChanged(bool visible) override {}
-    void onDetachedFrom(SceneComponent* parent) override {}
+    void onAttachedTo(SceneComponent* parent) override { SceneComponent::onAttachedTo(parent); }
+    void onVisibilityChanged(bool visible) override { SceneComponent::onVisibilityChanged(visible); }
+    void onDetachedFrom(SceneComponent* parent) override { SceneComponent::onDetachedFrom(parent); }
 
 private:
     std::shared_ptr<renderer::Mesh> mMesh;
     std::shared_ptr<renderer::Material> mMaterial;
+
+    // MVP 矩阵缓存
+    glm::mat4 mCachedMVP = glm::mat4(0.0f);
+    uint64_t mLastModelVersion = 0;
+    uint64_t mLastViewVersion = 0;
+    uint64_t mLastProjectionVersion = 0;
 };
 
 } // namespace engine

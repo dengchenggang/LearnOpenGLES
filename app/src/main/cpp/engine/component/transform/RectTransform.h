@@ -13,7 +13,7 @@ public:
     RectTransform& setSize(const glm::vec2& size);
     const glm::vec2& getSize() const { return mSize; }
 
-    const glm::mat4& getModelMatrix() const override;
+    const std::pair<glm::mat4, uint64_t>& getModelMatrix() const override;
 
 private:
     glm::vec2 mPivot = glm::vec2(0.5f, 0.5f);

@@ -47,6 +47,7 @@ void Image::onUpdate(float deltaTime) {
 }
 
 void Image::onRender() {
+    SceneComponent::onRender();
     if (!mInitialized) {
         LogW("%s not initialized, skip render", TAG);
         return;
@@ -248,21 +249,26 @@ void Image::createMesh() {
 
 void Image::updateTransform() {
     // 获取世界矩阵（支持父子挂载级联）
-    glm::mat4 model = getWorldMatrix();
+    auto& modelPair = getWorldMatrix();
+    auto& model = modelPair.first;
 
     // 从 Camera 获取正交投影矩阵
     auto& camera = GetOwner().getCamera();
-    auto projection = camera.getOrthoMatrix();
+    auto& projectionPair = camera.getOrthoMatrix();
+    auto& projection = projectionPair.first;
 
     auto pos = mRectTransform.getPosition();
     auto size = mRectTransform.getSize();
     LogD("%s render: pos=(%.1f,%.1f,%.1f) size=(%.1f,%.1f)",
          TAG, pos.x, pos.y, pos.z, size.x, size.y);
 
-    // 设置 Uniform
-    mMaterial->setUniformMat4("uModelMatrix", model);
-    mMaterial->setUniformMat4("uViewMatrix", glm::mat4(1.0f));
-    mMaterial->setUniformMat4("uProjectionMatrix", projection);
+    // 仅在 model 或 projection 变化时重新计算并上传 MVP
+    if (mLastModelVersion != modelPair.second || mLastProjectionVersion != projectionPair.second) {
+        mCachedMVP = projection * model;
+        mMaterial->setUniformMat4("uMVP", mCachedMVP);
+        mLastModelVersion = modelPair.second;
+        mLastProjectionVersion = projectionPair.second;
+    }
     mMaterial->setUniformVec4("uColor", mColor.r, mColor.g, mColor.b, mColor.a);
 }
 

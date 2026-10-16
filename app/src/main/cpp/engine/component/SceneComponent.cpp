@@ -49,21 +49,18 @@ void SceneComponent::detachFromParent() {
     onDetachedFrom(oldParent);
 }
 
-glm::mat4 SceneComponent::getWorldMatrix() const {
-    if (mAttachParent) {
-        return mAttachParent->getWorldMatrix() * getLocalMatrix();
-    }
-    return getLocalMatrix();
-}
-
-glm::vec3 SceneComponent::getWorldPosition() const {
-    return glm::vec3(getWorldMatrix()[3]);
-}
-
 void SceneComponent::markWorldDirty() {
     for (auto* child : mAttachChildren) {
         child->markWorldDirty();
     }
 }
+
+void SceneComponent::onAttachedTo(SceneComponent* parent) {}
+
+void SceneComponent::onVisibilityChanged(bool visible) {}
+
+void SceneComponent::onRender() {}
+
+void SceneComponent::onDetachedFrom(SceneComponent* parent) {}
 
 } // namespace engine
