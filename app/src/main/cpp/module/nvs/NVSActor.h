@@ -15,8 +15,9 @@ public:
 
     NVSActor(const NVSActor&) = delete;
     NVSActor& operator=(const NVSActor&) = delete;
-
+public:
     NVSComponentTarget& getTarget() const { return mTarget; }
+    NVSComponentVideo& getVideo() const { return mVideo; }
 
 protected:
     NVSActor(engine::Level& level, uint64_t id, const JsonConfigLoaderPtr& config);

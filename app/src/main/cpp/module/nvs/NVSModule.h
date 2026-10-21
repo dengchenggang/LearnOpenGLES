@@ -8,7 +8,7 @@ namespace module {
 
 class NVSModule : public engine::Level {
 public:
-    NVSModule(engine::ILevelManager& levelManager, engine::Camera& camera, const JsonConfigLoaderPtr& config);
+    NVSModule(engine::LevelManager& levelManager, engine::Camera& camera, const JsonConfigLoaderPtr& config);
     ~NVSModule() override;
 protected:
     void onBeginPlay() override;

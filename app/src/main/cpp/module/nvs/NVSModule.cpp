@@ -24,7 +24,7 @@ engine::ScaleMode readScaleMode(const JsonConfigLoaderPtr& config) {
 
 } // namespace
 
-NVSModule::NVSModule(engine::ILevelManager& levelManager, engine::Camera& camera, const JsonConfigLoaderPtr& config)
+NVSModule::NVSModule(engine::LevelManager& levelManager, engine::Camera& camera, const JsonConfigLoaderPtr& config)
     : engine::Level(MODULE_NAME_NVS, levelManager, camera, readDesignSize(config), readScaleMode(config))
     , mConfig(config)
     , mActor(createActor<NVSActor>(config))
@@ -40,11 +40,14 @@ void NVSModule::onBeginPlay() {
 
 void NVSModule::onEnter(int32_t width, int32_t height) {
     LogI("NVSModule onEnter: %dx%d", width, height);
+    mActor.getVideo().connect();
     engine::Level::onEnter(width, height);
 }
 
 void NVSModule::onExit() {
     LogI("NVSModule onExit");
+    engine::Level::onExit();
+     mActor.getVideo().disconnect();
 }
 
 void NVSModule::onEndPlay() {

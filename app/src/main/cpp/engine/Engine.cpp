@@ -29,21 +29,7 @@ void Engine::init(std::int32_t gles, std::map<std::string, LevelPtr>&& levels, c
             mRenderContext.attachOffscreenSurface();
         }
         if (result) {
-            mActiveLevel = nullptr;
-            mNextActiveLevelName.clear();
-            mLevels.clear();
-
-            for (auto& pair : levels) {
-                if (pair.second) {
-                    mLevels[pair.first] = std::move(pair.second);
-                }
-            }
-            mLevels[NilLevel::NAME] = std::make_unique<NilLevel>(*this, mCamera);
-
-            for (auto& pair : mLevels) {
-                pair.second->onBeginPlay();
-            }
-
+            initLevels(std::move(levels), mCamera);
             setViewportSize(1, 1);
             changeLevel(startLevel);
 
@@ -100,10 +86,7 @@ void Engine::resize(std::int32_t w, std::int32_t h) {
             return;
         }
         setViewportSize(w, h);
-        if (mActiveLevel) {
-            mActiveLevel->onResize(w, h);
-        }
-        applyLevelViewport();
+        resizeLevel(w, h);
         LOG_EXIT(".");
         if (mRunning && !mRenderLoopStarted.exchange(true)) {
             LogI("render loop started.");
@@ -124,10 +107,7 @@ void Engine::detachSurface() {
     mRenderLoopStarted = false;
 
     auto future = mTaskPool->submit([this]() {
-        if (mActiveLevel && mActiveLevel->getId() != NilLevel::NAME) {
-            mPreviousActiveLevelName = mActiveLevel->getId();
-            doChangeLevel(NilLevel::NAME);
-        }
+        doChangeLevel(NilLevel::NAME);
         mRenderContext.detachSurface();
     });
     future.wait();
@@ -143,34 +123,25 @@ void Engine::deInit() {
 
     if (mTaskPool && mTaskPool->isRunning()) {
         auto future = mTaskPool->submit([this]() {
-            for (auto& pair : mLevels) {
-                pair.second->onEndPlay();
-            }
-            mActiveLevel = nullptr;
-            mNextActiveLevelName = "";
+            deInitLevels();
             mRenderContext.deInitialize();
         });
         future.wait();
         mTaskPool->stop();
     } else {
-        mActiveLevel = nullptr;
-        mNextActiveLevelName = "";
+        deInitLevels();
         mRenderContext.deInitialize();
     }
 }
 
-void Engine::changeLevel(const std::string& levelName) {
-    LogI("%s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
-    mNextActiveLevelName = levelName;
+void Engine::onLogicalViewportChanged(const glm::vec4& rect) {
+    mCamera.setViewport(rect.x, rect.y, rect.z, rect.w);
 }
 
-void Engine::applyLevelViewport() {
-    if (!mActiveLevel || !mRenderContext.isBound()) {
+void Engine::onRenderViewportChanged(const glm::vec4& rect) {
+    if (!mRenderContext.isBound()) {
         return;
     }
-    const auto& logical = mActiveLevel->getLogicalRect();
-    const auto& rect = mActiveLevel->getRenderRect();
-    mCamera.setViewport(logical.x, logical.y, logical.z, logical.w);
     mRenderContext.setViewPort(static_cast<int32_t>(rect.x), static_cast<int32_t>(rect.y),
                                static_cast<int32_t>(rect.z), static_cast<int32_t>(rect.w));
 }
@@ -214,39 +185,12 @@ void Engine::renderFrame() {
 }
 
 void Engine::update(int64_t deltaTime) {
-    if (!mNextActiveLevelName.empty()) {
-        doChangeLevel(mNextActiveLevelName);
-    }
-
-    if (mActiveLevel) {
-        mActiveLevel->onUpdate(deltaTime);
-    }
+    updateLevels(deltaTime);
 }
 
 void Engine::render(int64_t deltaTime) {
     RenderInterface.clear(true, true, false);
-    if (mActiveLevel) {
-        mActiveLevel->onRender();
-    }
-}
-
-void Engine::doChangeLevel(const std::string& levelName) {
-    LogI("doChangeLevel: %s --> %s", mActiveLevel ? mActiveLevel->getId().c_str() : "nullptr", levelName.c_str());
-    auto it = mLevels.find(levelName);
-    if (it != mLevels.end()) {
-        auto oldLevel = mActiveLevel;
-        mActiveLevel = it->second.get();
-        if (oldLevel) {
-            oldLevel->onExit();
-        }
-        if (mActiveLevel) {
-            mActiveLevel->onEnter(mViewportWidth, mViewportHeight);
-            applyLevelViewport();
-        }
-    } else {
-        LogE("doChangeLevel: %s not found", levelName.c_str());
-    }
-    mNextActiveLevelName = "";
+    renderLevels();
 }
 
 } // namespace engine

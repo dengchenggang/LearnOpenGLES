@@ -9,14 +9,14 @@
 #include <chrono>
 #include "Camera.h"
 #include "level/Level.h"
-#include "level/ILevelManager.h"
+#include "level/LevelManager.h"
 #include <common/Singleton.hpp>
 #include "OpenGLESRenderContext.h"
 #include "utils/TaskPool.h"
 
 namespace engine {
 
-class Engine : public ILevelManager {
+class Engine : public LevelManager {
     friend class framework::Singleton<Engine>;
 public:
     Engine(const Engine&) = delete;
@@ -29,23 +29,19 @@ public:
     void deInit();
 public:
     Camera& getCamera() { return mCamera; }
-    void changeLevel(const std::string& levelName) override;
+
 private:
     Engine();
     ~Engine();
 private:
-    void applyLevelViewport();
+    void onLogicalViewportChanged(const glm::vec4& rect) override;
+    void onRenderViewportChanged(const glm::vec4& rect) override;
     void renderFrame();
     void update(int64_t deltaTime);
     void render(int64_t deltaTime);
-    void doChangeLevel(const std::string& levelName);
 private:
     std::atomic_bool mRenderLoopStarted;
     Camera mCamera;
-    std::map<std::string, LevelPtr> mLevels;
-    Level* mActiveLevel;
-    std::string mNextActiveLevelName;
-    std::string mPreviousActiveLevelName;
 private:
     renderer::OpenGLESRenderContext mRenderContext {};
     std::unique_ptr<TaskPool> mTaskPool {std::make_unique<TaskPool>()};

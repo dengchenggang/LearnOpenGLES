@@ -2,13 +2,11 @@
 #define C_VIDEO_PIPELINE_IMAGE_H
 
 #include "VideoPipeline.h"
-#include "VideoFrameBuffer.h"
 #include "video/VideoHardwareBuffer.h"
 #include "utils/TaskPool.h"
 #include "filesystem/FileSystem.h"
 #include <atomic>
 #include <vector>
-#include "utils/BufferPool.hpp"
 
 namespace framework {
 
@@ -39,7 +37,6 @@ private:
     std::unique_ptr<FileData> mImageData;
     std::unique_ptr<TaskPool> mTaskPool;
     std::chrono::steady_clock::time_point mLastFrameTime {};
-    BufferPool<VideoFrameBuffer> mBufferPool {300 * 1024 * 1024};
     VideoHardwareBufferPtr mHardwareBuffer;
     std::atomic<bool> mFirstFrameNotified{false};
 };

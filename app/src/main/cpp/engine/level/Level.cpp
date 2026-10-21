@@ -1,13 +1,14 @@
 #include "Level.h"
-#include "ILevelManager.h"
+#include "LevelManager.h"
 #include "component/camera/Camera.h"
+#include "utils/Log.h"
 #include <algorithm>
 
 namespace engine {
 
 uint64_t Level::sNextActorId = 1;
 
-Level::Level(const std::string& name, ILevelManager& levelManager, Camera& camera,
+Level::Level(const std::string& name, LevelManager& levelManager, Camera& camera,
              const glm::vec2& designSize, ScaleMode scaleMode)
     : mLevelManager(levelManager)
     , mCamera(camera)
@@ -23,21 +24,25 @@ Level::~Level() {
 }
 
 void Level::onBeginPlay() {
-    mBegunPlay = true;
-    for (auto& actor : mActors) {
-        if (!actor->getAttachParentActor()) {
-            actor->onBeginPlay();
+    if (!mBegunPlay) {
+        mBegunPlay = true;
+        for (auto& actor : mActors) {
+            if (!actor->getAttachParentActor()) {
+                actor->onBeginPlay();
+            }
         }
     }
 }
 
 void Level::onEndPlay() {
-    for (auto& actor : mActors) {
-        if (!actor->getAttachParentActor()) {
-            actor->onEndPlay();
+    if (mBegunPlay) {
+        for (auto& actor : mActors) {
+            if (!actor->getAttachParentActor()) {
+                actor->onEndPlay();
+            }
         }
+        mBegunPlay = false;
     }
-    mBegunPlay = false;
 }
 
 void Level::setScaleMode(ScaleMode scaleMode) {
@@ -83,6 +88,11 @@ void Level::updateAdaption(int32_t width, int32_t height) {
                                 (static_cast<float>(height) - scaled.y) * 0.5f,
                                 scaled.x, scaled.y);
     }
+    if (mRenderRect.z < 1.0f || mRenderRect.w < 1.0f) {
+        LogW("mRenderRect too small (%.2f, %.2f), fallback to (0, 0, 1, 1)", mRenderRect.z, mRenderRect.w);
+        mRenderRect = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    }
+    mLevelManager.applyLevelViewport(mLogicalRect, mRenderRect);
 }
 
 void Level::onUpdate(int64_t deltaTime) {

@@ -24,10 +24,20 @@ NVSComponentVideo::NVSComponentVideo(engine::Actor& owner, engine::Image& image,
 
 NVSComponentVideo::~NVSComponentVideo() = default;
 
-void NVSComponentVideo::onBeginPlay() {
+void NVSComponentVideo::connect() {
     auto url = mConfig->get<std::string>("video.url", "");
     bool connected = VideoCapture.connect(url, TAG, std::bind(&NVSComponentVideo::onVideoFrame, this, std::placeholders::_1));
     LogI("url=%s, connected=%d", url.c_str(), connected);
+}
+
+void NVSComponentVideo::disconnect() {
+    auto url = mConfig->get<std::string>("video.url", "");
+    VideoCapture.disconnect(url, TAG);
+    LogI("url=%s", url.c_str());
+}
+
+void NVSComponentVideo::onBeginPlay() {
+
 }
 
 void NVSComponentVideo::onUpdate(float deltaTime) {
@@ -53,13 +63,12 @@ void NVSComponentVideo::onUpdate(float deltaTime) {
                 return;
         }
         mImage.load(mFrontFrame->getData(), mFrontFrame->getWidth(), mFrontFrame->getHeight(), channels);
+    } else {
+        LogE("mFrontFrame is null");
     }
 }
 
 void NVSComponentVideo::onEndPlay() {
-    auto url = mConfig->get<std::string>("video.url", "");
-    VideoCapture.disconnect(url, TAG);
-    LogI("url=%s", url.c_str());
 }
 
 void NVSComponentVideo::onVideoFrame(const framework::VideoFramePtr& frame) {

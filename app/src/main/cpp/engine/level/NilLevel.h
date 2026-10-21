@@ -7,10 +7,8 @@ class NilLevel : public Level {
 public:
     static constexpr const char* NAME = "NilLevel";
 
-    NilLevel(ILevelManager& levelManager, Camera& camera);
+    NilLevel(LevelManager& levelManager, Camera& camera);
     ~NilLevel() override = default;
-protected:
-    void onExit() override;
 };
 
 } // namespace engine

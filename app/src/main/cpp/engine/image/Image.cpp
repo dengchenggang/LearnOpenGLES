@@ -262,13 +262,13 @@ void Image::updateTransform() {
     LogD("%s render: pos=(%.1f,%.1f,%.1f) size=(%.1f,%.1f)",
          TAG, pos.x, pos.y, pos.z, size.x, size.y);
 
-    // 仅在 model 或 projection 变化时重新计算并上传 MVP
+    // 仅在 model 或 projection 变化时重新计算 MVP
     if (mLastModelVersion != modelPair.second || mLastProjectionVersion != projectionPair.second) {
         mCachedMVP = projection * model;
-        mMaterial->setUniformMat4("uMVP", mCachedMVP);
         mLastModelVersion = modelPair.second;
         mLastProjectionVersion = projectionPair.second;
     }
+    mMaterial->setUniformMat4("uMVP", mCachedMVP);
     mMaterial->setUniformVec4("uColor", mColor.r, mColor.g, mColor.b, mColor.a);
 }
 

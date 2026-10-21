@@ -16,7 +16,9 @@ class NVSComponentVideo : public engine::ActorComponent {
 public:
     explicit NVSComponentVideo(engine::Actor& owner, engine::Image& image, const JsonConfigLoaderPtr& config);
     ~NVSComponentVideo() override;
-
+public:
+    void connect();
+    void disconnect();
 protected:
     void onBeginPlay() override;
     void onEnabledChanged(bool enabled) override {}

@@ -7,7 +7,7 @@
 #include "Actor.h"
 
 namespace engine {
-class ILevelManager;
+class LevelManager;
 class Camera;
 
 // 设计尺寸与实际视口宽高比不一致时的适配策略
@@ -18,9 +18,9 @@ enum class ScaleMode {
 };
 
 class Level {
-    friend class Engine;
+    friend class LevelManager;
 public:
-    Level(const std::string& name, ILevelManager& levelManager, Camera& camera,
+    Level(const std::string& name, LevelManager& levelManager, Camera& camera,
           const glm::vec2& designSize, ScaleMode scaleMode = ScaleMode::Fit);
     virtual ~Level();
     Level(const Level&) = delete;
@@ -61,14 +61,14 @@ protected:
     virtual void onEnter(int32_t width, int32_t height);
     virtual void onUpdate(int64_t deltaTime);
     virtual void onRender();
-    virtual void onExit() = 0;
+    virtual void onExit() {}
     virtual void onEndPlay();
 private:
     void updateAdaption(int32_t width, int32_t height);
 private:
     static uint64_t sNextActorId;
     bool mBegunPlay = false;
-    ILevelManager& mLevelManager;
+    LevelManager& mLevelManager;
     Camera& mCamera;
     std::string mName;
     std::vector<ActorPtr> mActors;
